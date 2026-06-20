@@ -184,7 +184,6 @@
       opacity: 0;
       transform: scale(0.9);
       display: none;
-      /* Slowed down the transition so it fades smoothly when ticking down live */
       transition: opacity 1.5s ease, transform 1.5s ease;
       text-align: center;
       width: 100%;
@@ -248,20 +247,28 @@
     }
 
     /* ===== 3D EXTRUDED REVEAL SCREEN ===== */
-    #reveal-screen { position: absolute; z-index: 70; display: none; text-align: center; padding: 20px; perspective: 1000px; }
+    #reveal-screen { position: absolute; z-index: 70; display: none; text-align: center; padding: 20px; perspective: 1000px; width: 100%; }
+    
     #reveal-subtitle {
       font-family: 'Cinzel', serif;
       font-weight: 400;
-      font-size: clamp(16px, 3.2vw, 24px);
+      font-size: clamp(18px, 4vw, 32px);
       letter-spacing: 12px;
       color: var(--gold-2);
-      margin-bottom: 40px;
+      margin-bottom: 50px;
       text-transform: uppercase;
       opacity: 0;
-      transform: translateY(-20px);
-      animation: floatIn 2s forwards 0.5s;
+      /* Cinematic slow zoom-in entrance */
+      transform: translateY(-20px) scale(0.9);
+      text-shadow: 0 5px 20px rgba(0,0,0,0.9);
     }
-    @keyframes floatIn { to { opacity: 1; transform: translateY(0); } }
+    
+    .subtitle-show {
+      animation: cinematicFloatIn 2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    }
+    @keyframes cinematicFloatIn { 
+        to { opacity: 1; transform: translateY(0) scale(1); } 
+    }
 
     .name-container { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
     
@@ -292,14 +299,14 @@
         100% { transform: translateY(-120vh) translateX(var(--drift)) rotate(15deg); opacity: 0; }
     }
 
-    /* ===== RESPONSIVE & REDUCED MOTION ===== */
+    /* ===== RESPONSIVE ===== */
     @media (max-width: 520px) {
       .timer-box { gap: 15px; }
       .time-unit { padding: 20px 15px; min-width: 85px; }
       .click-hint { letter-spacing: 5px; }
     }
     @media (prefers-reduced-motion: reduce) {
-      .gold-shimmer, #letter-N::after, .click-hint, #countdown-screen, .letter, .gate, #scene-container, .balloon-anim {
+      .gold-shimmer, #letter-N::after, .click-hint, #countdown-screen, .letter, .gate, #scene-container, .balloon-anim, .subtitle-show {
         animation-duration: 0.001ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 1ms !important;
@@ -333,7 +340,7 @@
   <div id="countdown-screen" aria-live="assertive" aria-atomic="true">5</div>
 
   <div id="reveal-screen" aria-hidden="true">
-    <h3 id="reveal-subtitle">Welcome To The World</h3>
+    <h3 id="reveal-subtitle" class="gold-shimmer">Welcome To The World</h3>
     <div class="name-container" id="baby-name" aria-hidden="true"></div>
   </div>
 
@@ -353,9 +360,7 @@
     const CONFIG = {
       ceremonyName: window.__ceremonyName || 'ARYAN',
       ceremonyEventDate: window.__ceremonyEventDate || null,
-      // I set this to 10 seconds so you can test the smooth fade-out! 
-      // To test the "Instant Skip", change this number to -10
-      timerDemoSeconds: 10 
+      timerDemoSeconds: 8 // Adjust for testing
     };
 
     /* ===== ELEMENT CACHE ===== */
@@ -372,6 +377,7 @@
       timerScreen: qs('#timer-screen'),
       countdownScreen: qs('#countdown-screen'),
       revealScreen: qs('#reveal-screen'),
+      revealSubtitle: qs('#reveal-subtitle'),
       babyNameContainer: qs('#baby-name'),
       canvas: qs('#canvas-bg')
     };
@@ -414,7 +420,6 @@
         }
       }
 
-      particlesArray = [];
       for (let i = 0; i < 150; i++) particlesArray.push(new Particle());
 
       function animate() {
@@ -465,7 +470,6 @@
         
         if (dist <= 0) {
           clearInterval(countdownInterval);
-          // If watching live, do a cinematic 1.5s fade out
           if (elements.timerScreen) {
               elements.timerScreen.style.transform = 'scale(1.1)';
               elements.timerScreen.style.opacity = '0';
@@ -530,19 +534,14 @@
         elements.gateRight?.classList.add('open-right');
       }, 500);
 
-      // Wait 3.5 seconds for the heavy gates to fully swing open
       setTimeout(() => {
         elements.sceneContainer && (elements.sceneContainer.style.display = 'none');
-
         const now = Date.now();
         const dist = eventDate.getTime() - now;
 
-        // INSTANT SKIP LOGIC
         if (dist <= 0) {
-            // The date has already passed. Skip the timer screen entirely.
             startFinalCountdown();
         } else {
-            // The date is in the future. Show the timer.
             elements.timerScreen && (elements.timerScreen.style.display = 'block');
             void elements.timerScreen.offsetWidth; 
             elements.timerScreen && (elements.timerScreen.style.opacity = '1');
@@ -555,50 +554,58 @@
     function triggerGrandReveal() {
       elements.revealScreen && (elements.revealScreen.style.display = 'block');
       
-      const letters = qsa('.letter', elements.babyNameContainer);
-      letters.forEach((letter, idx) => {
-        setTimeout(() => {
-          letter.classList.add('show');
-        }, idx * (reducedMotion ? 60 : 350)); 
-      });
-      
-      const delay = (letters.length * (reducedMotion ? 60 : 350)) + 200;
-      setTimeout(() => { 
-          fireMinimalPhysicsShowers(); 
-          fireHeartBalloons();
-      }, delay);
+      // 1. Show the "Welcome To The World" Subtitle first
+      if (elements.revealSubtitle) {
+          elements.revealSubtitle.classList.add('subtitle-show');
+      }
+
+      // 2. Wait 1.5 seconds for subtitle suspense, THEN reveal the name letters
+      setTimeout(() => {
+          const letters = qsa('.letter', elements.babyNameContainer);
+          letters.forEach((letter, idx) => {
+            setTimeout(() => {
+              letter.classList.add('show');
+            }, idx * (reducedMotion ? 60 : 350)); 
+          });
+          
+          // 3. Trigger 4-corner cannons & balloons precisely when the last letter drops
+          const delay = (letters.length * (reducedMotion ? 60 : 350)) + 200;
+          setTimeout(() => { 
+              fireFourCornerBlast(); 
+              fireHeartBalloons();
+          }, delay);
+          
+      }, 1500);
     }
 
-    /* ===== MINIMAL BLAST ===== */
-    function fireMinimalPhysicsShowers() {
+    /* ===== 4-CORNER ADVANCED CANNON BLAST ===== */
+    function fireFourCornerBlast() {
       if (reducedMotion || typeof confetti !== 'function') return;
       
-      const duration = 3 * 1000;
+      const duration = 4 * 1000; // 4 seconds of sustained cannons
       const animationEnd = Date.now() + duration;
-
-      function randomInRange(min, max) { return Math.random() * (max - min) + min; }
 
       const interval = setInterval(() => {
         const timeLeft = animationEnd - Date.now();
         if (timeLeft <= 0) return clearInterval(interval);
 
-        const particleCount = 10; 
+        const pCount = 8; // Particles per corner per tick
+        const cColors = ['#d4af37', '#e6ca7b', '#ffffff'];
+        const settings = { particleCount: pCount, spread: 45, colors: cColors, zIndex: 80, gravity: 1.1, shapes: ['square', 'circle'] };
+
+        // Top-Left (Fires down-right)
+        confetti({ ...settings, origin: { x: 0, y: 0 }, angle: 315, startVelocity: 35 });
         
-        confetti({
-            particleCount: particleCount,
-            origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
-            colors: ['#d4af37', '#e6ca7b'],
-            shapes: ['square', 'circle'],
-            gravity: 1.2, scalar: 1.2, drift: randomInRange(-0.4, 0.4), ticks: 200, zIndex: 80
-        });
-        confetti({
-            particleCount: particleCount,
-            origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
-            colors: ['#d4af37', '#e6ca7b'],
-            shapes: ['square', 'circle'],
-            gravity: 1.2, scalar: 1.2, drift: randomInRange(-0.4, 0.4), ticks: 200, zIndex: 80
-        });
-      }, 400); 
+        // Top-Right (Fires down-left)
+        confetti({ ...settings, origin: { x: 1, y: 0 }, angle: 225, startVelocity: 35 });
+        
+        // Bottom-Left (Fires up-right)
+        confetti({ ...settings, origin: { x: 0, y: 1 }, angle: 45, startVelocity: 60 });
+        
+        // Bottom-Right (Fires up-left)
+        confetti({ ...settings, origin: { x: 1, y: 1 }, angle: 135, startVelocity: 60 });
+        
+      }, 300); 
     }
 
     /* ===== BIG RED HEART BALLOONS ===== */
@@ -639,7 +646,7 @@
                 container.appendChild(balloonWrapper);
                 
                 setTimeout(() => balloonWrapper.remove(), 8500); 
-            }, Math.random() * 5000);
+            }, Math.random() * 4000); // Tighter balloon release schedule
         }
     }
 
