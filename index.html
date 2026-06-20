@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="theme-color" content="#050505" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <title>A Grand Beginning | Naming Ceremony</title>
 
-  <!-- Confetti CDN (keeps your original behavior) -->
+  <!-- Confetti CDN -->
   <script defer src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
-  <!-- Preconnect & preload fonts for better performance -->
+  <!-- Fonts (external) -->
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Montserrat:wght@200;300;400&display=swap" rel="stylesheet" />
 
@@ -19,7 +19,6 @@
       --bg:#050505;
       --gold-1:#bf953f;
       --gold-2:#fcf6ba;
-      --accent-ink: #111;
       --muted: rgba(255,255,255,0.5);
       --glass: rgba(20,20,20,0.6);
       --glass-border: rgba(191,149,63,0.2);
@@ -28,9 +27,8 @@
       --safe-area-bottom: env(safe-area-inset-bottom);
     }
 
-    /* Reset + sensible defaults */
     *{box-sizing:border-box;margin:0;padding:0}
-    html,body,#root{height:100%}
+    html,body{height:100%}
     body{
       font-family:'Montserrat',sans-serif;
       background-color:var(--bg);
@@ -46,23 +44,8 @@
       overflow:hidden;
     }
 
-    /* Use a mobile-friendly "viewport height" trick to avoid browser UI resizing issues */
-    /* JS sets --vh to window.innerHeight * 0.01 (so 100 * var(--vh) = actual device height) */
-    :root { --vh: 1vh; }
+    #canvas-bg{ position:fixed; inset:0; width:100%; height:100%; z-index:1; opacity:0.7; pointer-events:none; }
 
-    /* Canvas background */
-    #canvas-bg{
-      position:fixed;
-      inset:0;
-      width:100%;
-      height:100%;
-      z-index:1;
-      opacity:0.7;
-      pointer-events:none;
-      will-change:transform;
-    }
-
-    /* Gold shimmer effect for headings/text */
     .gold-shimmer{
       background:linear-gradient(90deg,var(--gold-1),var(--gold-2),#b38728,var(--gold-2),#aa771c);
       background-size:200% auto;
@@ -70,228 +53,83 @@
       -webkit-background-clip:text;
       background-clip:text;
       animation:shine 4s linear infinite;
-      -webkit-font-smoothing:antialiased;
     }
     @keyframes shine{ to { background-position:200% center } }
 
-    /* Intro container covers screen and uses perspective for cinematic gates */
     #intro-container{
-      position:fixed;
-      inset:0;
-      z-index:100;
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-      align-items:center;
-      perspective:1200px;
-      pointer-events:auto;
+      position:fixed; inset:0; z-index:100; display:flex; flex-direction:column; justify-content:center; align-items:center; perspective:1200px;
       padding:clamp(12px,2.5vw,28px);
     }
 
     .gate{
-      position:absolute;
-      top:0;
-      width:50%;
-      height:100%;
+      position:absolute; top:0; width:50%; height:100%;
       background:radial-gradient(circle at center,#1a1a1a 0%, #000 100%);
       box-shadow:inset 0 0 100px rgba(0,0,0,1);
       transition:transform 950ms cubic-bezier(.22,.9,.32,1);
-      z-index:101;
-      -webkit-backface-visibility:hidden;
-              backface-visibility:hidden;
-      will-change:transform;
+      z-index:101; backface-visibility:hidden;
     }
     .gate.left{ left:0; border-right:2px solid rgba(191,149,63,0.25); transform-origin:left; }
     .gate.right{ right:0; border-left:2px solid rgba(191,149,63,0.25); transform-origin:right; }
-
     .gate.open-left{ transform: rotateY(-100deg); }
     .gate.open-right{ transform: rotateY(100deg); }
 
-    /* Seal / central N */
-    .seal-wrapper{
-      position:relative;
-      z-index:102;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap:1.4rem;
-      pointer-events:auto;
-    }
+    .seal-wrapper{ position:relative; z-index:102; display:flex; flex-direction:column; align-items:center; gap:1.4rem; }
 
-    /* Use responsive/clamped sizes so it adapts across phones/tablets/desktops */
     #letter-N{
       font-family:'Cinzel Decorative',serif;
       font-size: clamp(40px, 8vw, 90px);
       width: clamp(120px, 26vw, 220px);
       height: clamp(120px, 26vw, 220px);
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      border-radius:50%;
-      background:linear-gradient(135deg,var(--gold-2) 0%, var(--gold-1) 100%);
-      color:var(--accent-ink);
-      cursor:pointer;
-      box-shadow:0 0 40px rgba(191,149,63,0.4), inset 0 0 20px rgba(255,255,255,0.5);
-      border:2px solid rgba(255,255,255,0.06);
-      transition:transform 300ms ease, box-shadow 300ms ease;
-      user-select:none;
-      -webkit-tap-highlight-color:transparent;
+      display:flex; justify-content:center; align-items:center; border-radius:50%;
+      background:linear-gradient(135deg,var(--gold-2),var(--gold-1));
+      color:#111; cursor:pointer; box-shadow:0 0 40px rgba(191,149,63,0.4), inset 0 0 20px rgba(255,255,255,0.5);
+      border:2px solid rgba(255,255,255,0.06); transition:transform 300ms ease; user-select:none;
     }
-    #letter-N:active{ transform: scale(0.98) }
     #letter-N:focus{ outline:3px solid rgba(191,149,63,0.18); outline-offset:4px; }
-
     #letter-N::after{
-      content:'';
-      position:absolute;
-      top:-10px;left:-10px;right:-10px;bottom:-10px;border-radius:50%;
-      border:2px solid rgba(191,149,63,0.45);
-      animation:pulseRing 2s infinite cubic-bezier(.215,.61,.355,1);
+      content:''; position:absolute; top:-10px; left:-10px; right:-10px; bottom:-10px; border-radius:50%;
+      border:2px solid rgba(191,149,63,0.45); animation:pulseRing 2s infinite cubic-bezier(.215,.61,.355,1);
     }
     @keyframes pulseRing{ 0%{ transform:scale(0.92); opacity:1 } 100%{ transform:scale(1.28); opacity:0 } }
 
-    .click-hint{
-      margin-top:12px;
-      font-size:12px;
-      letter-spacing:6px;
-      text-transform:uppercase;
-      color:var(--muted);
-      animation:fadeInOut 2s infinite;
-    }
-    @keyframes fadeInOut{ 0%,100%{opacity:0.3} 50%{opacity:1} }
+    .click-hint{ margin-top:12px; font-size:12px; letter-spacing:6px; color:var(--muted); }
 
-    /* Timer screen (glass) */
-    #timer-screen{
-      position:absolute;
-      z-index:50;
-      opacity:0;
-      display:none;
-      transition:opacity 450ms ease;
-      text-align:center;
-      width:100%;
-      padding: clamp(12px,2.5vw,32px);
-      pointer-events:auto;
-    }
-    #timer-screen h2{
-      font-family:'Cinzel Decorative',serif;
-      font-size: clamp(20px,4vw,32px);
-      margin-bottom: clamp(20px,4vw,40px);
-      letter-spacing:4px;
-    }
+    #timer-screen{ position:absolute; z-index:50; opacity:0; display:none; transition:opacity 450ms ease; text-align:center; width:100%; padding: clamp(12px,2.5vw,32px); }
+    #timer-title{ font-family:'Cinzel Decorative',serif; font-size: clamp(20px,4vw,32px); margin-bottom: clamp(20px,4vw,40px); letter-spacing:4px; }
     .timer-box{ display:flex; gap:18px; justify-content:center; flex-wrap:wrap; }
-
-    .time-unit{
-      background:var(--glass);
-      -webkit-backdrop-filter: blur(14px);
-      backdrop-filter: blur(14px);
-      border:1px solid var(--glass-border);
-      padding:18px 16px;
-      border-radius:12px;
-      box-shadow:0 10px 30px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.03);
-      min-width:90px;
-      text-align:center;
-    }
-    .time-unit div{
-      font-weight:200;
-      font-size: clamp(28px,8vw,65px);
-      line-height:1;
-      font-family:'Montserrat',sans-serif;
-    }
+    .time-unit{ background:var(--glass); backdrop-filter: blur(14px); border:1px solid var(--glass-border); padding:18px 16px; border-radius:12px; min-width:90px; text-align:center; }
+    .time-unit div{ font-weight:200; font-size: clamp(28px,8vw,65px); line-height:1; }
     .time-unit span{ display:block; font-size:11px; color:#bdbdbd; margin-top:8px; letter-spacing:2px; text-transform:uppercase; }
 
-    /* Final countdown big number */
-    #countdown-screen{
-      position:absolute;
-      z-index:60;
-      display:none;
-      font-family:'Cinzel Decorative',serif;
-      color:transparent;
-      -webkit-background-clip:text;
-      background-clip:text;
-      background:linear-gradient(90deg,var(--gold-1),var(--gold-2));
-      text-shadow:0 0 60px rgba(191,149,63,0.6);
-      font-size: clamp(96px, 30vw, 280px);
-      animation:cinematicPulse 1s infinite;
-      pointer-events:none;
-    }
-    @keyframes cinematicPulse{
-      0% { transform: scale(0.92); opacity:0; filter: blur(8px) }
-      50%{ transform: scale(1.04); opacity:1; filter: blur(0px) }
-      100%{ transform: scale(1.2); opacity:0; filter: blur(4px) }
-    }
+    #countdown-screen{ position:absolute; z-index:60; display:none; font-family:'Cinzel Decorative',serif; color:transparent; -webkit-background-clip:text; background-clip:text; background:linear-gradient(90deg,var(--gold-1),var(--gold-2)); text-shadow:0 0 60px rgba(191,149,63,0.6); font-size: clamp(96px, 30vw, 280px); pointer-events:none; }
 
-    /* Reveal screen */
     #reveal-screen{ position:absolute; z-index:70; display:none; text-align:center; padding:20px; }
-    #reveal-screen h3{
-      font-weight:300; font-size:clamp(14px,3.2vw,20px); letter-spacing:8px; color:rgba(255,255,255,0.85); margin-bottom:20px;
-      text-transform:uppercase; opacity:0; transform:translateY(-12px); animation:dropIn 600ms forwards 120ms;
-    }
+    #reveal-subtitle{ font-weight:300; font-size:clamp(14px,3.2vw,20px); letter-spacing:8px; color:rgba(255,255,255,0.85); margin-bottom:20px; text-transform:uppercase; }
     .name-container{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
-    .letter{
-      font-family:'Cinzel Decorative',serif;
-      font-size:clamp(48px,12vw,140px);
-      font-weight:700;
-      opacity:0;
-      transform:scale(0.86) translateY(40px) rotateX(-30deg);
-      transition: all 900ms cubic-bezier(.25,1,.5,1);
-      text-shadow: 0 12px 30px var(--shadow);
-      -webkit-font-smoothing:antialiased;
-    }
+    .letter{ font-family:'Cinzel Decorative',serif; font-size:clamp(48px,12vw,140px); font-weight:700; opacity:0; transform:scale(0.86) translateY(40px) rotateX(-30deg); transition: all 900ms cubic-bezier(.25,1,.5,1); text-shadow: 0 12px 30px rgba(0,0,0,0.9); }
     .letter.show{ opacity:1; transform:scale(1) translateY(0) rotateX(0deg); }
 
-    @keyframes dropIn{ to { opacity:1; transform:translateY(0) } }
-
-    /* RESPONSIVE tweaks */
-    @media (max-width:520px){
-      .timer-box{ gap:12px }
-      .time-unit{ padding:12px 10px; min-width:78px }
-      .click-hint{ letter-spacing:4px }
-      #letter-N::after{ display:block }
-      .gate{ transition:transform 1.2s cubic-bezier(.22,.9,.32,1) }
-    }
-
-    /* Respect user preferences */
     @media (prefers-reduced-motion: reduce){
-      .gold-shimmer, #letter-N::after, .click-hint, #countdown-screen, .letter, .gate { animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration: 1ms !important; }
+      .gold-shimmer, #letter-N::after, .click-hint, #countdown-screen, .letter, .gate { animation-duration:0.001ms !important; transition-duration: 1ms !important; }
       #canvas-bg{ opacity:0.5 }
     }
-
-    /* Accessibility high-contrast tweaks */
-    @media (prefers-contrast: more){ body{ filter:contrast(1.05) } }
-
   </style>
 </head>
 <body>
-  <!-- Canvas background -->
   <canvas id="canvas-bg" aria-hidden="true"></canvas>
 
-  <!-- Intro / gates -->
   <div id="intro-container" aria-hidden="false">
     <div class="gate left" id="gate-left" aria-hidden="true"></div>
     <div class="gate right" id="gate-right" aria-hidden="true"></div>
 
     <div class="seal-wrapper" id="seal-wrapper">
-      <!-- Make clickable/interactable element accessible by keyboard & screen readers -->
-      <div id="letter-N" role="button" tabindex="0" aria-pressed="false" aria-label="Open the ceremony welcome" title="Click or press Enter to open">N</div>
-      <div class="click-hint" id="click-hint">Click to Enter</div>
+      <div id="letter-N" role="button" tabindex="0" aria-pressed="false" aria-label="Open the ceremony welcome" title="Open the ceremony">N</div>
+      <div class="click-hint gold-shimmer" id="click-hint">Click to Enter</div>
     </div>
-
-    <!-- small control area: language selector + name input -> improves usability on mobile -->
-    <div style="position: absolute; bottom: 18px; display:flex; gap:8px; z-index: 120;">
-      <select id="lang-select" aria-label="Select language" title="Language">
-        <option value="auto">Auto</option>
-        <option value="en">English</option>
-        <option value="es">Español</option>
-        <option value="fr">Français</option>
-      </select>
-      <input id="name-input" type="text" placeholder="Name (e.g. Aryan)" aria-label="Baby name" style="padding:6px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.02);color:#fff;min-width:140px;" />
-      <button id="save-name" style="padding:6px 10px;border-radius:6px;border:1px solid rgba(191,149,63,0.2);background:transparent;color:var(--gold-2);">Save</button>
-    </div>
-
   </div>
 
-  <!-- Timer (hidden until triggered) -->
   <div id="timer-screen" aria-live="polite" aria-atomic="true">
-    <h2 class="gold-shimmer" id="timer-title">The Journey Unfolds In</h2>
+    <h2 id="timer-title" class="gold-shimmer">The Journey Unfolds In</h2>
     <div class="timer-box" role="group" aria-label="Countdown timer">
       <div class="time-unit" aria-hidden="false"><div id="days" class="gold-shimmer">00</div><span id="label-days">Days</span></div>
       <div class="time-unit" aria-hidden="false"><div id="hours" class="gold-shimmer">00</div><span id="label-hours">Hours</span></div>
@@ -300,27 +138,22 @@
     </div>
   </div>
 
-  <!-- Final numeric countdown -->
-  <div id="countdown-screen" class="gold-shimmer" aria-live="assertive" aria-atomic="true">5</div>
+  <div id="countdown-screen" aria-live="assertive" aria-atomic="true">5</div>
 
-  <!-- Reveal -->
   <div id="reveal-screen" aria-hidden="true">
-    <h3 id="reveal-subtitle">Welcome To The World</h3>
+    <h3 id="reveal-subtitle" class="gold-shimmer">Welcome To The World</h3>
     <div class="name-container" id="baby-name" aria-hidden="true"></div>
   </div>
 
-  <!-- Fallback for users with JS disabled -->
   <noscript>
     <div style="position:fixed;inset:0;display:flex;justify-content:center;align-items:center;background:linear-gradient(180deg,rgba(0,0,0,0.65),rgba(0,0,0,0.85));z-index:9999;padding:20px;text-align:center;">
       <div style="max-width:520px;color:#fff">
         <h2 style="font-family:Cinzel Decorative,serif;margin-bottom:12px">Welcome</h2>
-        <p style="opacity:0.9">This interactive experience requires JavaScript. Please enable JavaScript to view the ceremony animation.</p>
+        <p style="opacity:0.9">Please enable JavaScript to view the ceremony animation.</p>
       </div>
     </div>
   </noscript>
 
-  <!-- External JS -->
   <script defer src="main.js"></script>
-
 </body>
 </html>
