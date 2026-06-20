@@ -272,18 +272,31 @@
     <div class="seal-wrapper" id="seal-wrapper">
       <!-- Make clickable/interactable element accessible by keyboard & screen readers -->
       <div id="letter-N" role="button" tabindex="0" aria-pressed="false" aria-label="Open the ceremony welcome" title="Click or press Enter to open">N</div>
-      <div class="click-hint">Click to Enter</div>
+      <div class="click-hint" id="click-hint">Click to Enter</div>
     </div>
+
+    <!-- small control area: language selector + name input -> improves usability on mobile -->
+    <div style="position: absolute; bottom: 18px; display:flex; gap:8px; z-index: 120;">
+      <select id="lang-select" aria-label="Select language" title="Language">
+        <option value="auto">Auto</option>
+        <option value="en">English</option>
+        <option value="es">Español</option>
+        <option value="fr">Français</option>
+      </select>
+      <input id="name-input" type="text" placeholder="Name (e.g. Aryan)" aria-label="Baby name" style="padding:6px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.02);color:#fff;min-width:140px;" />
+      <button id="save-name" style="padding:6px 10px;border-radius:6px;border:1px solid rgba(191,149,63,0.2);background:transparent;color:var(--gold-2);">Save</button>
+    </div>
+
   </div>
 
   <!-- Timer (hidden until triggered) -->
   <div id="timer-screen" aria-live="polite" aria-atomic="true">
-    <h2 class="gold-shimmer">The Journey Unfolds In</h2>
+    <h2 class="gold-shimmer" id="timer-title">The Journey Unfolds In</h2>
     <div class="timer-box" role="group" aria-label="Countdown timer">
-      <div class="time-unit" aria-hidden="false"><div id="days" class="gold-shimmer">00</div><span>Days</span></div>
-      <div class="time-unit" aria-hidden="false"><div id="hours" class="gold-shimmer">00</div><span>Hours</span></div>
-      <div class="time-unit" aria-hidden="false"><div id="mins" class="gold-shimmer">00</div><span>Minutes</span></div>
-      <div class="time-unit" aria-hidden="false"><div id="secs" class="gold-shimmer">00</div><span>Seconds</span></div>
+      <div class="time-unit" aria-hidden="false"><div id="days" class="gold-shimmer">00</div><span id="label-days">Days</span></div>
+      <div class="time-unit" aria-hidden="false"><div id="hours" class="gold-shimmer">00</div><span id="label-hours">Hours</span></div>
+      <div class="time-unit" aria-hidden="false"><div id="mins" class="gold-shimmer">00</div><span id="label-mins">Minutes</span></div>
+      <div class="time-unit" aria-hidden="false"><div id="secs" class="gold-shimmer">00</div><span id="label-secs">Seconds</span></div>
     </div>
   </div>
 
@@ -292,14 +305,8 @@
 
   <!-- Reveal -->
   <div id="reveal-screen" aria-hidden="true">
-    <h3>Welcome To The World</h3>
-    <div class="name-container" id="baby-name" aria-hidden="true">
-      <div class="letter gold-shimmer">A</div>
-      <div class="letter gold-shimmer">R</div>
-      <div class="letter gold-shimmer">Y</div>
-      <div class="letter gold-shimmer">A</div>
-      <div class="letter gold-shimmer">N</div>
-    </div>
+    <h3 id="reveal-subtitle">Welcome To The World</h3>
+    <div class="name-container" id="baby-name" aria-hidden="true"></div>
   </div>
 
   <!-- Fallback for users with JS disabled -->
@@ -312,321 +319,8 @@
     </div>
   </noscript>
 
-  <script>
-    /* -------------------------
-       Responsive helpers & safe viewport height
-       ------------------------- */
-    (function setVhUnit(){
-      const setVh = () => {
-        document.documentElement.style.setProperty('--vh', (window.innerHeight * 0.01) + 'px');
-      };
-      setVh();
-      window.addEventListener('resize', setVh, { passive: true });
-    })();
+  <!-- External JS -->
+  <script defer src="main.js"></script>
 
-    /* -------------------------
-       High-DPI Canvas & Particle Engine
-       - Scales canvas with devicePixelRatio
-       - Reduces particle count for low power devices / low hardwareConcurrency
-       - Uses requestAnimationFrame with resize debounce
-       ------------------------- */
-    const canvas = document.getElementById('canvas-bg');
-    const ctx = canvas.getContext('2d', { alpha: true });
-    let dpr = Math.min(window.devicePixelRatio || 1, 2); // cap for performance
-    let particlesArray = [];
-    let animationId;
-    let particleConfig = {
-      baseCount: 150,
-      maxSize: 2.2,
-      maxSpeed: 0.6
-    };
-
-    // adapt particle count by hardware
-    try {
-      const cores = navigator.hardwareConcurrency || 4;
-      if (cores <= 2) particleConfig.baseCount = 60;
-      else if (cores <= 4) particleConfig.baseCount = 110;
-      else particleConfig.baseCount = 150;
-    } catch (e) { particleConfig.baseCount = 100; }
-
-    function resizeCanvas(){
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
-      canvas.width = Math.round(window.innerWidth * dpr);
-      canvas.height = Math.round(window.innerHeight * dpr);
-      canvas.style.width = window.innerWidth + 'px';
-      canvas.style.height = window.innerHeight + 'px';
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    }
-
-    class Particle {
-      constructor(){
-        this.reset(true);
-      }
-      reset(init=false){
-        this.x = Math.random() * window.innerWidth;
-        this.y = Math.random() * window.innerHeight;
-        this.size = Math.random() * (particleConfig.maxSize - 0.4) + 0.4;
-        this.speedY = Math.random() * particleConfig.maxSpeed - (particleConfig.maxSpeed/2);
-        this.speedX = Math.random() * particleConfig.maxSpeed - (particleConfig.maxSpeed/2);
-        // subtle twinkle
-        this.alpha = 0.6 + Math.random() * 0.4;
-        if(!init && Math.random() < 0.02) {
-          // teleport sometimes for variety
-          this.x = Math.random() * window.innerWidth;
-          this.y = Math.random() * window.innerHeight;
-        }
-      }
-      update(){
-        this.x += this.speedX;
-        this.y += this.speedY;
-        if(this.y > window.innerHeight + 10) this.y = -10;
-        if(this.y < -10) this.y = window.innerHeight + 10;
-        if(this.x > window.innerWidth + 10) this.x = -10;
-        if(this.x < -10) this.x = window.innerWidth + 10;
-      }
-      draw(){
-        ctx.fillStyle = 'rgba(191, 149, 63,' + this.alpha + ')';
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    }
-
-    function initParticles(count){
-      particlesArray = [];
-      for(let i=0;i<count;i++) particlesArray.push(new Particle());
-    }
-
-    let resizeTimeout;
-    function onResize(){
-      clearTimeout(resizeTimeout);
-      resizeTimeout = setTimeout(() => {
-        resizeCanvas();
-        initParticles(particleConfig.baseCount);
-      }, 120);
-    }
-    window.addEventListener('resize', onResize, { passive: true });
-
-    function animateParticles(){
-      ctx.clearRect(0,0,canvas.width,canvas.height);
-      for(let i=0;i<particlesArray.length;i++){
-        particlesArray[i].update();
-        particlesArray[i].draw();
-      }
-      animationId = requestAnimationFrame(animateParticles);
-    }
-
-    // Respect prefers-reduced-motion — if user prefers reduced motion, minimize visual motion
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (!reducedMotion){
-      resizeCanvas();
-      initParticles(particleConfig.baseCount);
-      animateParticles();
-    } else {
-      // very lightweight static background for reduced-motion users
-      resizeCanvas();
-      particlesArray = [];
-      ctx.clearRect(0,0,canvas.width,canvas.height);
-      // single subtle dot to keep the design aesthetic
-      ctx.fillStyle = 'rgba(191,149,63,0.4)';
-      ctx.beginPath();
-      ctx.arc(window.innerWidth/2, window.innerHeight/2, 1.8, 0, Math.PI*2);
-      ctx.fill();
-    }
-
-    /* -------------------------
-       Core Timers and Interaction
-       - Accessible keyboard & touch activation
-       - Debounced intervals and aria updates
-       - Adjustable eventDate for demo/dev
-       ------------------------- */
-    // For demo: 10 seconds from click. In production, set a real date:
-    function createEventDateFromNow(seconds){
-      const d = new Date();
-      d.setSeconds(d.getSeconds() + seconds);
-      return d;
-    }
-
-    let eventDate = createEventDateFromNow(10); // demo; change to future date as needed
-    let countdownInterval = null;
-    let finalTimer = null;
-
-    const letterN = document.getElementById('letter-N');
-    const sealWrapper = document.getElementById('seal-wrapper');
-    const timerScreen = document.getElementById('timer-screen');
-    const countdownScreen = document.getElementById('countdown-screen');
-    const revealScreen = document.getElementById('reveal-screen');
-    const nameContainer = document.getElementById('baby-name');
-    const gates = { left: document.getElementById('gate-left'), right: document.getElementById('gate-right') };
-
-    function safeSetText(id, text){
-      const el = document.getElementById(id);
-      if(el) el.textContent = text;
-    }
-
-    // Accessible trigger (mouse/touch/keyboard)
-    function triggerEntrance(){
-      // prevent double-activation
-      if(letterN.getAttribute('data-activated') === 'true') return;
-      letterN.setAttribute('data-activated','true');
-      letterN.setAttribute('aria-pressed','true');
-
-      // warm visual shockwave (reduce scale on reduced-motion)
-      if (!reducedMotion) {
-        sealWrapper.style.transform = 'scale(4)';
-        sealWrapper.style.opacity = '0';
-        sealWrapper.style.filter = 'blur(8px)';
-      } else {
-        sealWrapper.style.opacity = '0';
-      }
-
-      setTimeout(() => {
-        gates.left.classList.add('open-left');
-        gates.right.classList.add('open-right');
-      }, 300);
-
-      // Switch screens after gate animation
-      setTimeout(() => {
-        document.getElementById('intro-container').style.display = 'none';
-        timerScreen.style.display = 'block';
-        // small delay to allow CSS to transition opacity
-        setTimeout(()=> timerScreen.style.opacity = '1', 40);
-        startTimer();
-      }, 900); // shortened for snappy feeling on mobile
-    }
-
-    // Add keyboard support (Enter / Space)
-    letterN.addEventListener('keydown', (ev) => {
-      if(ev.key === 'Enter' || ev.key === ' '){
-        ev.preventDefault();
-        triggerEntrance();
-      }
-    }, { passive: false });
-
-    // Touch/pointer friendly
-    letterN.addEventListener('click', triggerEntrance, { passive: true });
-    letterN.addEventListener('pointerdown', (e) => { /* consume for a nicer tap feel */ }, { passive: true });
-
-    // Timer logic
-    function startTimer(){
-      if(countdownInterval) clearInterval(countdownInterval);
-
-      function updateOnce(){
-        const now = Date.now();
-        let dist = eventDate.getTime() - now;
-
-        if(dist <= 0){
-          clearInterval(countdownInterval);
-          timerScreen.style.opacity = '0';
-          setTimeout(() => {
-            timerScreen.style.display = 'none';
-            startFinalCountdown();
-          }, 500);
-          return;
-        }
-
-        const days = Math.floor(dist / (1000*60*60*24));
-        const hours = Math.floor((dist % (1000*60*60*24)) / (1000*60*60));
-        const minutes = Math.floor((dist % (1000*60*60)) / (1000*60));
-        const seconds = Math.floor((dist % (1000*60)) / 1000);
-
-        safeSetText('days', days < 10 ? '0'+days : String(days));
-        safeSetText('hours', hours < 10 ? '0'+hours : String(hours));
-        safeSetText('mins', minutes < 10 ? '0'+minutes : String(minutes));
-        safeSetText('secs', seconds < 10 ? '0'+seconds : String(seconds));
-      }
-
-      updateOnce();
-      countdownInterval = setInterval(updateOnce, 1000);
-    }
-
-    // Final numeric countdown and reveal
-    function startFinalCountdown(){
-      countdownScreen.style.display = 'block';
-      countdownScreen.textContent = '5';
-      let count = 5;
-
-      finalTimer = setInterval(() => {
-        count--;
-        if(count >= 0){
-          countdownScreen.textContent = String(count);
-        }
-        if(count < 0){
-          clearInterval(finalTimer);
-          countdownScreen.style.display = 'none';
-          triggerGrandReveal();
-        }
-      }, 1000);
-    }
-
-    function triggerGrandReveal(){
-      revealScreen.style.display = 'block';
-      revealScreen.setAttribute('aria-hidden','false');
-      nameContainer.setAttribute('aria-hidden','false');
-
-      const letters = document.querySelectorAll('.letter');
-      letters.forEach((letter, idx) => {
-        setTimeout(() => {
-          letter.classList.add('show');
-        }, idx * (reducedMotion ? 60 : 320));
-      });
-
-      // Confetti / celebration (respect reduced motion)
-      const delay = (letters.length * (reducedMotion ? 60 : 320)) + 120;
-      setTimeout(() => {
-        fireMajesticShowers();
-      }, delay);
-    }
-
-    /* -------------------------
-       Confetti fireworks with respect for reduced motion
-       ------------------------- */
-    function fireMajesticShowers(){
-      if (reducedMotion) return;
-
-      if (typeof confetti !== 'function') return; // safety
-      const duration = 12 * 1000;
-      const animationEnd = Date.now() + duration;
-      const defaults = { startVelocity: 55, spread: 360, ticks: 120, zIndex: 100 };
-
-      function randomInRange(min,max){ return Math.random()*(max-min)+min; }
-
-      const interval = setInterval(function(){
-        const timeLeft = animationEnd - Date.now();
-        if (timeLeft <= 0) return clearInterval(interval);
-
-        const particleCount = Math.floor(80 * (timeLeft / duration));
-        // Left bursts
-        confetti(Object.assign({}, defaults, {
-          particleCount,
-          origin: { x: randomInRange(0.0,0.2), y: Math.random() - 0.2 },
-          colors: ['#bf953f','#fcf6ba','#ffffff'],
-          disableForReducedMotion: true
-        }));
-        // Right bursts
-        confetti(Object.assign({}, defaults, {
-          particleCount,
-          origin: { x: randomInRange(0.8,1.0), y: Math.random() - 0.2 },
-          colors: ['#bf953f','#fcf6ba','#ffffff'],
-          disableForReducedMotion: true
-        }));
-      }, 200);
-    }
-
-    /* -------------------------
-       Clean up when navigating away (cancel RAF & intervals)
-       ------------------------- */
-    window.addEventListener('pagehide', () => {
-      if(animationId) cancelAnimationFrame(animationId);
-      if(countdownInterval) clearInterval(countdownInterval);
-      if(finalTimer) clearInterval(finalTimer);
-    }, { passive:true });
-
-    /* -------------------------
-       Optional: expose start function for debugging/test
-       ------------------------- */
-    window.__ceremony = { triggerEntrance, startTimer, startFinalCountdown, triggerGrandReveal };
-
-  </script>
 </body>
 </html>
