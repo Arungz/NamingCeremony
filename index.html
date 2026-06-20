@@ -5,119 +5,254 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="theme-color" content="#050505" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>A Grand Beginning | Naming Ceremony</title>
 
   <!-- Confetti CDN -->
   <script defer src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
-  <!-- Fonts (external) -->
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Montserrat:wght@200;300;400&display=swap" rel="stylesheet" />
 
   <style>
-    :root{
-      --bg:#050505;
-      --gold-1:#bf953f;
-      --gold-2:#fcf6ba;
-      --muted: rgba(255,255,255,0.5);
-      --glass: rgba(20,20,20,0.6);
-      --glass-border: rgba(191,149,63,0.2);
-      --shadow: rgba(0,0,0,0.9);
+    /* ===== VARIABLES & RESETS ===== */
+    :root {
+      --bg: #050505;
+      --gold-1: #bf953f;
+      --gold-2: #fcf6ba;
+      --muted: rgba(255, 255, 255, 0.5);
+      --glass: rgba(20, 20, 20, 0.6);
+      --glass-border: rgba(191, 149, 63, 0.2);
+      --shadow: rgba(0, 0, 0, 0.9);
       --safe-area-top: env(safe-area-inset-top);
       --safe-area-bottom: env(safe-area-inset-bottom);
     }
 
-    *{box-sizing:border-box;margin:0;padding:0}
-    html,body{height:100%}
-    body{
-      font-family:'Montserrat',sans-serif;
-      background-color:var(--bg);
-      color:#fff;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      min-height:100vh;
-      padding-top:var(--safe-area-top);
-      padding-bottom:var(--safe-area-bottom);
-      overflow:hidden;
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background-color: var(--bg);
+      color: #fff;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding-top: var(--safe-area-top);
+      padding-bottom: var(--safe-area-bottom);
+      overflow: hidden;
     }
 
-    #canvas-bg{ position:fixed; inset:0; width:100%; height:100%; z-index:1; opacity:0.7; pointer-events:none; }
-
-    .gold-shimmer{
-      background:linear-gradient(90deg,var(--gold-1),var(--gold-2),#b38728,var(--gold-2),#aa771c);
-      background-size:200% auto;
-      color:transparent;
-      -webkit-background-clip:text;
-      background-clip:text;
-      animation:shine 4s linear infinite;
-    }
-    @keyframes shine{ to { background-position:200% center } }
-
-    #intro-container{
-      position:fixed; inset:0; z-index:100; display:flex; flex-direction:column; justify-content:center; align-items:center; perspective:1200px;
-      padding:clamp(12px,2.5vw,28px);
+    /* ===== CANVAS BACKGROUND ===== */
+    #canvas-bg {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      opacity: 0.7;
+      pointer-events: none;
     }
 
-    .gate{
-      position:absolute; top:0; width:50%; height:100%;
-      background:radial-gradient(circle at center,#1a1a1a 0%, #000 100%);
-      box-shadow:inset 0 0 100px rgba(0,0,0,1);
-      transition:transform 950ms cubic-bezier(.22,.9,.32,1);
-      z-index:101; backface-visibility:hidden;
+    /* ===== GOLD SHIMMER ===== */
+    .gold-shimmer {
+      background: linear-gradient(90deg, var(--gold-1), var(--gold-2), #b38728, var(--gold-2), #aa771c);
+      background-size: 200% auto;
+      color: transparent;
+      -webkit-background-clip: text;
+      background-clip: text;
+      animation: shine 4s linear infinite;
     }
-    .gate.left{ left:0; border-right:2px solid rgba(191,149,63,0.25); transform-origin:left; }
-    .gate.right{ right:0; border-left:2px solid rgba(191,149,63,0.25); transform-origin:right; }
-    .gate.open-left{ transform: rotateY(-100deg); }
-    .gate.open-right{ transform: rotateY(100deg); }
+    @keyframes shine { to { background-position: 200% center; } }
 
-    .seal-wrapper{ position:relative; z-index:102; display:flex; flex-direction:column; align-items:center; gap:1.4rem; }
+    /* ===== INTRO CONTAINER ===== */
+    #intro-container {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      perspective: 1200px;
+      padding: clamp(12px, 2.5vw, 28px);
+    }
 
-    #letter-N{
-      font-family:'Cinzel Decorative',serif;
+    /* ===== CINEMATIC GATES ===== */
+    .gate {
+      position: absolute;
+      top: 0;
+      width: 50%;
+      height: 100%;
+      background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
+      box-shadow: inset 0 0 100px rgba(0, 0, 0, 1);
+      transition: transform 950ms cubic-bezier(0.22, 0.9, 0.32, 1);
+      z-index: 101;
+      backface-visibility: hidden;
+    }
+    .gate.left { left: 0; border-right: 2px solid rgba(191, 149, 63, 0.25); transform-origin: left; }
+    .gate.right { right: 0; border-left: 2px solid rgba(191, 149, 63, 0.25); transform-origin: right; }
+    .gate.open-left { transform: rotateY(-100deg); }
+    .gate.open-right { transform: rotateY(100deg); }
+
+    /* ===== SEAL & BUTTON ===== */
+    .seal-wrapper {
+      position: relative;
+      z-index: 102;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.4rem;
+    }
+
+    #letter-N {
+      font-family: 'Cinzel Decorative', serif;
       font-size: clamp(40px, 8vw, 90px);
       width: clamp(120px, 26vw, 220px);
       height: clamp(120px, 26vw, 220px);
-      display:flex; justify-content:center; align-items:center; border-radius:50%;
-      background:linear-gradient(135deg,var(--gold-2),var(--gold-1));
-      color:#111; cursor:pointer; box-shadow:0 0 40px rgba(191,149,63,0.4), inset 0 0 20px rgba(255,255,255,0.5);
-      border:2px solid rgba(255,255,255,0.06); transition:transform 300ms ease; user-select:none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold-2), var(--gold-1));
+      color: #111;
+      cursor: pointer;
+      box-shadow: 0 0 40px rgba(191, 149, 63, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.5);
+      border: 2px solid rgba(255, 255, 255, 0.06);
+      transition: transform 300ms ease, box-shadow 300ms ease;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      font-weight: 700;
     }
-    #letter-N:focus{ outline:3px solid rgba(191,149,63,0.18); outline-offset:4px; }
-    #letter-N::after{
-      content:''; position:absolute; top:-10px; left:-10px; right:-10px; bottom:-10px; border-radius:50%;
-      border:2px solid rgba(191,149,63,0.45); animation:pulseRing 2s infinite cubic-bezier(.215,.61,.355,1);
+    #letter-N:hover { transform: scale(1.02); box-shadow: 0 0 50px rgba(191, 149, 63, 0.6), inset 0 0 20px rgba(255, 255, 255, 0.6); }
+    #letter-N:active { transform: scale(0.98); }
+    #letter-N:focus { outline: 3px solid rgba(191, 149, 63, 0.18); outline-offset: 4px; }
+
+    #letter-N::after {
+      content: '';
+      position: absolute;
+      top: -10px;
+      left: -10px;
+      right: -10px;
+      bottom: -10px;
+      border-radius: 50%;
+      border: 2px solid rgba(191, 149, 63, 0.45);
+      animation: pulseRing 2s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
     }
-    @keyframes pulseRing{ 0%{ transform:scale(0.92); opacity:1 } 100%{ transform:scale(1.28); opacity:0 } }
+    @keyframes pulseRing { 0% { transform: scale(0.92); opacity: 1; } 100% { transform: scale(1.28); opacity: 0; } }
 
-    .click-hint{ margin-top:12px; font-size:12px; letter-spacing:6px; color:var(--muted); }
+    .click-hint {
+      margin-top: 12px;
+      font-size: 12px;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      color: var(--muted);
+      animation: fadeInOut 2s infinite;
+    }
+    @keyframes fadeInOut { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
 
-    #timer-screen{ position:absolute; z-index:50; opacity:0; display:none; transition:opacity 450ms ease; text-align:center; width:100%; padding: clamp(12px,2.5vw,32px); }
-    #timer-title{ font-family:'Cinzel Decorative',serif; font-size: clamp(20px,4vw,32px); margin-bottom: clamp(20px,4vw,40px); letter-spacing:4px; }
-    .timer-box{ display:flex; gap:18px; justify-content:center; flex-wrap:wrap; }
-    .time-unit{ background:var(--glass); backdrop-filter: blur(14px); border:1px solid var(--glass-border); padding:18px 16px; border-radius:12px; min-width:90px; text-align:center; }
-    .time-unit div{ font-weight:200; font-size: clamp(28px,8vw,65px); line-height:1; }
-    .time-unit span{ display:block; font-size:11px; color:#bdbdbd; margin-top:8px; letter-spacing:2px; text-transform:uppercase; }
+    /* ===== TIMER SCREEN ===== */
+    #timer-screen {
+      position: absolute;
+      z-index: 50;
+      opacity: 0;
+      display: none;
+      transition: opacity 450ms ease;
+      text-align: center;
+      width: 100%;
+      padding: clamp(12px, 2.5vw, 32px);
+    }
+    #timer-title {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: clamp(20px, 4vw, 32px);
+      margin-bottom: clamp(20px, 4vw, 40px);
+      letter-spacing: 4px;
+    }
+    .timer-box { display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; }
+    .time-unit {
+      background: var(--glass);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid var(--glass-border);
+      padding: 18px 16px;
+      border-radius: 12px;
+      min-width: 90px;
+      text-align: center;
+    }
+    .time-unit div { font-weight: 200; font-size: clamp(28px, 8vw, 65px); line-height: 1; }
+    .time-unit span { display: block; font-size: 11px; color: #bdbdbd; margin-top: 8px; letter-spacing: 2px; text-transform: uppercase; }
 
-    #countdown-screen{ position:absolute; z-index:60; display:none; font-family:'Cinzel Decorative',serif; color:transparent; -webkit-background-clip:text; background-clip:text; background:linear-gradient(90deg,var(--gold-1),var(--gold-2)); text-shadow:0 0 60px rgba(191,149,63,0.6); font-size: clamp(96px, 30vw, 280px); pointer-events:none; }
+    /* ===== COUNTDOWN SCREEN ===== */
+    #countdown-screen {
+      position: absolute;
+      z-index: 60;
+      display: none;
+      font-family: 'Cinzel Decorative', serif;
+      color: transparent;
+      -webkit-background-clip: text;
+      background-clip: text;
+      background: linear-gradient(90deg, var(--gold-1), var(--gold-2));
+      text-shadow: 0 0 60px rgba(191, 149, 63, 0.6);
+      font-size: clamp(96px, 30vw, 280px);
+      pointer-events: none;
+      animation: cinematicPulse 1s infinite;
+    }
+    @keyframes cinematicPulse {
+      0% { transform: scale(0.92); opacity: 0; filter: blur(8px); }
+      50% { transform: scale(1.04); opacity: 1; filter: blur(0px); }
+      100% { transform: scale(1.2); opacity: 0; filter: blur(4px); }
+    }
 
-    #reveal-screen{ position:absolute; z-index:70; display:none; text-align:center; padding:20px; }
-    #reveal-subtitle{ font-weight:300; font-size:clamp(14px,3.2vw,20px); letter-spacing:8px; color:rgba(255,255,255,0.85); margin-bottom:20px; text-transform:uppercase; }
-    .name-container{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
-    .letter{ font-family:'Cinzel Decorative',serif; font-size:clamp(48px,12vw,140px); font-weight:700; opacity:0; transform:scale(0.86) translateY(40px) rotateX(-30deg); transition: all 900ms cubic-bezier(.25,1,.5,1); text-shadow: 0 12px 30px rgba(0,0,0,0.9); }
-    .letter.show{ opacity:1; transform:scale(1) translateY(0) rotateX(0deg); }
+    /* ===== REVEAL SCREEN ===== */
+    #reveal-screen { position: absolute; z-index: 70; display: none; text-align: center; padding: 20px; }
+    #reveal-subtitle {
+      font-weight: 300;
+      font-size: clamp(14px, 3.2vw, 20px);
+      letter-spacing: 8px;
+      color: rgba(255, 255, 255, 0.85);
+      margin-bottom: 20px;
+      text-transform: uppercase;
+    }
+    .name-container { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+    .letter {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: clamp(48px, 12vw, 140px);
+      font-weight: 700;
+      opacity: 0;
+      transform: scale(0.86) translateY(40px) rotateX(-30deg);
+      transition: all 900ms cubic-bezier(0.25, 1, 0.5, 1);
+      text-shadow: 0 12px 30px rgba(0, 0, 0, 0.9);
+      -webkit-font-smoothing: antialiased;
+    }
+    .letter.show { opacity: 1; transform: scale(1) translateY(0) rotateX(0deg); }
 
-    @media (prefers-reduced-motion: reduce){
-      .gold-shimmer, #letter-N::after, .click-hint, #countdown-screen, .letter, .gate { animation-duration:0.001ms !important; transition-duration: 1ms !important; }
-      #canvas-bg{ opacity:0.5 }
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 520px) {
+      .timer-box { gap: 12px; }
+      .time-unit { padding: 12px 10px; min-width: 78px; }
+      .click-hint { letter-spacing: 4px; }
+      .gate { transition: transform 1.2s cubic-bezier(0.22, 0.9, 0.32, 1); }
+    }
+
+    /* ===== REDUCED MOTION ===== */
+    @media (prefers-reduced-motion: reduce) {
+      .gold-shimmer, #letter-N::after, .click-hint, #countdown-screen, .letter, .gate {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 1ms !important;
+      }
+      #canvas-bg { opacity: 0.5; }
     }
   </style>
 </head>
 <body>
+  <!-- Canvas Background -->
   <canvas id="canvas-bg" aria-hidden="true"></canvas>
 
+  <!-- Intro Container -->
   <div id="intro-container" aria-hidden="false">
     <div class="gate left" id="gate-left" aria-hidden="true"></div>
     <div class="gate right" id="gate-right" aria-hidden="true"></div>
@@ -128,32 +263,306 @@
     </div>
   </div>
 
+  <!-- Timer Screen -->
   <div id="timer-screen" aria-live="polite" aria-atomic="true">
     <h2 id="timer-title" class="gold-shimmer">The Journey Unfolds In</h2>
     <div class="timer-box" role="group" aria-label="Countdown timer">
-      <div class="time-unit" aria-hidden="false"><div id="days" class="gold-shimmer">00</div><span id="label-days">Days</span></div>
-      <div class="time-unit" aria-hidden="false"><div id="hours" class="gold-shimmer">00</div><span id="label-hours">Hours</span></div>
-      <div class="time-unit" aria-hidden="false"><div id="mins" class="gold-shimmer">00</div><span id="label-mins">Minutes</span></div>
-      <div class="time-unit" aria-hidden="false"><div id="secs" class="gold-shimmer">00</div><span id="label-secs">Seconds</span></div>
+      <div class="time-unit"><div id="days" class="gold-shimmer">00</div><span id="label-days">Days</span></div>
+      <div class="time-unit"><div id="hours" class="gold-shimmer">00</div><span id="label-hours">Hours</span></div>
+      <div class="time-unit"><div id="mins" class="gold-shimmer">00</div><span id="label-mins">Minutes</span></div>
+      <div class="time-unit"><div id="secs" class="gold-shimmer">00</div><span id="label-secs">Seconds</span></div>
     </div>
   </div>
 
+  <!-- Countdown Screen -->
   <div id="countdown-screen" aria-live="assertive" aria-atomic="true">5</div>
 
+  <!-- Reveal Screen -->
   <div id="reveal-screen" aria-hidden="true">
     <h3 id="reveal-subtitle" class="gold-shimmer">Welcome To The World</h3>
     <div class="name-container" id="baby-name" aria-hidden="true"></div>
   </div>
 
+  <!-- NoScript Fallback -->
   <noscript>
-    <div style="position:fixed;inset:0;display:flex;justify-content:center;align-items:center;background:linear-gradient(180deg,rgba(0,0,0,0.65),rgba(0,0,0,0.85));z-index:9999;padding:20px;text-align:center;">
-      <div style="max-width:520px;color:#fff">
-        <h2 style="font-family:Cinzel Decorative,serif;margin-bottom:12px">Welcome</h2>
-        <p style="opacity:0.9">Please enable JavaScript to view the ceremony animation.</p>
+    <div style="position: fixed; inset: 0; display: flex; justify-content: center; align-items: center; background: linear-gradient(180deg, rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.85)); z-index: 9999; padding: 20px; text-align: center;">
+      <div style="max-width: 520px; color: #fff;">
+        <h2 style="font-family: Cinzel Decorative, serif; margin-bottom: 12px;">Welcome</h2>
+        <p style="opacity: 0.9;">Please enable JavaScript to view the ceremony animation.</p>
       </div>
     </div>
   </noscript>
 
-  <script defer src="main.js"></script>
+  <!-- ===== ALL-IN-ONE SCRIPT ===== -->
+  <script>
+    'use strict';
+
+    /* ===== CONFIGURATION ===== */
+    const CONFIG = {
+      ceremonyName: window.__ceremonyName || 'ARYAN',
+      ceremonyEventDate: window.__ceremonyEventDate || null,
+      timerDemoSeconds: 10
+    };
+
+    /* ===== UTILITIES ===== */
+    const qs = (sel, root = document) => root ? root.querySelector(sel) : null;
+    const qsa = (sel, root = document) => root ? Array.from(root.querySelectorAll(sel)) : [];
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* ===== LOCALIZATION ===== */
+    const i18n = {
+      en: { timerTitle: 'The Journey Unfolds In', days: 'Days', hours: 'Hours', minutes: 'Minutes', seconds: 'Seconds', clickHint: 'Click to Enter', revealSubtitle: 'Welcome To The World' },
+      es: { timerTitle: 'El viaje comienza en', days: 'Días', hours: 'Horas', minutes: 'Minutos', seconds: 'Segundos', clickHint: 'Toca para entrar', revealSubtitle: 'Bienvenido al mundo' },
+      fr: { timerTitle: 'Le voyage commence dans', days: 'Jours', hours: 'Heures', minutes: 'Minutes', seconds: 'Secondes', clickHint: 'Cliquez pour entrer', revealSubtitle: 'Bienvenue au monde' },
+      de: { timerTitle: 'Die Reise beginnt in', days: 'Tage', hours: 'Stunden', minutes: 'Minuten', seconds: 'Sekunden', clickHint: 'Klicken Sie zum Betreten', revealSubtitle: 'Willkommen in der Welt' },
+      ja: { timerTitle: '旅は次のように始まります', days: '日', hours: '時間', minutes: '分', seconds: '秒', clickHint: 'クリックして入力', revealSubtitle: 'ようこそ、世界へ' }
+    };
+
+    function detectLang() {
+      const nav = (navigator.languages && navigator.languages[0]) || navigator.language || 'en';
+      const code = String(nav).split('-')[0].toLowerCase();
+      return i18n[code] ? code : 'en';
+    }
+
+    /* ===== ELEMENT CACHE ===== */
+    const elements = {
+      letterN: qs('#letter-N'),
+      sealWrapper: qs('#seal-wrapper'),
+      gateLeft: qs('#gate-left'),
+      gateRight: qs('#gate-right'),
+      introContainer: qs('#intro-container'),
+      timerScreen: qs('#timer-screen'),
+      countdownScreen: qs('#countdown-screen'),
+      revealScreen: qs('#reveal-screen'),
+      babyNameContainer: qs('#baby-name'),
+      clickHint: qs('#click-hint'),
+      timerTitle: qs('#timer-title'),
+      labelDays: qs('#label-days'),
+      labelHours: qs('#label-hours'),
+      labelMins: qs('#label-mins'),
+      labelSecs: qs('#label-secs'),
+      canvas: qs('#canvas-bg')
+    };
+
+    /* ===== CANVAS BACKGROUND PARTICLES ===== */
+    let animationId = null;
+    let particlesArray = [];
+
+    function initCanvas() {
+      if (!elements.canvas) return;
+      const ctx = elements.canvas.getContext('2d', { alpha: true });
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      elements.canvas.width = Math.round(window.innerWidth * dpr);
+      elements.canvas.height = Math.round(window.innerHeight * dpr);
+      elements.canvas.style.width = window.innerWidth + 'px';
+      elements.canvas.style.height = window.innerHeight + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      class Particle {
+        constructor() {
+          this.x = Math.random() * window.innerWidth;
+          this.y = Math.random() * window.innerHeight;
+          this.size = Math.random() * 2;
+          this.speedY = Math.random() * 0.5 - 0.25;
+          this.speedX = Math.random() * 0.5 - 0.25;
+        }
+        update() {
+          this.x += this.speedX;
+          this.y += this.speedY;
+          if (this.y > window.innerHeight) this.y = 0;
+          if (this.y < 0) this.y = window.innerHeight;
+          if (this.x > window.innerWidth) this.x = 0;
+          if (this.x < 0) this.x = window.innerWidth;
+        }
+        draw() {
+          ctx.fillStyle = 'rgba(191, 149, 63, 0.8)';
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      particlesArray = [];
+      for (let i = 0; i < 150; i++) particlesArray.push(new Particle());
+
+      function animate() {
+        ctx.clearRect(0, 0, elements.canvas.width, elements.canvas.height);
+        for (const p of particlesArray) {
+          p.update();
+          p.draw();
+        }
+        animationId = requestAnimationFrame(animate);
+      }
+
+      if (!reducedMotion) animate();
+    }
+
+    /* ===== APPLY LANGUAGE ===== */
+    function applyLang(code) {
+      const lang = i18n[code] || i18n.en;
+      if (elements.timerTitle) elements.timerTitle.textContent = lang.timerTitle;
+      if (elements.labelDays) elements.labelDays.textContent = lang.days;
+      if (elements.labelHours) elements.labelHours.textContent = lang.hours;
+      if (elements.labelMins) elements.labelMins.textContent = lang.minutes;
+      if (elements.labelSecs) elements.labelSecs.textContent = lang.seconds;
+      if (elements.clickHint) elements.clickHint.textContent = lang.clickHint;
+      const subtitle = qs('#reveal-subtitle');
+      if (subtitle) subtitle.textContent = lang.revealSubtitle;
+    }
+
+    /* ===== RENDER NAME ===== */
+    function renderName(nameStr) {
+      const container = elements.babyNameContainer;
+      if (!container) return;
+      container.innerHTML = '';
+      const final = (nameStr && nameStr.trim().length > 0) ? nameStr.trim().toUpperCase() : 'ARYAN';
+      for (const ch of Array.from(final)) {
+        const el = document.createElement('div');
+        el.className = 'letter gold-shimmer';
+        el.textContent = ch;
+        el.setAttribute('aria-hidden', 'true');
+        container.appendChild(el);
+      }
+    }
+
+    /* ===== TIMER LOGIC ===== */
+    let countdownInterval = null;
+    let finalTimer = null;
+    let eventDate = CONFIG.ceremonyEventDate || (function() {
+      const d = new Date();
+      d.setSeconds(d.getSeconds() + CONFIG.timerDemoSeconds);
+      return d;
+    })();
+
+    function safeSetText(id, text) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = text;
+    }
+
+    function startTimer() {
+      if (countdownInterval) clearInterval(countdownInterval);
+      function updateOnce() {
+        const now = Date.now();
+        const dist = eventDate.getTime() - now;
+        if (dist <= 0) {
+          clearInterval(countdownInterval);
+          if (elements.timerScreen) elements.timerScreen.style.opacity = '0';
+          setTimeout(() => {
+            if (elements.timerScreen) elements.timerScreen.style.display = 'none';
+            startFinalCountdown();
+          }, 600);
+          return;
+        }
+        const days = Math.floor(dist / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((dist % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((dist % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((dist % (1000 * 60)) / 1000);
+        safeSetText('days', days < 10 ? '0' + days : String(days));
+        safeSetText('hours', hours < 10 ? '0' + hours : String(hours));
+        safeSetText('mins', minutes < 10 ? '0' + minutes : String(minutes));
+        safeSetText('secs', seconds < 10 ? '0' + seconds : String(seconds));
+      }
+      updateOnce();
+      countdownInterval = setInterval(updateOnce, 1000);
+    }
+
+    function startFinalCountdown() {
+      if (elements.countdownScreen) elements.countdownScreen.style.display = 'block';
+      if (elements.countdownScreen) elements.countdownScreen.textContent = '5';
+      let count = 5;
+      finalTimer = setInterval(() => {
+        count--;
+        if (elements.countdownScreen) elements.countdownScreen.textContent = String(Math.max(0, count));
+        if (count < 0) {
+          clearInterval(finalTimer);
+          if (elements.countdownScreen) elements.countdownScreen.style.display = 'none';
+          triggerGrandReveal();
+        }
+      }, 1000);
+    }
+
+    /* ===== ENTRANCE & REVEAL ===== */
+    function triggerEntrance() {
+      if (!elements.letterN || elements.letterN.getAttribute('data-activated') === 'true') return;
+      elements.letterN.setAttribute('data-activated', 'true');
+      elements.letterN.setAttribute('aria-pressed', 'true');
+      if (!reducedMotion && elements.sealWrapper) {
+        elements.sealWrapper.style.transform = 'scale(4)';
+        elements.sealWrapper.style.opacity = '0';
+        elements.sealWrapper.style.filter = 'blur(8px)';
+      } else if (elements.sealWrapper) {
+        elements.sealWrapper.style.opacity = '0';
+      }
+      setTimeout(() => {
+        elements.gateLeft?.classList.add('open-left');
+        elements.gateRight?.classList.add('open-right');
+      }, 300);
+      setTimeout(() => {
+        elements.introContainer && (elements.introContainer.style.display = 'none');
+        elements.timerScreen && (elements.timerScreen.style.display = 'block');
+        setTimeout(() => elements.timerScreen && (elements.timerScreen.style.opacity = '1'), 40);
+        startTimer();
+      }, 900);
+    }
+
+    function triggerGrandReveal() {
+      elements.revealScreen && (elements.revealScreen.style.display = 'block');
+      elements.revealScreen && elements.revealScreen.setAttribute('aria-hidden', 'false');
+      elements.babyNameContainer && elements.babyNameContainer.setAttribute('aria-hidden', 'false');
+      const letters = qsa('.letter', elements.babyNameContainer);
+      letters.forEach((letter, idx) => {
+        setTimeout(() => {
+          letter.classList.add('show');
+          letter.setAttribute('aria-hidden', 'false');
+        }, idx * (reducedMotion ? 60 : 320));
+      });
+      const delay = (letters.length * (reducedMotion ? 60 : 320)) + 120;
+      setTimeout(() => { fireMajesticShowers(); }, delay);
+    }
+
+    /* ===== CONFETTI ===== */
+    function fireMajesticShowers() {
+      if (reducedMotion) return;
+      if (typeof confetti !== 'function') return;
+      const duration = 12 * 1000;
+      const animationEnd = Date.now() + duration;
+      const defaults = { startVelocity: 55, spread: 360, ticks: 120, zIndex: 100 };
+      function randomInRange(min, max) { return Math.random() * (max - min) + min; }
+      const interval = setInterval(() => {
+        const timeLeft = animationEnd - Date.now();
+        if (timeLeft <= 0) return clearInterval(interval);
+        const particleCount = Math.floor(80 * (timeLeft / duration));
+        confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.0, 0.2), y: Math.random() - 0.2 }, colors: ['#bf953f', '#fcf6ba', '#ffffff'], disableForReducedMotion: true }));
+        confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.8, 1.0), y: Math.random() - 0.2 }, colors: ['#bf953f', '#fcf6ba', '#ffffff'], disableForReducedMotion: true }));
+      }, 200);
+    }
+
+    /* ===== INITIALIZATION ===== */
+    (function init() {
+      initCanvas();
+      const lang = detectLang();
+      applyLang(lang);
+      renderName(CONFIG.ceremonyName);
+
+      // Wire events
+      elements.letterN?.addEventListener('click', triggerEntrance, { passive: true });
+      elements.letterN?.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Enter' || ev.key === ' ') {
+          ev.preventDefault();
+          triggerEntrance();
+        }
+      }, { passive: false });
+
+      // Cleanup on page hide
+      window.addEventListener('pagehide', () => {
+        if (animationId) cancelAnimationFrame(animationId);
+        if (countdownInterval) clearInterval(countdownInterval);
+        if (finalTimer) clearInterval(finalTimer);
+      }, { passive: true });
+
+      // Expose debug API
+      window.__ceremony = { triggerEntrance, triggerGrandReveal, startTimer, startFinalCountdown };
+    })();
+  </script>
 </body>
 </html>
