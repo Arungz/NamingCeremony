@@ -8,18 +8,28 @@
   <meta property="og:title" content="✨ Naming Ceremony ✨" />
   <meta property="og:description" content="You are warmly invited to witness the grand reveal and naming of our little one. Join us for this magical celebration!" />
   <meta property="og:image" content="https://arungz.github.io/NamingCeremony/Images/preview.png" />
+  <meta property="og:image:secure_url" content="https://arungz.github.io/NamingCeremony/Images/preview.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:url" content="https://arungz.github.io/NamingCeremony/" />
   <meta property="og:type" content="website" />
+  
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="✨ Naming Ceremony ✨">
+  <meta name="twitter:description" content="You are warmly invited to witness the grand reveal and naming of our little one.">
+  <meta name="twitter:image" content="https://arungz.github.io/NamingCeremony/Images/preview.png">
   
   <meta name="theme-color" content="#050505">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="✨ Naming Ceremony ✨">
+  <meta name="apple-mobile-web-app-title" content="Naming Ceremony">
   
   <meta name="description" content="A grand naming ceremony invitation. Join our family to celebrate this magical milestone.">
   <meta name="keywords" content="naming ceremony, baby naming, invitation, grand reveal, celebration, family, premium event">
   <meta name="robots" content="index, follow">
   <meta name="format-detection" content="telephone=no, email=no">
-  <title>✨ Naming Ceremony ✨</title>
+  
+  <title>Naming Ceremony ✨</title>
   <link rel="icon" type="image/png" href="Images/ak.png">
 
   <script defer src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -177,10 +187,6 @@
       transform: rotate(45deg) translateX(-100%);
       animation: lightSweep 4s infinite cubic-bezier(0.4, 0, 0.2, 1);
     }
-    @keyframes lightSweep {
-      0% { transform: rotate(45deg) translateX(-100%); }
-      100% { transform: rotate(45deg) translateX(100%); }
-    }
 
     .click-hint {
       font-size: 13px;
@@ -260,21 +266,32 @@
       100% { transform: scale(1.4); opacity: 0; filter: blur(5px); }
     }
 
-    /* ===== 3D EXTRUDED REVEAL SCREEN ===== */
-    #reveal-screen { position: absolute; z-index: 70; display: none; text-align: center; padding: 20px; perspective: 1000px; width: 100%; }
+    /* ===== PERFECTLY CENTERED REVEAL SCREEN ===== */
+    #reveal-screen { 
+      position: absolute; 
+      inset: 0;
+      z-index: 70; 
+      display: none; /* Changed to flex in JS */
+      flex-direction: column;
+      justify-content: center; 
+      align-items: center;
+      padding: 20px; 
+      perspective: 1000px; 
+      width: 100%; 
+    }
     
     #reveal-subtitle {
       font-family: 'Cinzel', serif;
       font-weight: 400;
-      font-size: clamp(18px, 4vw, 32px);
+      font-size: clamp(16px, 4vw, 32px);
       letter-spacing: 12px;
       color: var(--gold-2);
-      margin-bottom: 50px;
+      margin-bottom: 40px;
       text-transform: uppercase;
       opacity: 0;
-      /* Cinematic slow zoom-in entrance */
       transform: translateY(-20px) scale(0.9);
       text-shadow: 0 5px 20px rgba(0,0,0,0.9);
+      text-align: center;
     }
     
     .subtitle-show {
@@ -284,11 +301,18 @@
         to { opacity: 1; transform: translateY(0) scale(1); } 
     }
 
-    .name-container { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
+    /* Sizing logic ensures single-line fit on mobile */
+    .name-container { 
+      display: flex; 
+      gap: clamp(2px, 1.5vw, 15px); 
+      justify-content: center; 
+      align-items: center;
+      white-space: nowrap; /* Prevents awkward wrapping on mobile */
+    }
     
     .letter {
       font-family: 'Cinzel', serif;
-      font-size: clamp(60px, 15vw, 180px);
+      font-size: clamp(35px, 9.5vw, 160px); /* Perfectly scaled for both iOS/Android and PC */
       font-weight: 800;
       color: var(--gold-2);
       opacity: 0;
@@ -300,7 +324,18 @@
         0 20px 40px rgba(0,0,0,0.9);
       -webkit-font-smoothing: antialiased;
     }
-    .letter.show { opacity: 1; transform: translateZ(0) rotateX(0deg); }
+    
+    .letter.show { 
+      opacity: 1; 
+      transform: translateZ(0) rotateX(0deg); 
+    }
+
+    /* Modern beautiful flash for the rest of the name */
+    @keyframes popFlash {
+        0% { opacity: 0; transform: translateZ(-200px) scale(0.8) rotateX(-90deg); filter: brightness(1); }
+        40% { opacity: 1; transform: translateZ(30px) scale(1.1) rotateX(0deg); filter: brightness(2); text-shadow: 0 0 50px rgba(253, 245, 201, 1), 0 20px 40px rgba(0,0,0,0.9); color: #fff; }
+        100% { opacity: 1; transform: translateZ(0) scale(1) rotateX(0deg); filter: brightness(1); color: var(--gold-2); }
+    }
 
     /* ===== HEART BALLOON ANIMATIONS ===== */
     .balloon-anim {
@@ -315,8 +350,9 @@
 
     /* ===== RESPONSIVE ===== */
     @media (max-width: 520px) {
-      .timer-box { gap: 15px; }
-      .time-unit { padding: 20px 15px; min-width: 85px; }
+      .timer-box { gap: 12px; }
+      .time-unit { padding: 15px 12px; min-width: 80px; }
+      .time-unit div { font-size: clamp(35px, 10vw, 50px); }
       .click-hint { letter-spacing: 5px; }
     }
     @media (prefers-reduced-motion: reduce) {
@@ -347,7 +383,7 @@
       <div class="time-unit"><div id="days">00</div><span id="label-days">Days</span></div>
       <div class="time-unit"><div id="hours">00</div><span id="label-hours">Hours</span></div>
       <div class="time-unit"><div id="mins">00</div><span id="label-mins">Minutes</span></div>
-      <div class="time-unit"><div id="secs">05</div><span id="label-secs">Seconds</span></div>
+      <div class="time-unit"><div id="secs">00</div><span id="label-secs">Seconds</span></div>
     </div>
   </div>
 
@@ -374,7 +410,7 @@
     const CONFIG = {
       ceremonyName: window.__ceremonyName || 'A.NIVISHA',
       ceremonyEventDate: window.__ceremonyEventDate || null,
-      timerDemoSeconds: 8 // Adjust for testing
+      timerDemoSeconds: 8
     };
 
     /* ===== ELEMENT CACHE ===== */
@@ -447,19 +483,38 @@
       if (!reducedMotion) animate();
     }
 
-    /* ===== RENDER NAME ===== */
+    /* ===== RENDER NAME (SMART INITIAL SPLIT) ===== */
     function renderName(nameStr) {
       const container = elements.babyNameContainer;
       if (!container) return;
       container.innerHTML = '';
-      const final = (nameStr && nameStr.trim().length > 0) ? nameStr.trim().toUpperCase() : 'ARYAN';
-      for (const ch of Array.from(final)) {
+      const final = (nameStr && nameStr.trim().length > 0) ? nameStr.trim().toUpperCase() : 'A.NIVISHA';
+
+      // Dynamically detect where the initial ends (at the first dot or space)
+      let initialEndIdx = final.indexOf('.');
+      if (initialEndIdx === -1) initialEndIdx = final.indexOf(' ');
+      if (initialEndIdx === -1) initialEndIdx = 0; // Fallback to just the first letter
+
+      const chars = Array.from(final);
+      chars.forEach((ch, idx) => {
         const el = document.createElement('div');
         el.className = 'letter';
-        el.textContent = ch;
+        
+        // Group classes for the split animation
+        if (idx <= initialEndIdx) {
+            el.classList.add('is-initial');
+        } else {
+            el.classList.add('is-name');
+        }
+
+        if (ch === ' ') {
+            el.innerHTML = '&nbsp;';
+        } else {
+            el.textContent = ch;
+        }
         el.setAttribute('aria-hidden', 'true');
         container.appendChild(el);
-      }
+      });
     }
 
     /* ===== TIMER LOGIC ===== */
@@ -566,28 +621,45 @@
     }
 
     function triggerGrandReveal() {
-      elements.revealScreen && (elements.revealScreen.style.display = 'block');
+      // Changed to flex for perfect vertical/horizontal centering
+      elements.revealScreen && (elements.revealScreen.style.display = 'flex');
       
-      // 1. Show the "Welcome To The World" Subtitle first
       if (elements.revealSubtitle) {
           elements.revealSubtitle.classList.add('subtitle-show');
       }
 
-      // 2. Wait 1.5 seconds for subtitle suspense, THEN reveal the name letters
       setTimeout(() => {
-          const letters = qsa('.letter', elements.babyNameContainer);
-          letters.forEach((letter, idx) => {
+          const initials = qsa('.is-initial', elements.babyNameContainer);
+          const restOfName = qsa('.is-name', elements.babyNameContainer);
+          
+          // 1. Reveal Initial (e.g., "A.")
+          initials.forEach((letter, idx) => {
             setTimeout(() => {
               letter.classList.add('show');
-            }, idx * (reducedMotion ? 60 : 350)); 
+            }, idx * 150); 
           });
-          
-          // 3. Trigger 4-corner cannons & balloons precisely when the last letter drops
-          const delay = (letters.length * (reducedMotion ? 60 : 350)) + 200;
-          setTimeout(() => { 
-              fireFourCornerBlast(); 
-              fireHeartBalloons();
-          }, delay);
+
+          // 2. Pause for suspense, then swoop the rest of the name
+          const initialDelay = (initials.length * 150) + 600;
+
+          setTimeout(() => {
+              restOfName.forEach((letter, idx) => {
+                setTimeout(() => {
+                  letter.classList.add('show');
+                  if (!reducedMotion) {
+                      letter.style.animation = 'popFlash 0.5s ease-out forwards';
+                  }
+                }, idx * 100); // Fast, snappy reveal for the rest
+              });
+
+              // 3. Trigger cannons precisely when the last letter drops
+              const totalDelay = (restOfName.length * 100) + 200;
+              setTimeout(() => { 
+                  fireFourCornerBlast(); 
+                  fireHeartBalloons();
+              }, totalDelay);
+
+          }, initialDelay);
           
       }, 1500);
     }
@@ -596,27 +668,20 @@
     function fireFourCornerBlast() {
       if (reducedMotion || typeof confetti !== 'function') return;
       
-      const duration = 4 * 1000; // 4 seconds of sustained cannons
+      const duration = 4 * 1000;
       const animationEnd = Date.now() + duration;
 
       const interval = setInterval(() => {
         const timeLeft = animationEnd - Date.now();
         if (timeLeft <= 0) return clearInterval(interval);
 
-        const pCount = 8; // Particles per corner per tick
+        const pCount = 8;
         const cColors = ['#d4af37', '#e6ca7b', '#ffffff'];
         const settings = { particleCount: pCount, spread: 45, colors: cColors, zIndex: 80, gravity: 1.1, shapes: ['square', 'circle'] };
 
-        // Top-Left (Fires down-right)
         confetti({ ...settings, origin: { x: 0, y: 0 }, angle: 315, startVelocity: 35 });
-        
-        // Top-Right (Fires down-left)
         confetti({ ...settings, origin: { x: 1, y: 0 }, angle: 225, startVelocity: 35 });
-        
-        // Bottom-Left (Fires up-right)
         confetti({ ...settings, origin: { x: 0, y: 1 }, angle: 45, startVelocity: 60 });
-        
-        // Bottom-Right (Fires up-left)
         confetti({ ...settings, origin: { x: 1, y: 1 }, angle: 135, startVelocity: 60 });
         
       }, 300); 
@@ -660,7 +725,7 @@
                 container.appendChild(balloonWrapper);
                 
                 setTimeout(() => balloonWrapper.remove(), 8500); 
-            }, Math.random() * 4000); // Tighter balloon release schedule
+            }, Math.random() * 4000);
         }
     }
 
