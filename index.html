@@ -1,472 +1,632 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Grand Reveal | Hyper-Realistic</title>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Cormorant+Garamond:wght@300;600&display=swap');
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#050505" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>A Grand Beginning | Naming Ceremony</title>
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+  <!-- Confetti CDN (keeps your original behavior) -->
+  <script defer src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
-        body {
-            font-family: 'Cormorant Garamond', serif;
-            overflow: hidden;
-            /* Realistic dark marble/obsidian background */
-            background: radial-gradient(circle at 50% 50%, #1a1c20 0%, #0a0b0d 100%);
-            color: #fff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            perspective: 1500px; /* Deep 3D space */
-        }
+  <!-- Preconnect & preload fonts for better performance -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Montserrat:wght@200;300;400&display=swap" rel="stylesheet" />
 
-        /* --- BACKGROUND NOISE FOR REALISM --- */
-        body::before {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
-            z-index: 0;
-            pointer-events: none;
-        }
+  <style>
+    :root{
+      --bg:#050505;
+      --gold-1:#bf953f;
+      --gold-2:#fcf6ba;
+      --accent-ink: #111;
+      --muted: rgba(255,255,255,0.5);
+      --glass: rgba(20,20,20,0.6);
+      --glass-border: rgba(191,149,63,0.2);
+      --shadow: rgba(0,0,0,0.9);
+      --safe-area-top: env(safe-area-inset-top);
+      --safe-area-bottom: env(safe-area-inset-bottom);
+    }
 
-        /* --- STAGE 1: THE PHYSICAL GATES --- */
-        #scene-container {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
-            transform-style: preserve-3d;
-            transition: transform 3s cubic-bezier(0.25, 1, 0.5, 1); /* Camera push transition */
-        }
+    /* Reset + sensible defaults */
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body,#root{height:100%}
+    body{
+      font-family:'Montserrat',sans-serif;
+      background-color:var(--bg);
+      color:#fff;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      min-height:100vh;
+      padding-top:var(--safe-area-top);
+      padding-bottom:var(--safe-area-bottom);
+      overflow:hidden;
+    }
 
-        .gate {
-            position: absolute;
-            top: 0;
-            width: 50%;
-            height: 100%;
-            /* Brushed dark metal texture */
-            background: linear-gradient(90deg, #111, #222, #181818);
-            box-shadow: inset 0 0 50px rgba(0,0,0,0.9), 0 0 100px rgba(0,0,0,1);
-            transition: transform 4s cubic-bezier(0.5, 0, 0.1, 1); /* Heavy swing */
-            z-index: 101;
-            border-top: 10px solid #2a2a2a;
-            border-bottom: 10px solid #2a2a2a;
-        }
+    /* Use a mobile-friendly "viewport height" trick to avoid browser UI resizing issues */
+    /* JS sets --vh to window.innerHeight * 0.01 (so 100 * var(--vh) = actual device height) */
+    :root { --vh: 1vh; }
 
-        .gate.left { 
-            left: 0; 
-            transform-origin: left;
-            border-right: 15px solid #d4af37; /* Heavy gold trim */
-        }
-        .gate.right { 
-            right: 0; 
-            transform-origin: right;
-            border-left: 15px solid #d4af37;
-        }
+    /* Canvas background */
+    #canvas-bg{
+      position:fixed;
+      inset:0;
+      width:100%;
+      height:100%;
+      z-index:1;
+      opacity:0.7;
+      pointer-events:none;
+      will-change:transform;
+    }
 
-        .gate.open-left { transform: rotateY(-110deg); }
-        .gate.open-right { transform: rotateY(110deg); }
+    /* Gold shimmer effect for headings/text */
+    .gold-shimmer{
+      background:linear-gradient(90deg,var(--gold-1),var(--gold-2),#b38728,var(--gold-2),#aa771c);
+      background-size:200% auto;
+      color:transparent;
+      -webkit-background-clip:text;
+      background-clip:text;
+      animation:shine 4s linear infinite;
+      -webkit-font-smoothing:antialiased;
+    }
+    @keyframes shine{ to { background-position:200% center } }
 
-        /* --- THE MACHINED GOLD MEDALLION --- */
-        .medallion-wrapper {
-            position: relative;
-            z-index: 102;
-            transition: all 1s ease;
-        }
+    /* Intro container covers screen and uses perspective for cinematic gates */
+    #intro-container{
+      position:fixed;
+      inset:0;
+      z-index:100;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      perspective:1200px;
+      pointer-events:auto;
+      padding:clamp(12px,2.5vw,28px);
+    }
 
-        #letter-N {
-            font-family: 'Cinzel', serif;
-            font-size: 110px;
-            font-weight: 800;
-            color: #5a4010;
-            text-shadow: 1px 1px 1px rgba(255,255,255,0.8), -1px -1px 1px rgba(0,0,0,0.5);
-            /* Conic gradient simulates light reflecting off a circular machined metal surface */
-            background: conic-gradient(from 0deg, #e6ca7b, #b38728, #fdf5c9, #b38728, #e6ca7b);
-            width: 240px;
-            height: 240px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            box-shadow: 
-                inset 0 0 20px rgba(0,0,0,0.6), 
-                inset 0 0 5px rgba(255,255,255,0.8),
-                0 30px 50px rgba(0,0,0,0.8), 
-                0 0 0 10px #222, /* Outer dark ring */
-                0 0 0 14px #d4af37; /* Outer gold rim */
-            position: relative;
-            overflow: hidden;
-        }
+    .gate{
+      position:absolute;
+      top:0;
+      width:50%;
+      height:100%;
+      background:radial-gradient(circle at center,#1a1a1a 0%, #000 100%);
+      box-shadow:inset 0 0 100px rgba(0,0,0,1);
+      transition:transform 950ms cubic-bezier(.22,.9,.32,1);
+      z-index:101;
+      -webkit-backface-visibility:hidden;
+              backface-visibility:hidden;
+      will-change:transform;
+    }
+    .gate.left{ left:0; border-right:2px solid rgba(191,149,63,0.25); transform-origin:left; }
+    .gate.right{ right:0; border-left:2px solid rgba(191,149,63,0.25); transform-origin:right; }
 
-        /* Light sweeping reflection across the gold */
-        #letter-N::after {
-            content: '';
-            position: absolute;
-            top: -50%; left: -50%; width: 200%; height: 200%;
-            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%);
-            transform: rotate(45deg) translateX(-100%);
-            animation: lightSweep 4s infinite cubic-bezier(0.4, 0, 0.2, 1);
-        }
+    .gate.open-left{ transform: rotateY(-100deg); }
+    .gate.open-right{ transform: rotateY(100deg); }
 
-        @keyframes lightSweep {
-            0% { transform: rotate(45deg) translateX(-100%); }
-            100% { transform: rotate(45deg) translateX(100%); }
-        }
+    /* Seal / central N */
+    .seal-wrapper{
+      position:relative;
+      z-index:102;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:1.4rem;
+      pointer-events:auto;
+    }
 
-        /* --- STAGE 2: PHYSICAL FROSTED GLASS TIMER --- */
-        #timer-screen {
-            position: absolute;
-            text-align: center;
-            z-index: 50;
-            opacity: 0;
-            transform: scale(0.9);
-            transition: opacity 2s ease, transform 2s ease;
-            display: none;
-        }
+    /* Use responsive/clamped sizes so it adapts across phones/tablets/desktops */
+    #letter-N{
+      font-family:'Cinzel Decorative',serif;
+      font-size: clamp(40px, 8vw, 90px);
+      width: clamp(120px, 26vw, 220px);
+      height: clamp(120px, 26vw, 220px);
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      border-radius:50%;
+      background:linear-gradient(135deg,var(--gold-2) 0%, var(--gold-1) 100%);
+      color:var(--accent-ink);
+      cursor:pointer;
+      box-shadow:0 0 40px rgba(191,149,63,0.4), inset 0 0 20px rgba(255,255,255,0.5);
+      border:2px solid rgba(255,255,255,0.06);
+      transition:transform 300ms ease, box-shadow 300ms ease;
+      user-select:none;
+      -webkit-tap-highlight-color:transparent;
+    }
+    #letter-N:active{ transform: scale(0.98) }
+    #letter-N:focus{ outline:3px solid rgba(191,149,63,0.18); outline-offset:4px; }
 
-        #timer-screen h2 {
-            font-family: 'Cinzel', serif;
-            font-size: 38px;
-            margin-bottom: 60px;
-            color: #e6ca7b;
-            text-transform: uppercase;
-            letter-spacing: 6px;
-            text-shadow: 0 5px 15px rgba(0,0,0,0.8);
-        }
+    #letter-N::after{
+      content:'';
+      position:absolute;
+      top:-10px;left:-10px;right:-10px;bottom:-10px;border-radius:50%;
+      border:2px solid rgba(191,149,63,0.45);
+      animation:pulseRing 2s infinite cubic-bezier(.215,.61,.355,1);
+    }
+    @keyframes pulseRing{ 0%{ transform:scale(0.92); opacity:1 } 100%{ transform:scale(1.28); opacity:0 } }
 
-        .timer-box {
-            display: flex;
-            gap: 30px;
-            justify-content: center;
-        }
+    .click-hint{
+      margin-top:12px;
+      font-size:12px;
+      letter-spacing:6px;
+      text-transform:uppercase;
+      color:var(--muted);
+      animation:fadeInOut 2s infinite;
+    }
+    @keyframes fadeInOut{ 0%,100%{opacity:0.3} 50%{opacity:1} }
 
-        .time-unit {
-            /* Realistic thick frosted glass */
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(25px) saturate(120%);
-            -webkit-backdrop-filter: blur(25px) saturate(120%);
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
-            border-left: 1px solid rgba(255, 255, 255, 0.1);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.5);
-            border-right: 1px solid rgba(0, 0, 0, 0.5);
-            padding: 40px 30px;
-            border-radius: 15px;
-            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(0,0,0,0.2);
-            min-width: 150px;
-        }
+    /* Timer screen (glass) */
+    #timer-screen{
+      position:absolute;
+      z-index:50;
+      opacity:0;
+      display:none;
+      transition:opacity 450ms ease;
+      text-align:center;
+      width:100%;
+      padding: clamp(12px,2.5vw,32px);
+      pointer-events:auto;
+    }
+    #timer-screen h2{
+      font-family:'Cinzel Decorative',serif;
+      font-size: clamp(20px,4vw,32px);
+      margin-bottom: clamp(20px,4vw,40px);
+      letter-spacing:4px;
+    }
+    .timer-box{ display:flex; gap:18px; justify-content:center; flex-wrap:wrap; }
 
-        .time-unit div {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 75px;
-            font-weight: 300;
-            color: #fff;
-            line-height: 1;
-            text-shadow: 0 4px 10px rgba(0,0,0,0.5);
-        }
+    .time-unit{
+      background:var(--glass);
+      -webkit-backdrop-filter: blur(14px);
+      backdrop-filter: blur(14px);
+      border:1px solid var(--glass-border);
+      padding:18px 16px;
+      border-radius:12px;
+      box-shadow:0 10px 30px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.03);
+      min-width:90px;
+      text-align:center;
+    }
+    .time-unit div{
+      font-weight:200;
+      font-size: clamp(28px,8vw,65px);
+      line-height:1;
+      font-family:'Montserrat',sans-serif;
+    }
+    .time-unit span{ display:block; font-size:11px; color:#bdbdbd; margin-top:8px; letter-spacing:2px; text-transform:uppercase; }
 
-        .time-unit span {
-            display: block;
-            font-size: 14px;
-            color: #d4af37;
-            margin-top: 20px;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            font-family: 'Cinzel', serif;
-        }
+    /* Final countdown big number */
+    #countdown-screen{
+      position:absolute;
+      z-index:60;
+      display:none;
+      font-family:'Cinzel Decorative',serif;
+      color:transparent;
+      -webkit-background-clip:text;
+      background-clip:text;
+      background:linear-gradient(90deg,var(--gold-1),var(--gold-2));
+      text-shadow:0 0 60px rgba(191,149,63,0.6);
+      font-size: clamp(96px, 30vw, 280px);
+      animation:cinematicPulse 1s infinite;
+      pointer-events:none;
+    }
+    @keyframes cinematicPulse{
+      0% { transform: scale(0.92); opacity:0; filter: blur(8px) }
+      50%{ transform: scale(1.04); opacity:1; filter: blur(0px) }
+      100%{ transform: scale(1.2); opacity:0; filter: blur(4px) }
+    }
 
-        /* --- STAGE 3: THE COUNTDOWN --- */
-        #countdown-screen {
-            position: absolute;
-            font-family: 'Cinzel', serif;
-            font-size: 300px;
-            z-index: 60;
-            display: none;
-            color: transparent;
-            -webkit-text-stroke: 4px #d4af37; /* Hollow physical text outline */
-            text-shadow: 0 0 100px rgba(212, 175, 55, 0.4);
-        }
+    /* Reveal screen */
+    #reveal-screen{ position:absolute; z-index:70; display:none; text-align:center; padding:20px; }
+    #reveal-screen h3{
+      font-weight:300; font-size:clamp(14px,3.2vw,20px); letter-spacing:8px; color:rgba(255,255,255,0.85); margin-bottom:20px;
+      text-transform:uppercase; opacity:0; transform:translateY(-12px); animation:dropIn 600ms forwards 120ms;
+    }
+    .name-container{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+    .letter{
+      font-family:'Cinzel Decorative',serif;
+      font-size:clamp(48px,12vw,140px);
+      font-weight:700;
+      opacity:0;
+      transform:scale(0.86) translateY(40px) rotateX(-30deg);
+      transition: all 900ms cubic-bezier(.25,1,.5,1);
+      text-shadow: 0 12px 30px var(--shadow);
+      -webkit-font-smoothing:antialiased;
+    }
+    .letter.show{ opacity:1; transform:scale(1) translateY(0) rotateX(0deg); }
 
-        /* --- STAGE 4: EXTRUDED 3D REVEAL --- */
-        #reveal-screen {
-            position: absolute;
-            text-align: center;
-            z-index: 70;
-            display: none;
-        }
+    @keyframes dropIn{ to { opacity:1; transform:translateY(0) } }
 
-        #reveal-screen h3 {
-            font-family: 'Cinzel', serif;
-            font-weight: 400;
-            font-size: 22px;
-            letter-spacing: 12px;
-            color: #e6ca7b;
-            margin-bottom: 50px;
-            opacity: 0;
-            transform: translateY(-30px);
-            animation: floatIn 2s forwards 0.5s;
-            text-transform: uppercase;
-        }
+    /* RESPONSIVE tweaks */
+    @media (max-width:520px){
+      .timer-box{ gap:12px }
+      .time-unit{ padding:12px 10px; min-width:78px }
+      .click-hint{ letter-spacing:4px }
+      #letter-N::after{ display:block }
+      .gate{ transition:transform 1.2s cubic-bezier(.22,.9,.32,1) }
+    }
 
-        .name-container {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            perspective: 1000px;
-        }
+    /* Respect user preferences */
+    @media (prefers-reduced-motion: reduce){
+      .gold-shimmer, #letter-N::after, .click-hint, #countdown-screen, .letter, .gate { animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration: 1ms !important; }
+      #canvas-bg{ opacity:0.5 }
+    }
 
-        .letter {
-            font-family: 'Cinzel', serif;
-            font-size: 160px;
-            font-weight: 800;
-            color: #fdf5c9;
-            opacity: 0;
-            transform: translateZ(-200px) rotateX(-90deg);
-            transition: all 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Springy physical snap */
-            /* Advanced CSS 3D Extrusion - Makes the text look like a thick gold block */
-            text-shadow: 
-                0 1px 0 #b38728,
-                0 2px 0 #9f7622,
-                0 3px 0 #8c661c,
-                0 4px 0 #795717,
-                0 5px 0 #674a12,
-                0 6px 0 #563e0e,
-                0 15px 30px rgba(0,0,0,0.9);
-        }
+    /* Accessibility high-contrast tweaks */
+    @media (prefers-contrast: more){ body{ filter:contrast(1.05) } }
 
-        .letter.show {
-            opacity: 1;
-            transform: translateZ(0) rotateX(0deg);
-        }
-
-        @keyframes floatIn {
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-    </style>
+  </style>
 </head>
 <body>
+  <!-- Canvas background -->
+  <canvas id="canvas-bg" aria-hidden="true"></canvas>
 
-    <div id="scene-container">
-        <div class="gate left" id="gate-left"></div>
-        <div class="gate right" id="gate-right"></div>
-        
-        <div class="medallion-wrapper" id="medallion-wrapper">
-            <div id="letter-N" onclick="initiateSequence()">N</div>
-        </div>
+  <!-- Intro / gates -->
+  <div id="intro-container" aria-hidden="false">
+    <div class="gate left" id="gate-left" aria-hidden="true"></div>
+    <div class="gate right" id="gate-right" aria-hidden="true"></div>
+
+    <div class="seal-wrapper" id="seal-wrapper">
+      <!-- Make clickable/interactable element accessible by keyboard & screen readers -->
+      <div id="letter-N" role="button" tabindex="0" aria-pressed="false" aria-label="Open the ceremony welcome" title="Click or press Enter to open">N</div>
+      <div class="click-hint">Click to Enter</div>
     </div>
+  </div>
 
-    <div id="timer-screen">
-        <h2>The Grand Reveal Begins In</h2>
-        <div class="timer-box">
-            <div class="time-unit"><div id="days">00</div><span>Days</span></div>
-            <div class="time-unit"><div id="hours">00</div><span>Hours</span></div>
-            <div class="time-unit"><div id="mins">00</div><span>Minutes</span></div>
-            <div class="time-unit"><div id="secs">00</div><span>Seconds</span></div>
-        </div>
+  <!-- Timer (hidden until triggered) -->
+  <div id="timer-screen" aria-live="polite" aria-atomic="true">
+    <h2 class="gold-shimmer">The Journey Unfolds In</h2>
+    <div class="timer-box" role="group" aria-label="Countdown timer">
+      <div class="time-unit" aria-hidden="false"><div id="days" class="gold-shimmer">00</div><span>Days</span></div>
+      <div class="time-unit" aria-hidden="false"><div id="hours" class="gold-shimmer">00</div><span>Hours</span></div>
+      <div class="time-unit" aria-hidden="false"><div id="mins" class="gold-shimmer">00</div><span>Minutes</span></div>
+      <div class="time-unit" aria-hidden="false"><div id="secs" class="gold-shimmer">00</div><span>Seconds</span></div>
     </div>
+  </div>
 
-    <div id="countdown-screen">5</div>
+  <!-- Final numeric countdown -->
+  <div id="countdown-screen" class="gold-shimmer" aria-live="assertive" aria-atomic="true">5</div>
 
-    <div id="reveal-screen">
-        <h3>Welcome To The World</h3>
-        <div class="name-container" id="baby-name">
-            <div class="letter">A</div>
-            <div class="letter">R</div>
-            <div class="letter">Y</div>
-            <div class="letter">A</div>
-            <div class="letter">N</div>
-        </div>
+  <!-- Reveal -->
+  <div id="reveal-screen" aria-hidden="true">
+    <h3>Welcome To The World</h3>
+    <div class="name-container" id="baby-name" aria-hidden="true">
+      <div class="letter gold-shimmer">A</div>
+      <div class="letter gold-shimmer">R</div>
+      <div class="letter gold-shimmer">Y</div>
+      <div class="letter gold-shimmer">A</div>
+      <div class="letter gold-shimmer">N</div>
     </div>
+  </div>
 
-    <script>
-        // EVENT DATE: Set to 10 seconds for testing!
-        let eventDate = new Date();
-        eventDate.setSeconds(eventDate.getSeconds() + 10); 
-        let countdownInterval;
+  <!-- Fallback for users with JS disabled -->
+  <noscript>
+    <div style="position:fixed;inset:0;display:flex;justify-content:center;align-items:center;background:linear-gradient(180deg,rgba(0,0,0,0.65),rgba(0,0,0,0.85));z-index:9999;padding:20px;text-align:center;">
+      <div style="max-width:520px;color:#fff">
+        <h2 style="font-family:Cinzel Decorative,serif;margin-bottom:12px">Welcome</h2>
+        <p style="opacity:0.9">This interactive experience requires JavaScript. Please enable JavaScript to view the ceremony animation.</p>
+      </div>
+    </div>
+  </noscript>
 
-        function initiateSequence() {
-            let container = document.getElementById('scene-container');
-            let medallion = document.getElementById('medallion-wrapper');
-            let leftGate = document.getElementById('gate-left');
-            let rightGate = document.getElementById('gate-right');
+  <script>
+    /* -------------------------
+       Responsive helpers & safe viewport height
+       ------------------------- */
+    (function setVhUnit(){
+      const setVh = () => {
+        document.documentElement.style.setProperty('--vh', (window.innerHeight * 0.01) + 'px');
+      };
+      setVh();
+      window.addEventListener('resize', setVh, { passive: true });
+    })();
 
-            // 1. Camera pushes forward (scale up)
-            container.style.transform = 'scale(1.2)';
-            
-            // 2. Medallion sinks and fades
-            medallion.style.transform = 'translateZ(-100px) scale(0.8)';
-            medallion.style.opacity = '0';
+    /* -------------------------
+       High-DPI Canvas & Particle Engine
+       - Scales canvas with devicePixelRatio
+       - Reduces particle count for low power devices / low hardwareConcurrency
+       - Uses requestAnimationFrame with resize debounce
+       ------------------------- */
+    const canvas = document.getElementById('canvas-bg');
+    const ctx = canvas.getContext('2d', { alpha: true });
+    let dpr = Math.min(window.devicePixelRatio || 1, 2); // cap for performance
+    let particlesArray = [];
+    let animationId;
+    let particleConfig = {
+      baseCount: 150,
+      maxSize: 2.2,
+      maxSpeed: 0.6
+    };
 
-            // 3. Heavy gates swing open after a tiny mechanical delay
-            setTimeout(() => {
-                leftGate.classList.add('open-left');
-                rightGate.classList.add('open-right');
-            }, 600);
+    // adapt particle count by hardware
+    try {
+      const cores = navigator.hardwareConcurrency || 4;
+      if (cores <= 2) particleConfig.baseCount = 60;
+      else if (cores <= 4) particleConfig.baseCount = 110;
+      else particleConfig.baseCount = 150;
+    } catch (e) { particleConfig.baseCount = 100; }
 
-            // 4. Clean up intro and show timer
-            setTimeout(() => {
-                container.style.display = 'none';
-                let timerScreen = document.getElementById('timer-screen');
-                timerScreen.style.display = 'block';
-                // Trigger reflow
-                void timerScreen.offsetWidth;
-                timerScreen.style.opacity = '1';
-                timerScreen.style.transform = 'scale(1)';
-                startTimer();
-            }, 3500); // Waits for the heavy gate swing to finish
+    function resizeCanvas(){
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.round(window.innerWidth * dpr);
+      canvas.height = Math.round(window.innerHeight * dpr);
+      canvas.style.width = window.innerWidth + 'px';
+      canvas.style.height = window.innerHeight + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    class Particle {
+      constructor(){
+        this.reset(true);
+      }
+      reset(init=false){
+        this.x = Math.random() * window.innerWidth;
+        this.y = Math.random() * window.innerHeight;
+        this.size = Math.random() * (particleConfig.maxSize - 0.4) + 0.4;
+        this.speedY = Math.random() * particleConfig.maxSpeed - (particleConfig.maxSpeed/2);
+        this.speedX = Math.random() * particleConfig.maxSpeed - (particleConfig.maxSpeed/2);
+        // subtle twinkle
+        this.alpha = 0.6 + Math.random() * 0.4;
+        if(!init && Math.random() < 0.02) {
+          // teleport sometimes for variety
+          this.x = Math.random() * window.innerWidth;
+          this.y = Math.random() * window.innerHeight;
+        }
+      }
+      update(){
+        this.x += this.speedX;
+        this.y += this.speedY;
+        if(this.y > window.innerHeight + 10) this.y = -10;
+        if(this.y < -10) this.y = window.innerHeight + 10;
+        if(this.x > window.innerWidth + 10) this.x = -10;
+        if(this.x < -10) this.x = window.innerWidth + 10;
+      }
+      draw(){
+        ctx.fillStyle = 'rgba(191, 149, 63,' + this.alpha + ')';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    function initParticles(count){
+      particlesArray = [];
+      for(let i=0;i<count;i++) particlesArray.push(new Particle());
+    }
+
+    let resizeTimeout;
+    function onResize(){
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        resizeCanvas();
+        initParticles(particleConfig.baseCount);
+      }, 120);
+    }
+    window.addEventListener('resize', onResize, { passive: true });
+
+    function animateParticles(){
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      for(let i=0;i<particlesArray.length;i++){
+        particlesArray[i].update();
+        particlesArray[i].draw();
+      }
+      animationId = requestAnimationFrame(animateParticles);
+    }
+
+    // Respect prefers-reduced-motion — if user prefers reduced motion, minimize visual motion
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!reducedMotion){
+      resizeCanvas();
+      initParticles(particleConfig.baseCount);
+      animateParticles();
+    } else {
+      // very lightweight static background for reduced-motion users
+      resizeCanvas();
+      particlesArray = [];
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      // single subtle dot to keep the design aesthetic
+      ctx.fillStyle = 'rgba(191,149,63,0.4)';
+      ctx.beginPath();
+      ctx.arc(window.innerWidth/2, window.innerHeight/2, 1.8, 0, Math.PI*2);
+      ctx.fill();
+    }
+
+    /* -------------------------
+       Core Timers and Interaction
+       - Accessible keyboard & touch activation
+       - Debounced intervals and aria updates
+       - Adjustable eventDate for demo/dev
+       ------------------------- */
+    // For demo: 10 seconds from click. In production, set a real date:
+    function createEventDateFromNow(seconds){
+      const d = new Date();
+      d.setSeconds(d.getSeconds() + seconds);
+      return d;
+    }
+
+    let eventDate = createEventDateFromNow(10); // demo; change to future date as needed
+    let countdownInterval = null;
+    let finalTimer = null;
+
+    const letterN = document.getElementById('letter-N');
+    const sealWrapper = document.getElementById('seal-wrapper');
+    const timerScreen = document.getElementById('timer-screen');
+    const countdownScreen = document.getElementById('countdown-screen');
+    const revealScreen = document.getElementById('reveal-screen');
+    const nameContainer = document.getElementById('baby-name');
+    const gates = { left: document.getElementById('gate-left'), right: document.getElementById('gate-right') };
+
+    function safeSetText(id, text){
+      const el = document.getElementById(id);
+      if(el) el.textContent = text;
+    }
+
+    // Accessible trigger (mouse/touch/keyboard)
+    function triggerEntrance(){
+      // prevent double-activation
+      if(letterN.getAttribute('data-activated') === 'true') return;
+      letterN.setAttribute('data-activated','true');
+      letterN.setAttribute('aria-pressed','true');
+
+      // warm visual shockwave (reduce scale on reduced-motion)
+      if (!reducedMotion) {
+        sealWrapper.style.transform = 'scale(4)';
+        sealWrapper.style.opacity = '0';
+        sealWrapper.style.filter = 'blur(8px)';
+      } else {
+        sealWrapper.style.opacity = '0';
+      }
+
+      setTimeout(() => {
+        gates.left.classList.add('open-left');
+        gates.right.classList.add('open-right');
+      }, 300);
+
+      // Switch screens after gate animation
+      setTimeout(() => {
+        document.getElementById('intro-container').style.display = 'none';
+        timerScreen.style.display = 'block';
+        // small delay to allow CSS to transition opacity
+        setTimeout(()=> timerScreen.style.opacity = '1', 40);
+        startTimer();
+      }, 900); // shortened for snappy feeling on mobile
+    }
+
+    // Add keyboard support (Enter / Space)
+    letterN.addEventListener('keydown', (ev) => {
+      if(ev.key === 'Enter' || ev.key === ' '){
+        ev.preventDefault();
+        triggerEntrance();
+      }
+    }, { passive: false });
+
+    // Touch/pointer friendly
+    letterN.addEventListener('click', triggerEntrance, { passive: true });
+    letterN.addEventListener('pointerdown', (e) => { /* consume for a nicer tap feel */ }, { passive: true });
+
+    // Timer logic
+    function startTimer(){
+      if(countdownInterval) clearInterval(countdownInterval);
+
+      function updateOnce(){
+        const now = Date.now();
+        let dist = eventDate.getTime() - now;
+
+        if(dist <= 0){
+          clearInterval(countdownInterval);
+          timerScreen.style.opacity = '0';
+          setTimeout(() => {
+            timerScreen.style.display = 'none';
+            startFinalCountdown();
+          }, 500);
+          return;
         }
 
-        function startTimer() {
-            countdownInterval = setInterval(() => {
-                let now = new Date().getTime();
-                let distance = eventDate - now;
+        const days = Math.floor(dist / (1000*60*60*24));
+        const hours = Math.floor((dist % (1000*60*60*24)) / (1000*60*60));
+        const minutes = Math.floor((dist % (1000*60*60)) / (1000*60));
+        const seconds = Math.floor((dist % (1000*60)) / 1000);
 
-                if (distance <= 0) {
-                    clearInterval(countdownInterval);
-                    let timerScreen = document.getElementById('timer-screen');
-                    
-                    // Glass fades away
-                    timerScreen.style.opacity = '0'; 
-                    timerScreen.style.transform = 'scale(1.1)';
-                    
-                    setTimeout(() => {
-                        timerScreen.style.display = 'none';
-                        startFinalCountdown(); 
-                    }, 2000); 
-                    return;
-                }
+        safeSetText('days', days < 10 ? '0'+days : String(days));
+        safeSetText('hours', hours < 10 ? '0'+hours : String(hours));
+        safeSetText('mins', minutes < 10 ? '0'+minutes : String(minutes));
+        safeSetText('secs', seconds < 10 ? '0'+seconds : String(seconds));
+      }
 
-                let days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                let hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                let seconds = Math.floor((distance % (1000 * 60)) / 1000);
+      updateOnce();
+      countdownInterval = setInterval(updateOnce, 1000);
+    }
 
-                document.getElementById('days').innerText = days < 10 ? '0' + days : days;
-                document.getElementById('hours').innerText = hours < 10 ? '0' + hours : hours;
-                document.getElementById('mins').innerText = minutes < 10 ? '0' + minutes : minutes;
-                document.getElementById('secs').innerText = seconds < 10 ? '0' + seconds : seconds;
+    // Final numeric countdown and reveal
+    function startFinalCountdown(){
+      countdownScreen.style.display = 'block';
+      countdownScreen.textContent = '5';
+      let count = 5;
 
-            }, 1000);
+      finalTimer = setInterval(() => {
+        count--;
+        if(count >= 0){
+          countdownScreen.textContent = String(count);
         }
-
-        function startFinalCountdown() {
-            let countScreen = document.getElementById('countdown-screen');
-            countScreen.style.display = 'block';
-            let count = 5;
-            countScreen.innerText = count;
-
-            let finalTimer = setInterval(() => {
-                count--;
-                if (count > 0) {
-                    // Quick flash effect on change
-                    countScreen.style.opacity = '0.5';
-                    setTimeout(() => {
-                        countScreen.innerText = count;
-                        countScreen.style.opacity = '1';
-                    }, 100);
-                } else if (count === 0) {
-                    countScreen.innerText = "0";
-                } else {
-                    clearInterval(finalTimer);
-                    countScreen.style.display = 'none';
-                    triggerGrandReveal();
-                }
-            }, 1000);
+        if(count < 0){
+          clearInterval(finalTimer);
+          countdownScreen.style.display = 'none';
+          triggerGrandReveal();
         }
+      }, 1000);
+    }
 
-        function triggerGrandReveal() {
-            document.getElementById('reveal-screen').style.display = 'block';
-            let letters = document.querySelectorAll('.letter');
-            
-            // 3D physical snap-in for letters
-            letters.forEach((letter, index) => {
-                setTimeout(() => {
-                    letter.classList.add('show');
-                }, index * 400); 
-            });
+    function triggerGrandReveal(){
+      revealScreen.style.display = 'block';
+      revealScreen.setAttribute('aria-hidden','false');
+      nameContainer.setAttribute('aria-hidden','false');
 
-            setTimeout(() => {
-                fireRealisticPhysicsShowers();
-            }, (letters.length * 400) + 100);
-        }
+      const letters = document.querySelectorAll('.letter');
+      letters.forEach((letter, idx) => {
+        setTimeout(() => {
+          letter.classList.add('show');
+        }, idx * (reducedMotion ? 60 : 320));
+      });
 
-        function fireRealisticPhysicsShowers() {
-            var duration = 15 * 1000; 
-            var animationEnd = Date.now() + duration;
+      // Confetti / celebration (respect reduced motion)
+      const delay = (letters.length * (reducedMotion ? 60 : 320)) + 120;
+      setTimeout(() => {
+        fireMajesticShowers();
+      }, delay);
+    }
 
-            function randomInRange(min, max) {
-                return Math.random() * (max - min) + min;
-            }
+    /* -------------------------
+       Confetti fireworks with respect for reduced motion
+       ------------------------- */
+    function fireMajesticShowers(){
+      if (reducedMotion) return;
 
-            var interval = setInterval(function() {
-                var timeLeft = animationEnd - Date.now();
+      if (typeof confetti !== 'function') return; // safety
+      const duration = 12 * 1000;
+      const animationEnd = Date.now() + duration;
+      const defaults = { startVelocity: 55, spread: 360, ticks: 120, zIndex: 100 };
 
-                if (timeLeft <= 0) {
-                    return clearInterval(interval);
-                }
+      function randomInRange(min,max){ return Math.random()*(max-min)+min; }
 
-                var particleCount = 60 * (timeLeft / duration);
-                
-                // --- METALLIC FOIL (Heavier, drops faster, reflects light) ---
-                confetti({
-                    particleCount: particleCount / 2,
-                    origin: { x: randomInRange(0.0, 0.3), y: Math.random() - 0.2 },
-                    colors: ['#d4af37', '#e6ca7b', '#b38728'],
-                    shapes: ['square'], /* Squares mimic cut foil */
-                    gravity: 1.2, /* Heavy realistic drop */
-                    scalar: 1.2,
-                    drift: randomInRange(-0.4, 0.4),
-                    ticks: 300
-                });
+      const interval = setInterval(function(){
+        const timeLeft = animationEnd - Date.now();
+        if (timeLeft <= 0) return clearInterval(interval);
 
-                confetti({
-                    particleCount: particleCount / 2,
-                    origin: { x: randomInRange(0.7, 1.0), y: Math.random() - 0.2 },
-                    colors: ['#d4af37', '#e6ca7b', '#b38728'],
-                    shapes: ['square'],
-                    gravity: 1.2,
-                    scalar: 1.2,
-                    drift: randomInRange(-0.4, 0.4),
-                    ticks: 300
-                });
+        const particleCount = Math.floor(80 * (timeLeft / duration));
+        // Left bursts
+        confetti(Object.assign({}, defaults, {
+          particleCount,
+          origin: { x: randomInRange(0.0,0.2), y: Math.random() - 0.2 },
+          colors: ['#bf953f','#fcf6ba','#ffffff'],
+          disableForReducedMotion: true
+        }));
+        // Right bursts
+        confetti(Object.assign({}, defaults, {
+          particleCount,
+          origin: { x: randomInRange(0.8,1.0), y: Math.random() - 0.2 },
+          colors: ['#bf953f','#fcf6ba','#ffffff'],
+          disableForReducedMotion: true
+        }));
+      }, 200);
+    }
 
-                // --- ROSE PETALS (Softer, drifts in the wind, slower gravity) ---
-                confetti({
-                    particleCount: particleCount / 2,
-                    origin: { x: randomInRange(0.0, 0.3), y: Math.random() - 0.2 },
-                    colors: ['#ffc0cb', '#ffb6c1', '#ffffff'],
-                    shapes: ['circle'], /* Circles mimic soft petals */
-                    gravity: 0.6, /* Slow, floaty drop */
-                    scalar: 1.5,
-                    drift: randomInRange(-1, 1), /* High wind drift */
-                    ticks: 400
-                });
+    /* -------------------------
+       Clean up when navigating away (cancel RAF & intervals)
+       ------------------------- */
+    window.addEventListener('pagehide', () => {
+      if(animationId) cancelAnimationFrame(animationId);
+      if(countdownInterval) clearInterval(countdownInterval);
+      if(finalTimer) clearInterval(finalTimer);
+    }, { passive:true });
 
-                confetti({
-                    particleCount: particleCount / 2,
-                    origin: { x: randomInRange(0.7, 1.0), y: Math.random() - 0.2 },
-                    colors: ['#ffc0cb', '#ffb6c1', '#ffffff'],
-                    shapes: ['circle'],
-                    gravity: 0.6,
-                    scalar: 1.5,
-                    drift: randomInRange(-1, 1),
-                    ticks: 400
-                });
+    /* -------------------------
+       Optional: expose start function for debugging/test
+       ------------------------- */
+    window.__ceremony = { triggerEntrance, startTimer, startFinalCountdown, triggerGrandReveal };
 
-            }, 250);
-        }
-    </script>
+  </script>
 </body>
 </html>
