@@ -8,32 +8,32 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>A Grand Beginning | Naming Ceremony</title>
 
-  <!-- Confetti CDN -->
   <script defer src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
-  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Montserrat:wght@200;300;400&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Cinzel+Decorative:wght@700&family=Montserrat:wght@200;300;400&display=swap" rel="stylesheet" />
 
   <style>
     /* ===== VARIABLES & RESETS ===== */
     :root {
       --bg: #050505;
       --gold-1: #bf953f;
-      --gold-2: #fcf6ba;
+      --gold-2: #fdf5c9;
+      --gold-3: #b38728;
       --muted: rgba(255, 255, 255, 0.5);
-      --glass: rgba(20, 20, 20, 0.6);
-      --glass-border: rgba(191, 149, 63, 0.2);
-      --shadow: rgba(0, 0, 0, 0.9);
+      --glass: rgba(20, 20, 20, 0.4);
+      --glass-border: rgba(191, 149, 63, 0.3);
       --safe-area-top: env(safe-area-inset-top);
       --safe-area-bottom: env(safe-area-inset-bottom);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; }
+    
     body {
       font-family: 'Montserrat', sans-serif;
-      background-color: var(--bg);
+      /* Deep radial background for a premium studio feel */
+      background: radial-gradient(circle at 50% 50%, #1a1c20 0%, #050505 100%);
       color: #fff;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
@@ -44,6 +44,17 @@
       padding-top: var(--safe-area-top);
       padding-bottom: var(--safe-area-bottom);
       overflow: hidden;
+      perspective: 1500px;
+    }
+
+    /* Subtle atmospheric noise */
+    body::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
+      z-index: 0;
+      pointer-events: none;
     }
 
     /* ===== CANVAS BACKGROUND ===== */
@@ -53,13 +64,13 @@
       width: 100%;
       height: 100%;
       z-index: 1;
-      opacity: 0.7;
+      opacity: 0.5;
       pointer-events: none;
     }
 
     /* ===== GOLD SHIMMER ===== */
     .gold-shimmer {
-      background: linear-gradient(90deg, var(--gold-1), var(--gold-2), #b38728, var(--gold-2), #aa771c);
+      background: linear-gradient(90deg, var(--gold-1), var(--gold-2), var(--gold-3), var(--gold-2), var(--gold-1));
       background-size: 200% auto;
       color: transparent;
       -webkit-background-clip: text;
@@ -69,7 +80,7 @@
     @keyframes shine { to { background-position: 200% center; } }
 
     /* ===== INTRO CONTAINER ===== */
-    #intro-container {
+    #scene-container {
       position: fixed;
       inset: 0;
       z-index: 100;
@@ -77,28 +88,37 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      perspective: 1200px;
-      padding: clamp(12px, 2.5vw, 28px);
+      transform-style: preserve-3d;
+      transition: transform 3.5s cubic-bezier(0.25, 1, 0.5, 1);
     }
 
-    /* ===== CINEMATIC GATES ===== */
+    /* ===== HEAVY 3D GATES ===== */
     .gate {
       position: absolute;
       top: 0;
       width: 50%;
       height: 100%;
-      background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
-      box-shadow: inset 0 0 100px rgba(0, 0, 0, 1);
-      transition: transform 950ms cubic-bezier(0.22, 0.9, 0.32, 1);
+      background: linear-gradient(90deg, #0a0a0a, #1a1a1a, #0a0a0a);
+      box-shadow: inset 0 0 80px rgba(0,0,0,1), 0 0 50px rgba(0,0,0,0.8);
+      transition: transform 3.5s cubic-bezier(0.5, 0, 0.1, 1);
       z-index: 101;
-      backface-visibility: hidden;
+      border-top: 5px solid #222;
+      border-bottom: 5px solid #222;
     }
-    .gate.left { left: 0; border-right: 2px solid rgba(191, 149, 63, 0.25); transform-origin: left; }
-    .gate.right { right: 0; border-left: 2px solid rgba(191, 149, 63, 0.25); transform-origin: right; }
-    .gate.open-left { transform: rotateY(-100deg); }
-    .gate.open-right { transform: rotateY(100deg); }
+    .gate.left { 
+      left: 0; 
+      transform-origin: left;
+      border-right: 8px solid var(--gold-1); 
+    }
+    .gate.right { 
+      right: 0; 
+      transform-origin: right;
+      border-left: 8px solid var(--gold-1); 
+    }
+    .gate.open-left { transform: rotateY(-105deg); }
+    .gate.open-right { transform: rotateY(105deg); }
 
-    /* ===== SEAL & BUTTON ===== */
+    /* ===== MACHINED GOLD SEAL ===== */
     .seal-wrapper {
       position: relative;
       z-index: 102;
@@ -106,154 +126,188 @@
       flex-direction: column;
       align-items: center;
       gap: 1.4rem;
+      transition: all 1.5s cubic-bezier(0.25, 1, 0.5, 1);
     }
 
     #letter-N {
       font-family: 'Cinzel Decorative', serif;
-      font-size: clamp(40px, 8vw, 90px);
-      width: clamp(120px, 26vw, 220px);
-      height: clamp(120px, 26vw, 220px);
+      font-size: clamp(50px, 8vw, 110px);
+      width: clamp(140px, 26vw, 240px);
+      height: clamp(140px, 26vw, 240px);
       display: flex;
       justify-content: center;
       align-items: center;
       border-radius: 50%;
-      background: linear-gradient(135deg, var(--gold-2), var(--gold-1));
-      color: #111;
+      /* Conic gradient for realistic metallic reflection */
+      background: conic-gradient(from 0deg, var(--gold-2), var(--gold-3), #fff, var(--gold-3), var(--gold-2));
+      color: #3d2b07;
+      text-shadow: 1px 1px 2px rgba(255,255,255,0.8), -1px -1px 2px rgba(0,0,0,0.4);
       cursor: pointer;
-      box-shadow: 0 0 40px rgba(191, 149, 63, 0.4), inset 0 0 20px rgba(255, 255, 255, 0.5);
-      border: 2px solid rgba(255, 255, 255, 0.06);
+      box-shadow: 
+        inset 0 0 20px rgba(0,0,0,0.5), 
+        0 20px 40px rgba(0,0,0,0.9), 
+        0 0 0 8px #111, 
+        0 0 0 12px var(--gold-1);
       transition: transform 300ms ease, box-shadow 300ms ease;
       user-select: none;
       -webkit-tap-highlight-color: transparent;
       font-weight: 700;
+      position: relative;
+      overflow: hidden;
     }
-    #letter-N:hover { transform: scale(1.02); box-shadow: 0 0 50px rgba(191, 149, 63, 0.6), inset 0 0 20px rgba(255, 255, 255, 0.6); }
-    #letter-N:active { transform: scale(0.98); }
-    #letter-N:focus { outline: 3px solid rgba(191, 149, 63, 0.18); outline-offset: 4px; }
+    
+    #letter-N:hover { transform: scale(1.05); }
+    #letter-N:active { transform: scale(0.95); }
 
+    /* Sweeping light reflection on the gold coin */
     #letter-N::after {
       content: '';
       position: absolute;
-      top: -10px;
-      left: -10px;
-      right: -10px;
-      bottom: -10px;
-      border-radius: 50%;
-      border: 2px solid rgba(191, 149, 63, 0.45);
-      animation: pulseRing 2s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+      top: -50%; left: -50%; width: 200%; height: 200%;
+      background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0) 100%);
+      transform: rotate(45deg) translateX(-100%);
+      animation: lightSweep 4s infinite cubic-bezier(0.4, 0, 0.2, 1);
     }
-    @keyframes pulseRing { 0% { transform: scale(0.92); opacity: 1; } 100% { transform: scale(1.28); opacity: 0; } }
+    @keyframes lightSweep {
+      0% { transform: rotate(45deg) translateX(-100%); }
+      100% { transform: rotate(45deg) translateX(100%); }
+    }
 
     .click-hint {
-      margin-top: 12px;
-      font-size: 12px;
-      letter-spacing: 6px;
+      font-size: 13px;
+      letter-spacing: 8px;
       text-transform: uppercase;
       color: var(--muted);
       animation: fadeInOut 2s infinite;
     }
     @keyframes fadeInOut { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
 
-    /* ===== TIMER SCREEN ===== */
+    /* ===== FROSTED GLASS TIMER SCREEN ===== */
     #timer-screen {
       position: absolute;
       z-index: 50;
       opacity: 0;
+      transform: scale(0.9);
       display: none;
-      transition: opacity 450ms ease;
+      transition: opacity 1.5s ease, transform 1.5s ease;
       text-align: center;
       width: 100%;
       padding: clamp(12px, 2.5vw, 32px);
     }
     #timer-title {
-      font-family: 'Cinzel Decorative', serif;
-      font-size: clamp(20px, 4vw, 32px);
-      margin-bottom: clamp(20px, 4vw, 40px);
-      letter-spacing: 4px;
+      font-family: 'Cinzel', serif;
+      font-size: clamp(22px, 4vw, 36px);
+      margin-bottom: clamp(30px, 4vw, 50px);
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      text-shadow: 0 5px 15px rgba(0,0,0,0.8);
     }
-    .timer-box { display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; }
+    .timer-box { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; }
     .time-unit {
       background: var(--glass);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border: 1px solid var(--glass-border);
-      padding: 18px 16px;
-      border-radius: 12px;
-      min-width: 90px;
-      text-align: center;
+      backdrop-filter: blur(20px) saturate(120%);
+      -webkit-backdrop-filter: blur(20px) saturate(120%);
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      border-left: 1px solid rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.6);
+      border-right: 1px solid rgba(0, 0, 0, 0.6);
+      padding: 30px 20px;
+      border-radius: 16px;
+      min-width: 110px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
     }
-    .time-unit div { font-weight: 200; font-size: clamp(28px, 8vw, 65px); line-height: 1; }
-    .time-unit span { display: block; font-size: 11px; color: #bdbdbd; margin-top: 8px; letter-spacing: 2px; text-transform: uppercase; }
+    .time-unit div { 
+      font-weight: 300; 
+      font-size: clamp(40px, 8vw, 75px); 
+      line-height: 1; 
+      text-shadow: 0 4px 10px rgba(0,0,0,0.6);
+    }
+    .time-unit span { 
+      display: block; 
+      font-size: 12px; 
+      color: var(--gold-1); 
+      margin-top: 15px; 
+      letter-spacing: 3px; 
+      text-transform: uppercase; 
+      font-family: 'Cinzel', serif;
+    }
 
-    /* ===== COUNTDOWN SCREEN ===== */
+    /* ===== HEARTBEAT COUNTDOWN SCREEN ===== */
     #countdown-screen {
       position: absolute;
       z-index: 60;
       display: none;
-      font-family: 'Cinzel Decorative', serif;
+      font-family: 'Cinzel', serif;
       color: transparent;
-      -webkit-background-clip: text;
-      background-clip: text;
-      background: linear-gradient(90deg, var(--gold-1), var(--gold-2));
-      text-shadow: 0 0 60px rgba(191, 149, 63, 0.6);
-      font-size: clamp(96px, 30vw, 280px);
+      -webkit-text-stroke: 3px var(--gold-1);
+      text-shadow: 0 0 80px rgba(191, 149, 63, 0.5);
+      font-size: clamp(120px, 30vw, 320px);
       pointer-events: none;
-      animation: cinematicPulse 1s infinite;
+      animation: heartbeatPulse 1s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
     }
-    @keyframes cinematicPulse {
-      0% { transform: scale(0.92); opacity: 0; filter: blur(8px); }
-      50% { transform: scale(1.04); opacity: 1; filter: blur(0px); }
-      100% { transform: scale(1.2); opacity: 0; filter: blur(4px); }
+    @keyframes heartbeatPulse {
+      0% { transform: scale(0.8); opacity: 0; filter: blur(10px); }
+      20% { transform: scale(1.1); opacity: 1; filter: blur(0px); }
+      100% { transform: scale(1.4); opacity: 0; filter: blur(5px); }
     }
 
-    /* ===== REVEAL SCREEN ===== */
-    #reveal-screen { position: absolute; z-index: 70; display: none; text-align: center; padding: 20px; }
+    /* ===== 3D EXTRUDED REVEAL SCREEN ===== */
+    #reveal-screen { position: absolute; z-index: 70; display: none; text-align: center; padding: 20px; perspective: 1000px; }
     #reveal-subtitle {
-      font-weight: 300;
-      font-size: clamp(14px, 3.2vw, 20px);
-      letter-spacing: 8px;
-      color: rgba(255, 255, 255, 0.85);
-      margin-bottom: 20px;
+      font-family: 'Cinzel', serif;
+      font-weight: 400;
+      font-size: clamp(16px, 3.2vw, 24px);
+      letter-spacing: 12px;
+      color: var(--gold-2);
+      margin-bottom: 40px;
       text-transform: uppercase;
-    }
-    .name-container { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-    .letter {
-      font-family: 'Cinzel Decorative', serif;
-      font-size: clamp(48px, 12vw, 140px);
-      font-weight: 700;
       opacity: 0;
-      transform: scale(0.86) translateY(40px) rotateX(-30deg);
-      transition: all 900ms cubic-bezier(0.25, 1, 0.5, 1);
-      text-shadow: 0 12px 30px rgba(0, 0, 0, 0.9);
+      transform: translateY(-20px);
+      animation: floatIn 2s forwards 0.5s;
+    }
+    @keyframes floatIn { to { opacity: 1; transform: translateY(0); } }
+
+    .name-container { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
+    
+    .letter {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(60px, 15vw, 180px);
+      font-weight: 800;
+      color: var(--gold-2);
+      opacity: 0;
+      transform: translateZ(-200px) rotateX(-90deg);
+      transition: all 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      /* Advanced 3D Extrusion */
+      text-shadow: 
+        0 1px 0 #b38728, 0 2px 0 #9f7622, 0 3px 0 #8c661c,
+        0 4px 0 #795717, 0 5px 0 #674a12, 0 6px 0 #563e0e,
+        0 20px 40px rgba(0,0,0,0.9);
       -webkit-font-smoothing: antialiased;
     }
-    .letter.show { opacity: 1; transform: scale(1) translateY(0) rotateX(0deg); }
+    .letter.show { opacity: 1; transform: translateZ(0) rotateX(0deg); }
 
     /* ===== RESPONSIVE ===== */
     @media (max-width: 520px) {
-      .timer-box { gap: 12px; }
-      .time-unit { padding: 12px 10px; min-width: 78px; }
-      .click-hint { letter-spacing: 4px; }
-      .gate { transition: transform 1.2s cubic-bezier(0.22, 0.9, 0.32, 1); }
+      .timer-box { gap: 15px; }
+      .time-unit { padding: 20px 15px; min-width: 85px; }
+      .click-hint { letter-spacing: 5px; }
     }
 
     /* ===== REDUCED MOTION ===== */
     @media (prefers-reduced-motion: reduce) {
-      .gold-shimmer, #letter-N::after, .click-hint, #countdown-screen, .letter, .gate {
+      .gold-shimmer, #letter-N::after, .click-hint, #countdown-screen, .letter, .gate, #scene-container {
         animation-duration: 0.001ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 1ms !important;
       }
-      #canvas-bg { opacity: 0.5; }
+      #canvas-bg { opacity: 0.3; }
     }
   </style>
 </head>
 <body>
-  <!-- Canvas Background -->
   <canvas id="canvas-bg" aria-hidden="true"></canvas>
 
-  <!-- Intro Container -->
-  <div id="intro-container" aria-hidden="false">
+  <div id="scene-container" aria-hidden="false">
     <div class="gate left" id="gate-left" aria-hidden="true"></div>
     <div class="gate right" id="gate-right" aria-hidden="true"></div>
 
@@ -263,37 +317,32 @@
     </div>
   </div>
 
-  <!-- Timer Screen -->
   <div id="timer-screen" aria-live="polite" aria-atomic="true">
     <h2 id="timer-title" class="gold-shimmer">The Journey Unfolds In</h2>
     <div class="timer-box" role="group" aria-label="Countdown timer">
-      <div class="time-unit"><div id="days" class="gold-shimmer">00</div><span id="label-days">Days</span></div>
-      <div class="time-unit"><div id="hours" class="gold-shimmer">00</div><span id="label-hours">Hours</span></div>
-      <div class="time-unit"><div id="mins" class="gold-shimmer">00</div><span id="label-mins">Minutes</span></div>
-      <div class="time-unit"><div id="secs" class="gold-shimmer">00</div><span id="label-secs">Seconds</span></div>
+      <div class="time-unit"><div id="days">00</div><span id="label-days">Days</span></div>
+      <div class="time-unit"><div id="hours">00</div><span id="label-hours">Hours</span></div>
+      <div class="time-unit"><div id="mins">00</div><span id="label-mins">Minutes</span></div>
+      <div class="time-unit"><div id="secs">00</div><span id="label-secs">Seconds</span></div>
     </div>
   </div>
 
-  <!-- Countdown Screen -->
   <div id="countdown-screen" aria-live="assertive" aria-atomic="true">5</div>
 
-  <!-- Reveal Screen -->
   <div id="reveal-screen" aria-hidden="true">
-    <h3 id="reveal-subtitle" class="gold-shimmer">Welcome To The World</h3>
+    <h3 id="reveal-subtitle">Welcome To The World</h3>
     <div class="name-container" id="baby-name" aria-hidden="true"></div>
   </div>
 
-  <!-- NoScript Fallback -->
   <noscript>
-    <div style="position: fixed; inset: 0; display: flex; justify-content: center; align-items: center; background: linear-gradient(180deg, rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.85)); z-index: 9999; padding: 20px; text-align: center;">
-      <div style="max-width: 520px; color: #fff;">
-        <h2 style="font-family: Cinzel Decorative, serif; margin-bottom: 12px;">Welcome</h2>
-        <p style="opacity: 0.9;">Please enable JavaScript to view the ceremony animation.</p>
+    <div style="position: fixed; inset: 0; display: flex; justify-content: center; align-items: center; background: #050505; z-index: 9999; padding: 20px; text-align: center;">
+      <div style="color: #d4af37;">
+        <h2 style="font-family: Cinzel, serif; margin-bottom: 12px;">Welcome</h2>
+        <p>Please enable JavaScript to view the ceremony animation.</p>
       </div>
     </div>
   </noscript>
 
-  <!-- ===== ALL-IN-ONE SCRIPT ===== -->
   <script>
     'use strict';
 
@@ -301,7 +350,7 @@
     const CONFIG = {
       ceremonyName: window.__ceremonyName || 'ARYAN',
       ceremonyEventDate: window.__ceremonyEventDate || null,
-      timerDemoSeconds: 10
+      timerDemoSeconds: 12 // Increased slightly to allow the majestic gate opening to finish
     };
 
     /* ===== UTILITIES ===== */
@@ -313,9 +362,7 @@
     const i18n = {
       en: { timerTitle: 'The Journey Unfolds In', days: 'Days', hours: 'Hours', minutes: 'Minutes', seconds: 'Seconds', clickHint: 'Click to Enter', revealSubtitle: 'Welcome To The World' },
       es: { timerTitle: 'El viaje comienza en', days: 'Días', hours: 'Horas', minutes: 'Minutos', seconds: 'Segundos', clickHint: 'Toca para entrar', revealSubtitle: 'Bienvenido al mundo' },
-      fr: { timerTitle: 'Le voyage commence dans', days: 'Jours', hours: 'Heures', minutes: 'Minutes', seconds: 'Secondes', clickHint: 'Cliquez pour entrer', revealSubtitle: 'Bienvenue au monde' },
-      de: { timerTitle: 'Die Reise beginnt in', days: 'Tage', hours: 'Stunden', minutes: 'Minuten', seconds: 'Sekunden', clickHint: 'Klicken Sie zum Betreten', revealSubtitle: 'Willkommen in der Welt' },
-      ja: { timerTitle: '旅は次のように始まります', days: '日', hours: '時間', minutes: '分', seconds: '秒', clickHint: 'クリックして入力', revealSubtitle: 'ようこそ、世界へ' }
+      fr: { timerTitle: 'Le voyage commence dans', days: 'Jours', hours: 'Heures', minutes: 'Minutes', seconds: 'Secondes', clickHint: 'Cliquez pour entrer', revealSubtitle: 'Bienvenue au monde' }
     };
 
     function detectLang() {
@@ -330,7 +377,7 @@
       sealWrapper: qs('#seal-wrapper'),
       gateLeft: qs('#gate-left'),
       gateRight: qs('#gate-right'),
-      introContainer: qs('#intro-container'),
+      sceneContainer: qs('#scene-container'),
       timerScreen: qs('#timer-screen'),
       countdownScreen: qs('#countdown-screen'),
       revealScreen: qs('#reveal-screen'),
@@ -363,8 +410,8 @@
           this.x = Math.random() * window.innerWidth;
           this.y = Math.random() * window.innerHeight;
           this.size = Math.random() * 2;
-          this.speedY = Math.random() * 0.5 - 0.25;
-          this.speedX = Math.random() * 0.5 - 0.25;
+          this.speedY = Math.random() * 0.3 - 0.15;
+          this.speedX = Math.random() * 0.3 - 0.15;
         }
         update() {
           this.x += this.speedX;
@@ -375,7 +422,7 @@
           if (this.x < 0) this.x = window.innerWidth;
         }
         draw() {
-          ctx.fillStyle = 'rgba(191, 149, 63, 0.8)';
+          ctx.fillStyle = 'rgba(212, 175, 55, 0.6)';
           ctx.beginPath();
           ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
           ctx.fill();
@@ -418,7 +465,7 @@
       const final = (nameStr && nameStr.trim().length > 0) ? nameStr.trim().toUpperCase() : 'ARYAN';
       for (const ch of Array.from(final)) {
         const el = document.createElement('div');
-        el.className = 'letter gold-shimmer';
+        el.className = 'letter';
         el.textContent = ch;
         el.setAttribute('aria-hidden', 'true');
         container.appendChild(el);
@@ -446,11 +493,14 @@
         const dist = eventDate.getTime() - now;
         if (dist <= 0) {
           clearInterval(countdownInterval);
-          if (elements.timerScreen) elements.timerScreen.style.opacity = '0';
+          if (elements.timerScreen) {
+            elements.timerScreen.style.transform = 'scale(1.1)';
+            elements.timerScreen.style.opacity = '0';
+          }
           setTimeout(() => {
             if (elements.timerScreen) elements.timerScreen.style.display = 'none';
             startFinalCountdown();
-          }, 600);
+          }, 1500); // Wait for fade out
           return;
         }
         const days = Math.floor(dist / (1000 * 60 * 60 * 24));
@@ -468,12 +518,22 @@
 
     function startFinalCountdown() {
       if (elements.countdownScreen) elements.countdownScreen.style.display = 'block';
-      if (elements.countdownScreen) elements.countdownScreen.textContent = '5';
       let count = 5;
+      
+      // Trigger first heartbeat immediately
+      if (elements.countdownScreen) elements.countdownScreen.textContent = String(count);
+
       finalTimer = setInterval(() => {
         count--;
-        if (elements.countdownScreen) elements.countdownScreen.textContent = String(Math.max(0, count));
-        if (count < 0) {
+        if (count > 0) {
+          if (elements.countdownScreen) {
+             // Reset animation to trigger heartbeat pulse perfectly on the second
+             elements.countdownScreen.style.animation = 'none';
+             void elements.countdownScreen.offsetWidth; // Trigger reflow
+             elements.countdownScreen.style.animation = 'heartbeatPulse 1s infinite cubic-bezier(0.215, 0.61, 0.355, 1)';
+             elements.countdownScreen.textContent = String(count);
+          }
+        } else {
           clearInterval(finalTimer);
           if (elements.countdownScreen) elements.countdownScreen.style.display = 'none';
           triggerGrandReveal();
@@ -486,55 +546,115 @@
       if (!elements.letterN || elements.letterN.getAttribute('data-activated') === 'true') return;
       elements.letterN.setAttribute('data-activated', 'true');
       elements.letterN.setAttribute('aria-pressed', 'true');
+      
+      // Camera Push
+      if (elements.sceneContainer) {
+        elements.sceneContainer.style.transform = 'scale(1.2)';
+      }
+
+      // Medallion Sink
       if (!reducedMotion && elements.sealWrapper) {
-        elements.sealWrapper.style.transform = 'scale(4)';
-        elements.sealWrapper.style.opacity = '0';
-        elements.sealWrapper.style.filter = 'blur(8px)';
-      } else if (elements.sealWrapper) {
+        elements.sealWrapper.style.transform = 'translateZ(-100px) scale(0.8)';
         elements.sealWrapper.style.opacity = '0';
       }
+
+      // Heavy Gates Swing (Delayed slightly for realism)
       setTimeout(() => {
         elements.gateLeft?.classList.add('open-left');
         elements.gateRight?.classList.add('open-right');
-      }, 300);
+      }, 500);
+
+      // Clean up and show Timer
       setTimeout(() => {
-        elements.introContainer && (elements.introContainer.style.display = 'none');
+        elements.sceneContainer && (elements.sceneContainer.style.display = 'none');
         elements.timerScreen && (elements.timerScreen.style.display = 'block');
-        setTimeout(() => elements.timerScreen && (elements.timerScreen.style.opacity = '1'), 40);
+        void elements.timerScreen.offsetWidth; // Reflow
+        elements.timerScreen && (elements.timerScreen.style.opacity = '1');
+        elements.timerScreen && (elements.timerScreen.style.transform = 'scale(1)');
         startTimer();
-      }, 900);
+      }, 3500); // Matches the 3.5s gate swing transition
     }
 
     function triggerGrandReveal() {
       elements.revealScreen && (elements.revealScreen.style.display = 'block');
       elements.revealScreen && elements.revealScreen.setAttribute('aria-hidden', 'false');
       elements.babyNameContainer && elements.babyNameContainer.setAttribute('aria-hidden', 'false');
+      
       const letters = qsa('.letter', elements.babyNameContainer);
       letters.forEach((letter, idx) => {
         setTimeout(() => {
           letter.classList.add('show');
           letter.setAttribute('aria-hidden', 'false');
-        }, idx * (reducedMotion ? 60 : 320));
+        }, idx * (reducedMotion ? 60 : 350)); // Physical snap-in timing
       });
-      const delay = (letters.length * (reducedMotion ? 60 : 320)) + 120;
-      setTimeout(() => { fireMajesticShowers(); }, delay);
+      
+      const delay = (letters.length * (reducedMotion ? 60 : 350)) + 200;
+      setTimeout(() => { fireRealisticPhysicsShowers(); }, delay);
     }
 
-    /* ===== CONFETTI ===== */
-    function fireMajesticShowers() {
-      if (reducedMotion) return;
-      if (typeof confetti !== 'function') return;
-      const duration = 12 * 1000;
+    /* ===== ADVANCED PHYSICS CONFETTI ===== */
+    function fireRealisticPhysicsShowers() {
+      if (reducedMotion || typeof confetti !== 'function') return;
+      
+      const duration = 15 * 1000;
       const animationEnd = Date.now() + duration;
-      const defaults = { startVelocity: 55, spread: 360, ticks: 120, zIndex: 100 };
+
       function randomInRange(min, max) { return Math.random() * (max - min) + min; }
+
       const interval = setInterval(() => {
         const timeLeft = animationEnd - Date.now();
         if (timeLeft <= 0) return clearInterval(interval);
-        const particleCount = Math.floor(80 * (timeLeft / duration));
-        confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.0, 0.2), y: Math.random() - 0.2 }, colors: ['#bf953f', '#fcf6ba', '#ffffff'], disableForReducedMotion: true }));
-        confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.8, 1.0), y: Math.random() - 0.2 }, colors: ['#bf953f', '#fcf6ba', '#ffffff'], disableForReducedMotion: true }));
-      }, 200);
+
+        const particleCount = Math.floor(60 * (timeLeft / duration));
+        
+        // 1. METALLIC FOIL (Heavy, drops fast, square cuts)
+        confetti({
+            particleCount: particleCount / 2,
+            origin: { x: randomInRange(0.0, 0.3), y: Math.random() - 0.2 },
+            colors: ['#d4af37', '#e6ca7b', '#b38728'],
+            shapes: ['square'],
+            gravity: 1.2,
+            scalar: 1.2,
+            drift: randomInRange(-0.4, 0.4),
+            ticks: 300,
+            zIndex: 100
+        });
+        confetti({
+            particleCount: particleCount / 2,
+            origin: { x: randomInRange(0.7, 1.0), y: Math.random() - 0.2 },
+            colors: ['#d4af37', '#e6ca7b', '#b38728'],
+            shapes: ['square'],
+            gravity: 1.2,
+            scalar: 1.2,
+            drift: randomInRange(-0.4, 0.4),
+            ticks: 300,
+            zIndex: 100
+        });
+
+        // 2. ROSE PETALS (Soft, drifts wildly, slow float)
+        confetti({
+            particleCount: particleCount / 2,
+            origin: { x: randomInRange(0.0, 0.3), y: Math.random() - 0.2 },
+            colors: ['#ffc0cb', '#ffb6c1', '#ffffff'],
+            shapes: ['circle'],
+            gravity: 0.6,
+            scalar: 1.5,
+            drift: randomInRange(-1.5, 1.5),
+            ticks: 400,
+            zIndex: 99
+        });
+        confetti({
+            particleCount: particleCount / 2,
+            origin: { x: randomInRange(0.7, 1.0), y: Math.random() - 0.2 },
+            colors: ['#ffc0cb', '#ffb6c1', '#ffffff'],
+            shapes: ['circle'],
+            gravity: 0.6,
+            scalar: 1.5,
+            drift: randomInRange(-1.5, 1.5),
+            ticks: 400,
+            zIndex: 99
+        });
+      }, 250);
     }
 
     /* ===== INITIALIZATION ===== */
@@ -559,9 +679,6 @@
         if (countdownInterval) clearInterval(countdownInterval);
         if (finalTimer) clearInterval(finalTimer);
       }, { passive: true });
-
-      // Expose debug API
-      window.__ceremony = { triggerEntrance, triggerGrandReveal, startTimer, startFinalCountdown };
     })();
   </script>
 </body>
