@@ -1,2 +1,2 @@
 # NamingCeremony
-*❤  AK Baby ❤ 
+❤  AK Baby ❤ 
