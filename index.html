@@ -266,16 +266,19 @@
       100% { transform: scale(1.4); opacity: 0; filter: blur(5px); }
     }
 
-    /* ===== PERFECTLY CENTERED REVEAL SCREEN ===== */
+    /* ===== PERFECTLY POSITIONED REVEAL SCREEN ===== */
     #reveal-screen { 
       position: absolute; 
       inset: 0;
       z-index: 70; 
       display: none; /* Changed to flex in JS */
       flex-direction: column;
-      justify-content: center; 
+      
+      /* THIS FORCES IT TO THE TOP CONSISTENTLY ACROSS ALL DEVICES */
+      justify-content: flex-start; 
+      padding-top: 18vh; 
+      
       align-items: center;
-      padding: 20px; 
       perspective: 1000px; 
       width: 100%; 
     }
@@ -301,39 +304,64 @@
         to { opacity: 1; transform: translateY(0) scale(1); } 
     }
 
-    /* Sizing logic ensures single-line fit on mobile */
+    /* ===== THE SMART ANIMATION CONTAINER ===== */
     .name-container { 
       display: flex; 
-      gap: clamp(2px, 1.5vw, 15px); 
       justify-content: center; 
       align-items: center;
-      white-space: nowrap; /* Prevents awkward wrapping on mobile */
+      white-space: nowrap; 
     }
     
+    /* The CSS Grid Engine that makes the initial slide smoothly to the left */
+    .rest-part-wrapper {
+        display: grid;
+        grid-template-columns: 0fr; /* Starts completely hidden with zero width */
+        transition: grid-template-columns 1.5s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+    .rest-part-wrapper.expand {
+        grid-template-columns: 1fr; /* Expands smoothly, sliding the initial to the left naturally */
+    }
+    .rest-part-inner {
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+    }
+
     .letter {
       font-family: 'Cinzel', serif;
-      font-size: clamp(35px, 9.5vw, 160px); /* Perfectly scaled for both iOS/Android and PC */
+      /* 10vw perfectly fits an 9-10 character name on a single line on mobile */
+      font-size: clamp(30px, 10vw, 140px); 
       font-weight: 800;
       color: var(--gold-2);
-      opacity: 0;
-      transform: translateZ(-200px) rotateX(-90deg);
-      transition: all 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      -webkit-font-smoothing: antialiased;
+      /* Advanced 3D Extrusion */
       text-shadow: 
         0 1px 0 #b38728, 0 2px 0 #9f7622, 0 3px 0 #8c661c,
         0 4px 0 #795717, 0 5px 0 #674a12, 0 6px 0 #563e0e,
         0 20px 40px rgba(0,0,0,0.9);
-      -webkit-font-smoothing: antialiased;
     }
-    
-    .letter.show { 
+
+    /* The Initial (A.) drop animation */
+    .initial-part {
+      opacity: 0;
+      transform: translateZ(-200px) rotateX(-90deg);
+      transition: all 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .initial-part.show { 
       opacity: 1; 
       transform: translateZ(0) rotateX(0deg); 
     }
 
-    /* Modern beautiful flash for the rest of the name */
+    /* Spacing between letters in the remaining part */
+    .is-name {
+      opacity: 0;
+      margin-left: clamp(2px, 1.5vw, 15px);
+    }
+
+    /* The glowing sweep-in animation for the rest of the name */
     @keyframes popFlash {
-        0% { opacity: 0; transform: translateZ(-200px) scale(0.8) rotateX(-90deg); filter: brightness(1); }
-        40% { opacity: 1; transform: translateZ(30px) scale(1.1) rotateX(0deg); filter: brightness(2); text-shadow: 0 0 50px rgba(253, 245, 201, 1), 0 20px 40px rgba(0,0,0,0.9); color: #fff; }
+        0% { opacity: 0; transform: translateZ(-100px) scale(0.5) rotateX(-45deg); filter: brightness(1); }
+        50% { opacity: 1; transform: translateZ(40px) scale(1.1) rotateX(0deg); filter: brightness(2); text-shadow: 0 0 50px rgba(253, 245, 201, 1), 0 20px 40px rgba(0,0,0,0.9); color: #fff; }
         100% { opacity: 1; transform: translateZ(0) scale(1) rotateX(0deg); filter: brightness(1); color: var(--gold-2); }
     }
 
@@ -383,7 +411,7 @@
       <div class="time-unit"><div id="days">00</div><span id="label-days">Days</span></div>
       <div class="time-unit"><div id="hours">00</div><span id="label-hours">Hours</span></div>
       <div class="time-unit"><div id="mins">00</div><span id="label-mins">Minutes</span></div>
-      <div class="time-unit"><div id="secs">00</div><span id="label-secs">Seconds</span></div>
+      <div class="time-unit"><div id="secs">05</div><span id="label-secs">Seconds</span></div>
     </div>
   </div>
 
@@ -483,38 +511,44 @@
       if (!reducedMotion) animate();
     }
 
-    /* ===== RENDER NAME (SMART INITIAL SPLIT) ===== */
+    /* ===== SMART NAME RENDERER (SPLITS INITIAL & NAME) ===== */
     function renderName(nameStr) {
       const container = elements.babyNameContainer;
       if (!container) return;
       container.innerHTML = '';
-      const final = (nameStr && nameStr.trim().length > 0) ? nameStr.trim().toUpperCase() : 'A.NIVISHA';
+      const final = (nameStr && nameStr.trim().length > 0) ? nameStr.trim().toUpperCase() : 'A.NURA';
 
-      // Dynamically detect where the initial ends (at the first dot or space)
+      // Smartly find the initial (e.g., stops at the dot or space)
       let initialEndIdx = final.indexOf('.');
       if (initialEndIdx === -1) initialEndIdx = final.indexOf(' ');
-      if (initialEndIdx === -1) initialEndIdx = 0; // Fallback to just the first letter
+      if (initialEndIdx === -1) initialEndIdx = 0; // Fallback
 
-      const chars = Array.from(final);
-      chars.forEach((ch, idx) => {
+      const initialStr = final.substring(0, initialEndIdx + 1);
+      const restStr = final.substring(initialEndIdx + 1).trim();
+
+      // Create Initial Element
+      const initialDiv = document.createElement('div');
+      initialDiv.className = 'initial-part letter';
+      initialDiv.textContent = initialStr;
+      container.appendChild(initialDiv);
+
+      // Create Animated CSS Grid Wrapper for the rest of the name
+      const restWrapper = document.createElement('div');
+      restWrapper.className = 'rest-part-wrapper';
+      
+      const restInner = document.createElement('div');
+      restInner.className = 'rest-part-inner';
+
+      // Insert letters into inner wrapper
+      Array.from(restStr).forEach(ch => {
         const el = document.createElement('div');
-        el.className = 'letter';
-        
-        // Group classes for the split animation
-        if (idx <= initialEndIdx) {
-            el.classList.add('is-initial');
-        } else {
-            el.classList.add('is-name');
-        }
-
-        if (ch === ' ') {
-            el.innerHTML = '&nbsp;';
-        } else {
-            el.textContent = ch;
-        }
-        el.setAttribute('aria-hidden', 'true');
-        container.appendChild(el);
+        el.className = 'letter is-name';
+        el.innerHTML = ch === ' ' ? '&nbsp;' : ch;
+        restInner.appendChild(el);
       });
+
+      restWrapper.appendChild(restInner);
+      container.appendChild(restWrapper);
     }
 
     /* ===== TIMER LOGIC ===== */
@@ -621,45 +655,43 @@
     }
 
     function triggerGrandReveal() {
-      // Changed to flex for perfect vertical/horizontal centering
+      // Changed to flex layout for perfect centering
       elements.revealScreen && (elements.revealScreen.style.display = 'flex');
       
       if (elements.revealSubtitle) {
           elements.revealSubtitle.classList.add('subtitle-show');
       }
 
+      // Step 1: Wait for subtitle, then reveal the Initial ("A.") exactly in the center
       setTimeout(() => {
-          const initials = qsa('.is-initial', elements.babyNameContainer);
-          const restOfName = qsa('.is-name', elements.babyNameContainer);
-          
-          // 1. Reveal Initial (e.g., "A.")
-          initials.forEach((letter, idx) => {
-            setTimeout(() => {
-              letter.classList.add('show');
-            }, idx * 150); 
-          });
+          const initialPart = qs('.initial-part');
+          if (initialPart) initialPart.classList.add('show');
 
-          // 2. Pause for suspense, then swoop the rest of the name
-          const initialDelay = (initials.length * 150) + 600;
-
+          // Step 2: Hold for 1.5 seconds of suspense, then trigger the slide & full reveal
           setTimeout(() => {
-              restOfName.forEach((letter, idx) => {
-                setTimeout(() => {
-                  letter.classList.add('show');
-                  if (!reducedMotion) {
-                      letter.style.animation = 'popFlash 0.5s ease-out forwards';
-                  }
-                }, idx * 100); // Fast, snappy reveal for the rest
+              
+              // This triggers the CSS Grid to expand, naturally sliding the "A." to the left
+              const wrapper = qs('.rest-part-wrapper');
+              if(wrapper) wrapper.classList.add('expand');
+
+              const restLetters = qsa('.is-name', elements.babyNameContainer);
+              restLetters.forEach((letter, idx) => {
+                  setTimeout(() => {
+                      letter.classList.add('show');
+                      if (!reducedMotion) {
+                          letter.style.animation = 'popFlash 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards';
+                      }
+                  }, idx * 100); // Snappy, staggered reveal for the rest of the name
               });
 
-              // 3. Trigger cannons precisely when the last letter drops
-              const totalDelay = (restOfName.length * 100) + 200;
+              // Step 3: Trigger cannons precisely when the last letter flashes
+              const totalDelay = (restLetters.length * 100) + 400;
               setTimeout(() => { 
                   fireFourCornerBlast(); 
                   fireHeartBalloons();
               }, totalDelay);
 
-          }, initialDelay);
+          }, 1500); // Suspense hold
           
       }, 1500);
     }
