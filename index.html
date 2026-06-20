@@ -32,7 +32,6 @@
     
     body {
       font-family: 'Montserrat', sans-serif;
-      /* Deep radial background for a premium studio feel */
       background: radial-gradient(circle at 50% 50%, #1a1c20 0%, #050505 100%);
       color: #fff;
       -webkit-font-smoothing: antialiased;
@@ -47,7 +46,6 @@
       perspective: 1500px;
     }
 
-    /* Subtle atmospheric noise */
     body::before {
       content: "";
       position: absolute;
@@ -138,7 +136,6 @@
       justify-content: center;
       align-items: center;
       border-radius: 50%;
-      /* Conic gradient for realistic metallic reflection */
       background: conic-gradient(from 0deg, var(--gold-2), var(--gold-3), #fff, var(--gold-3), var(--gold-2));
       color: #3d2b07;
       text-shadow: 1px 1px 2px rgba(255,255,255,0.8), -1px -1px 2px rgba(0,0,0,0.4);
@@ -150,7 +147,6 @@
         0 0 0 12px var(--gold-1);
       transition: transform 300ms ease, box-shadow 300ms ease;
       user-select: none;
-      -webkit-tap-highlight-color: transparent;
       font-weight: 700;
       position: relative;
       overflow: hidden;
@@ -159,7 +155,6 @@
     #letter-N:hover { transform: scale(1.05); }
     #letter-N:active { transform: scale(0.95); }
 
-    /* Sweeping light reflection on the gold coin */
     #letter-N::after {
       content: '';
       position: absolute;
@@ -189,6 +184,7 @@
       opacity: 0;
       transform: scale(0.9);
       display: none;
+      /* Slowed down the transition so it fades smoothly when ticking down live */
       transition: opacity 1.5s ease, transform 1.5s ease;
       text-align: center;
       width: 100%;
@@ -277,7 +273,6 @@
       opacity: 0;
       transform: translateZ(-200px) rotateX(-90deg);
       transition: all 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      /* Advanced 3D Extrusion */
       text-shadow: 
         0 1px 0 #b38728, 0 2px 0 #9f7622, 0 3px 0 #8c661c,
         0 4px 0 #795717, 0 5px 0 #674a12, 0 6px 0 #563e0e,
@@ -286,21 +281,29 @@
     }
     .letter.show { opacity: 1; transform: translateZ(0) rotateX(0deg); }
 
-    /* ===== RESPONSIVE ===== */
+    /* ===== HEART BALLOON ANIMATIONS ===== */
+    .balloon-anim {
+        position: absolute;
+        bottom: -200px;
+        animation: floatUp 8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+    @keyframes floatUp {
+        0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 1; }
+        100% { transform: translateY(-120vh) translateX(var(--drift)) rotate(15deg); opacity: 0; }
+    }
+
+    /* ===== RESPONSIVE & REDUCED MOTION ===== */
     @media (max-width: 520px) {
       .timer-box { gap: 15px; }
       .time-unit { padding: 20px 15px; min-width: 85px; }
       .click-hint { letter-spacing: 5px; }
     }
-
-    /* ===== REDUCED MOTION ===== */
     @media (prefers-reduced-motion: reduce) {
-      .gold-shimmer, #letter-N::after, .click-hint, #countdown-screen, .letter, .gate, #scene-container {
+      .gold-shimmer, #letter-N::after, .click-hint, #countdown-screen, .letter, .gate, #scene-container, .balloon-anim {
         animation-duration: 0.001ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 1ms !important;
       }
-      #canvas-bg { opacity: 0.3; }
     }
   </style>
 </head>
@@ -312,14 +315,14 @@
     <div class="gate right" id="gate-right" aria-hidden="true"></div>
 
     <div class="seal-wrapper" id="seal-wrapper">
-      <div id="letter-N" role="button" tabindex="0" aria-pressed="false" aria-label="Open the ceremony welcome" title="Open the ceremony">N</div>
+      <div id="letter-N" role="button" tabindex="0">N</div>
       <div class="click-hint gold-shimmer" id="click-hint">Click to Enter</div>
     </div>
   </div>
 
   <div id="timer-screen" aria-live="polite" aria-atomic="true">
     <h2 id="timer-title" class="gold-shimmer">The Journey Unfolds In</h2>
-    <div class="timer-box" role="group" aria-label="Countdown timer">
+    <div class="timer-box" role="group">
       <div class="time-unit"><div id="days">00</div><span id="label-days">Days</span></div>
       <div class="time-unit"><div id="hours">00</div><span id="label-hours">Hours</span></div>
       <div class="time-unit"><div id="mins">00</div><span id="label-mins">Minutes</span></div>
@@ -350,28 +353,16 @@
     const CONFIG = {
       ceremonyName: window.__ceremonyName || 'ARYAN',
       ceremonyEventDate: window.__ceremonyEventDate || null,
-      timerDemoSeconds: 12 // Increased slightly to allow the majestic gate opening to finish
+      // I set this to 10 seconds so you can test the smooth fade-out! 
+      // To test the "Instant Skip", change this number to -10
+      timerDemoSeconds: 10 
     };
 
-    /* ===== UTILITIES ===== */
+    /* ===== ELEMENT CACHE ===== */
     const qs = (sel, root = document) => root ? root.querySelector(sel) : null;
     const qsa = (sel, root = document) => root ? Array.from(root.querySelectorAll(sel)) : [];
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    /* ===== LOCALIZATION ===== */
-    const i18n = {
-      en: { timerTitle: 'The Journey Unfolds In', days: 'Days', hours: 'Hours', minutes: 'Minutes', seconds: 'Seconds', clickHint: 'Click to Enter', revealSubtitle: 'Welcome To The World' },
-      es: { timerTitle: 'El viaje comienza en', days: 'Días', hours: 'Horas', minutes: 'Minutos', seconds: 'Segundos', clickHint: 'Toca para entrar', revealSubtitle: 'Bienvenido al mundo' },
-      fr: { timerTitle: 'Le voyage commence dans', days: 'Jours', hours: 'Heures', minutes: 'Minutes', seconds: 'Secondes', clickHint: 'Cliquez pour entrer', revealSubtitle: 'Bienvenue au monde' }
-    };
-
-    function detectLang() {
-      const nav = (navigator.languages && navigator.languages[0]) || navigator.language || 'en';
-      const code = String(nav).split('-')[0].toLowerCase();
-      return i18n[code] ? code : 'en';
-    }
-
-    /* ===== ELEMENT CACHE ===== */
     const elements = {
       letterN: qs('#letter-N'),
       sealWrapper: qs('#seal-wrapper'),
@@ -382,12 +373,6 @@
       countdownScreen: qs('#countdown-screen'),
       revealScreen: qs('#reveal-screen'),
       babyNameContainer: qs('#baby-name'),
-      clickHint: qs('#click-hint'),
-      timerTitle: qs('#timer-title'),
-      labelDays: qs('#label-days'),
-      labelHours: qs('#label-hours'),
-      labelMins: qs('#label-mins'),
-      labelSecs: qs('#label-secs'),
       canvas: qs('#canvas-bg')
     };
 
@@ -440,21 +425,7 @@
         }
         animationId = requestAnimationFrame(animate);
       }
-
       if (!reducedMotion) animate();
-    }
-
-    /* ===== APPLY LANGUAGE ===== */
-    function applyLang(code) {
-      const lang = i18n[code] || i18n.en;
-      if (elements.timerTitle) elements.timerTitle.textContent = lang.timerTitle;
-      if (elements.labelDays) elements.labelDays.textContent = lang.days;
-      if (elements.labelHours) elements.labelHours.textContent = lang.hours;
-      if (elements.labelMins) elements.labelMins.textContent = lang.minutes;
-      if (elements.labelSecs) elements.labelSecs.textContent = lang.seconds;
-      if (elements.clickHint) elements.clickHint.textContent = lang.clickHint;
-      const subtitle = qs('#reveal-subtitle');
-      if (subtitle) subtitle.textContent = lang.revealSubtitle;
     }
 
     /* ===== RENDER NAME ===== */
@@ -491,18 +462,21 @@
       function updateOnce() {
         const now = Date.now();
         const dist = eventDate.getTime() - now;
+        
         if (dist <= 0) {
           clearInterval(countdownInterval);
+          // If watching live, do a cinematic 1.5s fade out
           if (elements.timerScreen) {
-            elements.timerScreen.style.transform = 'scale(1.1)';
-            elements.timerScreen.style.opacity = '0';
+              elements.timerScreen.style.transform = 'scale(1.1)';
+              elements.timerScreen.style.opacity = '0';
           }
           setTimeout(() => {
-            if (elements.timerScreen) elements.timerScreen.style.display = 'none';
-            startFinalCountdown();
-          }, 1500); // Wait for fade out
+              if (elements.timerScreen) elements.timerScreen.style.display = 'none';
+              startFinalCountdown();
+          }, 1500); 
           return;
         }
+        
         const days = Math.floor(dist / (1000 * 60 * 60 * 24));
         const hours = Math.floor((dist % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const minutes = Math.floor((dist % (1000 * 60 * 60)) / (1000 * 60));
@@ -520,16 +494,14 @@
       if (elements.countdownScreen) elements.countdownScreen.style.display = 'block';
       let count = 5;
       
-      // Trigger first heartbeat immediately
       if (elements.countdownScreen) elements.countdownScreen.textContent = String(count);
 
       finalTimer = setInterval(() => {
         count--;
         if (count > 0) {
           if (elements.countdownScreen) {
-             // Reset animation to trigger heartbeat pulse perfectly on the second
              elements.countdownScreen.style.animation = 'none';
-             void elements.countdownScreen.offsetWidth; // Trigger reflow
+             void elements.countdownScreen.offsetWidth; 
              elements.countdownScreen.style.animation = 'heartbeatPulse 1s infinite cubic-bezier(0.215, 0.61, 0.355, 1)';
              elements.countdownScreen.textContent = String(count);
           }
@@ -541,62 +513,67 @@
       }, 1000);
     }
 
-    /* ===== ENTRANCE & REVEAL ===== */
+    /* ===== ENTRANCE & REVEAL LOGIC ===== */
     function triggerEntrance() {
       if (!elements.letterN || elements.letterN.getAttribute('data-activated') === 'true') return;
       elements.letterN.setAttribute('data-activated', 'true');
-      elements.letterN.setAttribute('aria-pressed', 'true');
       
-      // Camera Push
-      if (elements.sceneContainer) {
-        elements.sceneContainer.style.transform = 'scale(1.2)';
-      }
+      if (elements.sceneContainer) elements.sceneContainer.style.transform = 'scale(1.2)';
 
-      // Medallion Sink
       if (!reducedMotion && elements.sealWrapper) {
         elements.sealWrapper.style.transform = 'translateZ(-100px) scale(0.8)';
         elements.sealWrapper.style.opacity = '0';
       }
 
-      // Heavy Gates Swing (Delayed slightly for realism)
       setTimeout(() => {
         elements.gateLeft?.classList.add('open-left');
         elements.gateRight?.classList.add('open-right');
       }, 500);
 
-      // Clean up and show Timer
+      // Wait 3.5 seconds for the heavy gates to fully swing open
       setTimeout(() => {
         elements.sceneContainer && (elements.sceneContainer.style.display = 'none');
-        elements.timerScreen && (elements.timerScreen.style.display = 'block');
-        void elements.timerScreen.offsetWidth; // Reflow
-        elements.timerScreen && (elements.timerScreen.style.opacity = '1');
-        elements.timerScreen && (elements.timerScreen.style.transform = 'scale(1)');
-        startTimer();
-      }, 3500); // Matches the 3.5s gate swing transition
+
+        const now = Date.now();
+        const dist = eventDate.getTime() - now;
+
+        // INSTANT SKIP LOGIC
+        if (dist <= 0) {
+            // The date has already passed. Skip the timer screen entirely.
+            startFinalCountdown();
+        } else {
+            // The date is in the future. Show the timer.
+            elements.timerScreen && (elements.timerScreen.style.display = 'block');
+            void elements.timerScreen.offsetWidth; 
+            elements.timerScreen && (elements.timerScreen.style.opacity = '1');
+            elements.timerScreen && (elements.timerScreen.style.transform = 'scale(1)');
+            startTimer();
+        }
+      }, 3500); 
     }
 
     function triggerGrandReveal() {
       elements.revealScreen && (elements.revealScreen.style.display = 'block');
-      elements.revealScreen && elements.revealScreen.setAttribute('aria-hidden', 'false');
-      elements.babyNameContainer && elements.babyNameContainer.setAttribute('aria-hidden', 'false');
       
       const letters = qsa('.letter', elements.babyNameContainer);
       letters.forEach((letter, idx) => {
         setTimeout(() => {
           letter.classList.add('show');
-          letter.setAttribute('aria-hidden', 'false');
-        }, idx * (reducedMotion ? 60 : 350)); // Physical snap-in timing
+        }, idx * (reducedMotion ? 60 : 350)); 
       });
       
       const delay = (letters.length * (reducedMotion ? 60 : 350)) + 200;
-      setTimeout(() => { fireRealisticPhysicsShowers(); }, delay);
+      setTimeout(() => { 
+          fireMinimalPhysicsShowers(); 
+          fireHeartBalloons();
+      }, delay);
     }
 
-    /* ===== ADVANCED PHYSICS CONFETTI ===== */
-    function fireRealisticPhysicsShowers() {
+    /* ===== MINIMAL BLAST ===== */
+    function fireMinimalPhysicsShowers() {
       if (reducedMotion || typeof confetti !== 'function') return;
       
-      const duration = 15 * 1000;
+      const duration = 3 * 1000;
       const animationEnd = Date.now() + duration;
 
       function randomInRange(min, max) { return Math.random() * (max - min) + min; }
@@ -605,80 +582,73 @@
         const timeLeft = animationEnd - Date.now();
         if (timeLeft <= 0) return clearInterval(interval);
 
-        const particleCount = Math.floor(60 * (timeLeft / duration));
+        const particleCount = 10; 
         
-        // 1. METALLIC FOIL (Heavy, drops fast, square cuts)
         confetti({
-            particleCount: particleCount / 2,
-            origin: { x: randomInRange(0.0, 0.3), y: Math.random() - 0.2 },
-            colors: ['#d4af37', '#e6ca7b', '#b38728'],
-            shapes: ['square'],
-            gravity: 1.2,
-            scalar: 1.2,
-            drift: randomInRange(-0.4, 0.4),
-            ticks: 300,
-            zIndex: 100
+            particleCount: particleCount,
+            origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
+            colors: ['#d4af37', '#e6ca7b'],
+            shapes: ['square', 'circle'],
+            gravity: 1.2, scalar: 1.2, drift: randomInRange(-0.4, 0.4), ticks: 200, zIndex: 80
         });
         confetti({
-            particleCount: particleCount / 2,
-            origin: { x: randomInRange(0.7, 1.0), y: Math.random() - 0.2 },
-            colors: ['#d4af37', '#e6ca7b', '#b38728'],
-            shapes: ['square'],
-            gravity: 1.2,
-            scalar: 1.2,
-            drift: randomInRange(-0.4, 0.4),
-            ticks: 300,
-            zIndex: 100
+            particleCount: particleCount,
+            origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
+            colors: ['#d4af37', '#e6ca7b'],
+            shapes: ['square', 'circle'],
+            gravity: 1.2, scalar: 1.2, drift: randomInRange(-0.4, 0.4), ticks: 200, zIndex: 80
         });
+      }, 400); 
+    }
 
-        // 2. ROSE PETALS (Soft, drifts wildly, slow float)
-        confetti({
-            particleCount: particleCount / 2,
-            origin: { x: randomInRange(0.0, 0.3), y: Math.random() - 0.2 },
-            colors: ['#ffc0cb', '#ffb6c1', '#ffffff'],
-            shapes: ['circle'],
-            gravity: 0.6,
-            scalar: 1.5,
-            drift: randomInRange(-1.5, 1.5),
-            ticks: 400,
-            zIndex: 99
-        });
-        confetti({
-            particleCount: particleCount / 2,
-            origin: { x: randomInRange(0.7, 1.0), y: Math.random() - 0.2 },
-            colors: ['#ffc0cb', '#ffb6c1', '#ffffff'],
-            shapes: ['circle'],
-            gravity: 0.6,
-            scalar: 1.5,
-            drift: randomInRange(-1.5, 1.5),
-            ticks: 400,
-            zIndex: 99
-        });
-      }, 250);
+    /* ===== BIG RED HEART BALLOONS ===== */
+    function fireHeartBalloons() {
+        const container = document.createElement('div');
+        container.style.position = 'fixed';
+        container.style.inset = '0';
+        container.style.pointerEvents = 'none';
+        container.style.zIndex = '90';
+        container.style.overflow = 'hidden';
+        document.body.appendChild(container);
+
+        for (let i = 0; i < 30; i++) {
+            setTimeout(() => {
+                const balloonWrapper = document.createElement('div');
+                balloonWrapper.className = 'balloon-anim';
+                balloonWrapper.style.left = (Math.random() * 100) + 'vw';
+                
+                const scale = 0.6 + Math.random() * 0.8;
+                const drift = (Math.random() - 0.5) * 300;
+                balloonWrapper.style.setProperty('--drift', drift + 'px');
+                
+                balloonWrapper.innerHTML = `
+                    <div style="transform: scale(${scale}); transform-origin: bottom center;">
+                        <svg width="80" height="80" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0px 10px 10px rgba(0,0,0,0.6));">
+                            <defs>
+                                <radialGradient id="balloonGrad${i}" cx="30%" cy="30%" r="70%">
+                                    <stop offset="0%" stop-color="#ff8080" />
+                                    <stop offset="50%" stop-color="#e60000" />
+                                    <stop offset="100%" stop-color="#990000" />
+                                </radialGradient>
+                            </defs>
+                            <path fill="url(#balloonGrad${i})" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                        <div style="width: 2px; height: 60px; background: rgba(255,255,255,0.3); margin: 0 auto; margin-top: -8px;"></div>
+                    </div>
+                `;
+                container.appendChild(balloonWrapper);
+                
+                setTimeout(() => balloonWrapper.remove(), 8500); 
+            }, Math.random() * 5000);
+        }
     }
 
     /* ===== INITIALIZATION ===== */
     (function init() {
       initCanvas();
-      const lang = detectLang();
-      applyLang(lang);
       renderName(CONFIG.ceremonyName);
 
-      // Wire events
       elements.letterN?.addEventListener('click', triggerEntrance, { passive: true });
-      elements.letterN?.addEventListener('keydown', (ev) => {
-        if (ev.key === 'Enter' || ev.key === ' ') {
-          ev.preventDefault();
-          triggerEntrance();
-        }
-      }, { passive: false });
-
-      // Cleanup on page hide
-      window.addEventListener('pagehide', () => {
-        if (animationId) cancelAnimationFrame(animationId);
-        if (countdownInterval) clearInterval(countdownInterval);
-        if (finalTimer) clearInterval(finalTimer);
-      }, { passive: true });
     })();
   </script>
 </body>
