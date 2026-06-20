@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Baby Naming Ceremony</title>
+    <title>A Grand Beginning | Naming Ceremony</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Great+Vibes&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Montserrat:wght@200;300;400&display=swap');
 
         * {
             box-sizing: border-box;
@@ -16,17 +16,42 @@
         }
 
         body {
-            font-family: 'Cinzel', serif;
-            overflow: hidden; /* Prevents scrolling */
-            background-color: #fdfbf7;
-            color: #333;
+            font-family: 'Montserrat', sans-serif;
+            overflow: hidden;
+            background-color: #050505; /* Deep rich black base */
+            color: #fff;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
         }
 
-        /* --- STAGE 1: INTRO SCREEN & GATES --- */
+        /* Ambient Starlight Background */
+        #canvas-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            opacity: 0.6;
+        }
+
+        /* --- GOLD FOIL SHIMMER EFFECT --- */
+        .gold-shimmer {
+            background: linear-gradient(to right, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+            background-size: 200% auto;
+            color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            animation: shine 4s linear infinite;
+        }
+
+        @keyframes shine {
+            to { background-position: 200% center; }
+        }
+
+        /* --- STAGE 1: CINEMATIC GATES --- */
         #intro-container {
             position: fixed;
             top: 0;
@@ -35,8 +60,10 @@
             height: 100%;
             z-index: 100;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
+            perspective: 1200px;
         }
 
         .gate {
@@ -44,88 +71,150 @@
             top: 0;
             width: 50%;
             height: 100%;
-            background-color: #d4af37; /* Gold color */
-            transition: transform 2s ease-in-out;
+            background: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%);
+            box-shadow: inset 0 0 100px rgba(0,0,0,1);
+            transition: transform 3s cubic-bezier(0.645, 0.045, 0.355, 1);
             z-index: 101;
         }
 
-        .gate.left { left: 0; border-right: 2px solid #fff; }
-        .gate.right { right: 0; border-left: 2px solid #fff; }
+        .gate.left { 
+            left: 0; 
+            border-right: 2px solid rgba(191, 149, 63, 0.3); 
+            transform-origin: left;
+        }
+        .gate.right { 
+            right: 0; 
+            border-left: 2px solid rgba(191, 149, 63, 0.3); 
+            transform-origin: right;
+        }
 
-        .gate.open-left { transform: translateX(-100%); }
-        .gate.open-right { transform: translateX(100%); }
+        .gate.open-left { transform: rotateY(-100deg); }
+        .gate.open-right { transform: rotateY(100deg); }
+
+        /* The Majestic 'N' */
+        .seal-wrapper {
+            position: relative;
+            z-index: 102;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
         #letter-N {
-            font-size: 100px;
-            color: white;
-            background: #2c3e50;
-            width: 150px;
-            height: 150px;
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 90px;
+            font-weight: 700;
+            color: #111;
+            background: linear-gradient(135deg, #fcf6ba 0%, #bf953f 100%);
+            width: 200px;
+            height: 200px;
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
             cursor: pointer;
-            z-index: 102;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
-            animation: pulse 2s infinite;
-            transition: opacity 1s, transform 1s;
+            box-shadow: 0 0 40px rgba(191, 149, 63, 0.4), inset 0 0 20px rgba(255,255,255,0.6);
+            border: 2px solid #fff;
+            transition: all 0.5s ease;
+            position: relative;
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
+        #letter-N::after {
+            content: '';
+            position: absolute;
+            top: -10px; left: -10px; right: -10px; bottom: -10px;
+            border-radius: 50%;
+            border: 2px solid rgba(191, 149, 63, 0.5);
+            animation: pulseRing 2s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
         }
 
-        /* --- STAGE 2: TIMER SCREEN --- */
+        @keyframes pulseRing {
+            0% { transform: scale(0.9); opacity: 1; }
+            100% { transform: scale(1.3); opacity: 0; }
+        }
+
+        .click-hint {
+            margin-top: 30px;
+            font-size: 12px;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.5);
+            animation: fadeInOut 2s infinite;
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        /* --- STAGE 2: PREMIUM GLASS TIMER --- */
         #timer-screen {
             position: absolute;
             text-align: center;
             z-index: 50;
             opacity: 0;
-            transition: opacity 2s;
+            transition: opacity 2s ease;
             display: none;
         }
 
         #timer-screen h2 {
-            font-size: 30px;
-            margin-bottom: 20px;
-            color: #555;
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 32px;
+            margin-bottom: 50px;
+            letter-spacing: 4px;
         }
 
         .timer-box {
             display: flex;
-            gap: 20px;
-            font-size: 40px;
+            gap: 40px;
+            justify-content: center;
         }
 
         .time-unit {
-            background: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            min-width: 100px;
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(191, 149, 63, 0.2);
+            padding: 35px 25px;
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255,255,255,0.1);
+            min-width: 140px;
+        }
+
+        .time-unit div {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 200;
+            font-size: 65px;
+            line-height: 1;
         }
 
         .time-unit span {
             display: block;
-            font-size: 16px;
+            font-size: 12px;
             color: #888;
-            margin-top: 5px;
+            margin-top: 15px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
         }
 
-        /* --- STAGE 3: 5 TO 0 COUNTDOWN --- */
+        /* --- STAGE 3: THE COUNTDOWN --- */
         #countdown-screen {
             position: absolute;
-            font-size: 150px;
-            color: #d4af37;
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 280px;
             z-index: 60;
             display: none;
-            text-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+            text-shadow: 0 0 80px rgba(191, 149, 63, 0.6);
+            animation: cinematicPulse 1s infinite;
         }
 
-        /* --- STAGE 4: FINAL REVEAL --- */
+        @keyframes cinematicPulse {
+            0% { transform: scale(0.9); opacity: 0; filter: blur(10px); }
+            50% { transform: scale(1.1); opacity: 1; filter: blur(0px); }
+            100% { transform: scale(1.3); opacity: 0; filter: blur(5px); }
+        }
+
+        /* --- STAGE 4: GRAND REVEAL --- */
         #reveal-screen {
             position: absolute;
             text-align: center;
@@ -134,10 +223,15 @@
         }
 
         #reveal-screen h3 {
-            font-size: 40px;
-            color: #555;
-            margin-bottom: 20px;
-            font-family: 'Great Vibes', cursive;
+            font-weight: 300;
+            font-size: 20px;
+            letter-spacing: 8px;
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 40px;
+            opacity: 0;
+            transform: translateY(-20px);
+            animation: dropIn 2s forwards 0.5s;
+            text-transform: uppercase;
         }
 
         .name-container {
@@ -147,91 +241,154 @@
         }
 
         .letter {
-            font-size: 80px;
-            color: #2c3e50;
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 140px;
+            font-weight: 700;
             opacity: 0;
-            transform: translateY(50px);
-            transition: opacity 0.5s ease, transform 0.5s ease;
+            transform: scale(0.8) translateY(60px) rotateX(-45deg);
+            transition: all 1s cubic-bezier(0.25, 1, 0.5, 1);
+            text-shadow: 0 20px 40px rgba(0,0,0,0.9);
         }
 
         .letter.show {
             opacity: 1;
-            transform: translateY(0);
+            transform: scale(1) translateY(0) rotateX(0deg);
+        }
+
+        @keyframes dropIn {
+            to { opacity: 1; transform: translateY(0); }
         }
 
     </style>
 </head>
 <body>
 
+    <canvas id="canvas-bg"></canvas>
+
     <div id="intro-container">
         <div class="gate left" id="gate-left"></div>
         <div class="gate right" id="gate-right"></div>
-        <div id="letter-N" onclick="openGates()">N</div>
-    </div>
-
-    <div id="timer-screen">
-        <h2>The Naming Ceremony Begins In...</h2>
-        <div class="timer-box">
-            <div class="time-unit"><div id="days">00</div><span>Days</span></div>
-            <div class="time-unit"><div id="hours">00</div><span>Hours</span></div>
-            <div class="time-unit"><div id="mins">00</div><span>Minutes</span></div>
-            <div class="time-unit"><div id="secs">00</div><span>Seconds</span></div>
+        
+        <div class="seal-wrapper" id="seal-wrapper">
+            <div id="letter-N" onclick="triggerEntrance()">N</div>
+            <div class="click-hint">Click to Enter</div>
         </div>
     </div>
 
-    <div id="countdown-screen">5</div>
+    <div id="timer-screen">
+        <h2 class="gold-shimmer">The Journey Unfolds In</h2>
+        <div class="timer-box">
+            <div class="time-unit"><div id="days" class="gold-shimmer">00</div><span>Days</span></div>
+            <div class="time-unit"><div id="hours" class="gold-shimmer">00</div><span>Hours</span></div>
+            <div class="time-unit"><div id="mins" class="gold-shimmer">00</div><span>Minutes</span></div>
+            <div class="time-unit"><div id="secs" class="gold-shimmer">00</div><span>Seconds</span></div>
+        </div>
+    </div>
+
+    <div id="countdown-screen" class="gold-shimmer">5</div>
 
     <div id="reveal-screen">
-        <h3>Welcome to the world</h3>
+        <h3>Welcome To The World</h3>
         <div class="name-container" id="baby-name">
-            <div class="letter">A</div>
-            <div class="letter">R</div>
-            <div class="letter">Y</div>
-            <div class="letter">A</div>
-            <div class="letter">N</div>
+            <div class="letter gold-shimmer">A</div>
+            <div class="letter gold-shimmer">R</div>
+            <div class="letter gold-shimmer">Y</div>
+            <div class="letter gold-shimmer">A</div>
+            <div class="letter gold-shimmer">N</div>
         </div>
     </div>
 
     <script>
-        // --- CONFIGURATION ---
-        // SET YOUR EVENT DATE HERE. Format: "Month DD, YYYY HH:MM:SS"
-        // Note: I set it to 10 seconds from now so you can test it immediately!
+        // --- 1. BACKGROUND STARLIGHT ENGINE ---
+        const canvas = document.getElementById('canvas-bg');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let particlesArray = [];
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2;
+                this.speedY = Math.random() * 0.5 - 0.25;
+                this.speedX = Math.random() * 0.5 - 0.25;
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if(this.y > canvas.height) this.y = 0;
+                if(this.y < 0) this.y = canvas.height;
+                if(this.x > canvas.width) this.x = 0;
+                if(this.x < 0) this.x = canvas.width;
+            }
+            draw() {
+                ctx.fillStyle = 'rgba(191, 149, 63, 0.8)';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        function initParticles() {
+            for (let i = 0; i < 150; i++) particlesArray.push(new Particle());
+        }
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+                particlesArray[i].draw();
+            }
+            requestAnimationFrame(animateParticles);
+        }
+        initParticles();
+        animateParticles();
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // --- 2. CORE LOGIC & TIMERS ---
+        // EVENT DATE: Set to 10 seconds for immediate viewing!
         let eventDate = new Date();
         eventDate.setSeconds(eventDate.getSeconds() + 10); 
         let countdownInterval;
 
-        // Step 1: Open the gates when 'N' is clicked
-        function openGates() {
-            document.getElementById('gate-left').classList.add('open-left');
-            document.getElementById('gate-right').classList.add('open-right');
+        function triggerEntrance() {
+            let seal = document.getElementById('seal-wrapper');
+            // Shockwave explosion effect
+            seal.style.transform = 'scale(4)';
+            seal.style.opacity = '0';
+            seal.style.filter = 'blur(10px)';
             
-            let letterN = document.getElementById('letter-N');
-            letterN.style.transform = 'scale(0)';
-            letterN.style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('gate-left').classList.add('open-left');
+                document.getElementById('gate-right').classList.add('open-right');
+            }, 400);
 
             setTimeout(() => {
                 document.getElementById('intro-container').style.display = 'none';
-                
-                // Show timer screen
                 let timerScreen = document.getElementById('timer-screen');
                 timerScreen.style.display = 'block';
-                setTimeout(() => timerScreen.style.opacity = '1', 100);
-                
+                setTimeout(() => timerScreen.style.opacity = '1', 50);
                 startTimer();
-            }, 1500);
+            }, 3000);
         }
 
-        // Step 2: Timer Logic
         function startTimer() {
             countdownInterval = setInterval(() => {
                 let now = new Date().getTime();
                 let distance = eventDate - now;
 
                 if (distance <= 0) {
-                    // Timer reached 0
                     clearInterval(countdownInterval);
-                    document.getElementById('timer-screen').style.display = 'none';
-                    startFinalCountdown(); // Start 5, 4, 3, 2, 1, 0
+                    let timerScreen = document.getElementById('timer-screen');
+                    timerScreen.style.opacity = '0'; 
+                    
+                    setTimeout(() => {
+                        timerScreen.style.display = 'none';
+                        startFinalCountdown(); 
+                    }, 2000); // 2 seconds fade out for elegance
                     return;
                 }
 
@@ -248,11 +405,9 @@
             }, 1000);
         }
 
-        // Step 3: 5 to 0 Countdown
         function startFinalCountdown() {
             let countScreen = document.getElementById('countdown-screen');
             countScreen.style.display = 'block';
-            
             let count = 5;
             countScreen.innerText = count;
 
@@ -260,42 +415,37 @@
                 count--;
                 if (count > 0) {
                     countScreen.innerText = count;
-                    // Trigger a tiny burst on every count down tick for excitement
-                    confetti({ particleCount: 20, spread: 40, origin: { y: 0.8 }, colors: ['#d4af37', '#fff'] });
                 } else if (count === 0) {
                     countScreen.innerText = "0";
                 } else {
                     clearInterval(finalTimer);
                     countScreen.style.display = 'none';
-                    revealName();
+                    triggerGrandReveal();
                 }
             }, 1000);
         }
 
-        // Step 4: Reveal Name and Trigger Showers
-        function revealName() {
+        function triggerGrandReveal() {
             document.getElementById('reveal-screen').style.display = 'block';
-            
             let letters = document.querySelectorAll('.letter');
             
-            // Reveal letters 1 by 1
+            // Dramatic letter-by-letter reveal
             letters.forEach((letter, index) => {
                 setTimeout(() => {
                     letter.classList.add('show');
-                }, index * 400); // 400ms delay between each letter
+                }, index * 400); 
             });
 
-            // Trigger the "Bushwan/Flower" shower from bottom 2 sides
+            // Trigger the massive majestic showers perfectly timed with the final letter
             setTimeout(() => {
-                fireShowers();
-            }, (letters.length * 400)); // Fire showers right as the last letter appears
+                fireMajesticShowers();
+            }, (letters.length * 400) + 100);
         }
 
-        // Step 5: Side Showers (Confetti/Flowers)
-        function fireShowers() {
-            var duration = 5 * 1000;
+        function fireMajesticShowers() {
+            var duration = 12 * 1000; // 12 seconds of celebration
             var animationEnd = Date.now() + duration;
-            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+            var defaults = { startVelocity: 55, spread: 360, ticks: 120, zIndex: 100 };
 
             function randomInRange(min, max) {
                 return Math.random() * (max - min) + min;
@@ -308,21 +458,23 @@
                     return clearInterval(interval);
                 }
 
-                var particleCount = 50 * (timeLeft / duration);
+                var particleCount = 80 * (timeLeft / duration);
                 
-                // Fire from Left bottom
+                // Left Cannons
                 confetti(Object.assign({}, defaults, { 
                     particleCount, 
-                    origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
-                    colors: ['#ffc0cb', '#ff69b4', '#d4af37', '#ffffff'] // Pink and Gold flower colors
+                    origin: { x: randomInRange(0.0, 0.2), y: Math.random() - 0.2 },
+                    colors: ['#bf953f', '#fcf6ba', '#ffffff'],
+                    disableForReducedMotion: true
                 }));
-                // Fire from Right bottom
+                // Right Cannons
                 confetti(Object.assign({}, defaults, { 
                     particleCount, 
-                    origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
-                    colors: ['#ffc0cb', '#ff69b4', '#d4af37', '#ffffff']
+                    origin: { x: randomInRange(0.8, 1.0), y: Math.random() - 0.2 },
+                    colors: ['#bf953f', '#fcf6ba', '#ffffff'],
+                    disableForReducedMotion: true
                 }));
-            }, 250);
+            }, 200);
         }
     </script>
 </body>
