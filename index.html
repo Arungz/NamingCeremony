@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Baby Naming Ceremony</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Great+Vibes&display=swap');
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Cinzel', serif;
+            overflow: hidden; /* Prevents scrolling */
+            background-color: #fdfbf7;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        /* --- STAGE 1: INTRO SCREEN & GATES --- */
+        #intro-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .gate {
+            position: absolute;
+            top: 0;
+            width: 50%;
+            height: 100%;
+            background-color: #d4af37; /* Gold color */
+            transition: transform 2s ease-in-out;
+            z-index: 101;
+        }
+
+        .gate.left { left: 0; border-right: 2px solid #fff; }
+        .gate.right { right: 0; border-left: 2px solid #fff; }
+
+        .gate.open-left { transform: translateX(-100%); }
+        .gate.open-right { transform: translateX(100%); }
+
+        #letter-N {
+            font-size: 100px;
+            color: white;
+            background: #2c3e50;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 102;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            animation: pulse 2s infinite;
+            transition: opacity 1s, transform 1s;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* --- STAGE 2: TIMER SCREEN --- */
+        #timer-screen {
+            position: absolute;
+            text-align: center;
+            z-index: 50;
+            opacity: 0;
+            transition: opacity 2s;
+            display: none;
+        }
+
+        #timer-screen h2 {
+            font-size: 30px;
+            margin-bottom: 20px;
+            color: #555;
+        }
+
+        .timer-box {
+            display: flex;
+            gap: 20px;
+            font-size: 40px;
+        }
+
+        .time-unit {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            min-width: 100px;
+        }
+
+        .time-unit span {
+            display: block;
+            font-size: 16px;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        /* --- STAGE 3: 5 TO 0 COUNTDOWN --- */
+        #countdown-screen {
+            position: absolute;
+            font-size: 150px;
+            color: #d4af37;
+            z-index: 60;
+            display: none;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+        }
+
+        /* --- STAGE 4: FINAL REVEAL --- */
+        #reveal-screen {
+            position: absolute;
+            text-align: center;
+            z-index: 70;
+            display: none;
+        }
+
+        #reveal-screen h3 {
+            font-size: 40px;
+            color: #555;
+            margin-bottom: 20px;
+            font-family: 'Great Vibes', cursive;
+        }
+
+        .name-container {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .letter {
+            font-size: 80px;
+            color: #2c3e50;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .letter.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="intro-container">
+        <div class="gate left" id="gate-left"></div>
+        <div class="gate right" id="gate-right"></div>
+        <div id="letter-N" onclick="openGates()">N</div>
+    </div>
+
+    <div id="timer-screen">
+        <h2>The Naming Ceremony Begins In...</h2>
+        <div class="timer-box">
+            <div class="time-unit"><div id="days">00</div><span>Days</span></div>
+            <div class="time-unit"><div id="hours">00</div><span>Hours</span></div>
+            <div class="time-unit"><div id="mins">00</div><span>Minutes</span></div>
+            <div class="time-unit"><div id="secs">00</div><span>Seconds</span></div>
+        </div>
+    </div>
+
+    <div id="countdown-screen">5</div>
+
+    <div id="reveal-screen">
+        <h3>Welcome to the world</h3>
+        <div class="name-container" id="baby-name">
+            <div class="letter">A</div>
+            <div class="letter">R</div>
+            <div class="letter">Y</div>
+            <div class="letter">A</div>
+            <div class="letter">N</div>
+        </div>
+    </div>
+
+    <script>
+        // --- CONFIGURATION ---
+        // SET YOUR EVENT DATE HERE. Format: "Month DD, YYYY HH:MM:SS"
+        // Note: I set it to 10 seconds from now so you can test it immediately!
+        let eventDate = new Date();
+        eventDate.setSeconds(eventDate.getSeconds() + 10); 
+        let countdownInterval;
+
+        // Step 1: Open the gates when 'N' is clicked
+        function openGates() {
+            document.getElementById('gate-left').classList.add('open-left');
+            document.getElementById('gate-right').classList.add('open-right');
+            
+            let letterN = document.getElementById('letter-N');
+            letterN.style.transform = 'scale(0)';
+            letterN.style.opacity = '0';
+
+            setTimeout(() => {
+                document.getElementById('intro-container').style.display = 'none';
+                
+                // Show timer screen
+                let timerScreen = document.getElementById('timer-screen');
+                timerScreen.style.display = 'block';
+                setTimeout(() => timerScreen.style.opacity = '1', 100);
+                
+                startTimer();
+            }, 1500);
+        }
+
+        // Step 2: Timer Logic
+        function startTimer() {
+            countdownInterval = setInterval(() => {
+                let now = new Date().getTime();
+                let distance = eventDate - now;
+
+                if (distance <= 0) {
+                    // Timer reached 0
+                    clearInterval(countdownInterval);
+                    document.getElementById('timer-screen').style.display = 'none';
+                    startFinalCountdown(); // Start 5, 4, 3, 2, 1, 0
+                    return;
+                }
+
+                let days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                let hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                let seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                document.getElementById('days').innerText = days < 10 ? '0' + days : days;
+                document.getElementById('hours').innerText = hours < 10 ? '0' + hours : hours;
+                document.getElementById('mins').innerText = minutes < 10 ? '0' + minutes : minutes;
+                document.getElementById('secs').innerText = seconds < 10 ? '0' + seconds : seconds;
+
+            }, 1000);
+        }
+
+        // Step 3: 5 to 0 Countdown
+        function startFinalCountdown() {
+            let countScreen = document.getElementById('countdown-screen');
+            countScreen.style.display = 'block';
+            
+            let count = 5;
+            countScreen.innerText = count;
+
+            let finalTimer = setInterval(() => {
+                count--;
+                if (count > 0) {
+                    countScreen.innerText = count;
+                    // Trigger a tiny burst on every count down tick for excitement
+                    confetti({ particleCount: 20, spread: 40, origin: { y: 0.8 }, colors: ['#d4af37', '#fff'] });
+                } else if (count === 0) {
+                    countScreen.innerText = "0";
+                } else {
+                    clearInterval(finalTimer);
+                    countScreen.style.display = 'none';
+                    revealName();
+                }
+            }, 1000);
+        }
+
+        // Step 4: Reveal Name and Trigger Showers
+        function revealName() {
+            document.getElementById('reveal-screen').style.display = 'block';
+            
+            let letters = document.querySelectorAll('.letter');
+            
+            // Reveal letters 1 by 1
+            letters.forEach((letter, index) => {
+                setTimeout(() => {
+                    letter.classList.add('show');
+                }, index * 400); // 400ms delay between each letter
+            });
+
+            // Trigger the "Bushwan/Flower" shower from bottom 2 sides
+            setTimeout(() => {
+                fireShowers();
+            }, (letters.length * 400)); // Fire showers right as the last letter appears
+        }
+
+        // Step 5: Side Showers (Confetti/Flowers)
+        function fireShowers() {
+            var duration = 5 * 1000;
+            var animationEnd = Date.now() + duration;
+            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+            function randomInRange(min, max) {
+                return Math.random() * (max - min) + min;
+            }
+
+            var interval = setInterval(function() {
+                var timeLeft = animationEnd - Date.now();
+
+                if (timeLeft <= 0) {
+                    return clearInterval(interval);
+                }
+
+                var particleCount = 50 * (timeLeft / duration);
+                
+                // Fire from Left bottom
+                confetti(Object.assign({}, defaults, { 
+                    particleCount, 
+                    origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
+                    colors: ['#ffc0cb', '#ff69b4', '#d4af37', '#ffffff'] // Pink and Gold flower colors
+                }));
+                // Fire from Right bottom
+                confetti(Object.assign({}, defaults, { 
+                    particleCount, 
+                    origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
+                    colors: ['#ffc0cb', '#ff69b4', '#d4af37', '#ffffff']
+                }));
+            }, 250);
+        }
+    </script>
+</body>
+</html>
