@@ -1,9 +1,7 @@
-# Naming Ceremony
-=================
+# Naming Ceremony :
 ❤  AK Baby ❤ 
 
-# Website
-=========
-![https://akbaby.online](https://github.com/Arungz/maadu/blob/master/images/maadu.jpeg)
+# Website :
+![Name Ceremony](https:akbaby.online)
 <p align="center"> 
 
