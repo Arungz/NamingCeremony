@@ -56,13 +56,7 @@
       --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
-    * { 
-      box-sizing: border-box; 
-      margin: 0; 
-      padding: 0; 
-      -webkit-tap-highlight-color: transparent !important;
-      outline: none !important;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     
     html, body { 
       height: 100%; 
@@ -86,6 +80,7 @@
       padding-bottom: var(--safe-area-bottom);
       perspective: 1200px; 
       user-select: none; 
+      -webkit-tap-highlight-color: transparent; 
     }
 
     body::before {
@@ -102,7 +97,7 @@
         position: fixed;
         top: 50%; left: 50%;
         width: 100vw; height: 100vh;
-        background: radial-gradient(circle, rgba(191, 149, 63, 0.06) 0%, transparent 65%);
+        background: radial-gradient(circle, rgba(191, 149, 63, 0.05) 0%, transparent 60%);
         transform: translate3d(-50%, -50%, 0);
         z-index: 2; 
         pointer-events: none;
@@ -431,7 +426,7 @@
       font-family: 'Cinzel', serif;
     }
 
-    /* ===== NEW: CINEMATIC COUNTDOWN SCREEN ===== */
+    /* ===== CINEMATIC COUNTDOWN SCREEN ===== */
     #countdown-screen {
       position: absolute;
       top: 50%;
@@ -442,7 +437,6 @@
       font-family: 'Cinzel', serif;
       font-size: clamp(150px, 35vw, 350px);
       font-weight: 800;
-      /* Beautiful Solid Gold Gradient */
       background: linear-gradient(180deg, var(--gold-2) 0%, var(--gold-1) 100%);
       -webkit-background-clip: text;
       background-clip: text;
@@ -483,7 +477,7 @@
       font-family: 'Cinzel', serif;
       font-weight: 400;
       font-size: clamp(16px, 4vw, 32px);
-      letter-spacing: clamp(2px, 1vw, 6px); 
+      letter-spacing: clamp(4px, 2vw, 12px); 
       color: var(--gold-2);
       margin-bottom: 40px;
       text-transform: uppercase;
@@ -492,21 +486,25 @@
       text-shadow: 0 5px 20px rgba(0,0,0,0.9);
       text-align: center;
       will-change: transform, opacity;
+      
+      background: linear-gradient(90deg, var(--gold-3) 0%, var(--gold-2) 40%, #fff 50%, var(--gold-2) 60%, var(--gold-3) 100%);
+      background-size: 200% auto;
+      color: transparent;
+      -webkit-background-clip: text;
+      background-clip: text;
     }
     
     .subtitle-show { 
         animation: 
             cinematicSettle 2.5s var(--ease-out-expo) forwards,
-            goldSweep 4s infinite linear 2.5s; 
+            shimmerSweep 4s linear infinite 2.5s; 
     }
     @keyframes cinematicSettle {
         0% { opacity: 0; transform: translate3d(0, -40px, 0) scale(1.1); filter: blur(8px); }
-        100% { opacity: 1; transform: translate3d(0, -20px, 0) scale(1); filter: blur(0px); text-shadow: 0 5px 20px rgba(0,0,0,0.9); }
+        100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); filter: blur(0px); text-shadow: 0 5px 20px rgba(0,0,0,0.9); }
     }
-    @keyframes goldSweep {
-        0%, 20% { text-shadow: 0 5px 20px rgba(0,0,0,0.9); color: var(--gold-2); }
-        50% { text-shadow: 0 5px 30px rgba(253, 245, 201, 0.8), 0 0 20px #fff; color: #fff; }
-        80%, 100% { text-shadow: 0 5px 20px rgba(0,0,0,0.9); color: var(--gold-2); }
+    @keyframes shimmerSweep {
+        to { background-position: 200% center; }
     }
 
     /* ===== SMART ANIMATION NAME CONTAINER ===== */
@@ -530,6 +528,8 @@
         overflow: hidden;
         display: flex;
         align-items: center;
+        padding: 20px 0;
+        margin: -20px 0;
     }
 
     .letter {
@@ -538,7 +538,7 @@
       font-weight: 800;
       color: var(--gold-2);
       -webkit-font-smoothing: antialiased;
-      will-change: transform, opacity, color, text-shadow, filter;
+      will-change: transform, opacity, color, text-shadow;
       text-shadow: 
         0 1px 0 #b38728, 0 2px 0 #9f7622, 0 3px 0 #8c661c,
         0 15px 25px rgba(0,0,0,0.8);
@@ -709,7 +709,7 @@
   <div id="countdown-screen" aria-live="assertive" aria-atomic="true">5</div>
 
   <div id="reveal-screen" aria-hidden="true">
-    <h3 id="reveal-subtitle" class="gold-shimmer">Welcome To The World</h3>
+    <h3 id="reveal-subtitle">Welcome To The World</h3>
     <div class="name-container" id="baby-name" aria-hidden="true"></div>
     
     <div id="baby-girl-container">
@@ -868,6 +868,8 @@
     let particlesArray = [];
     let canvasCtx = null;
     let canvasWidth, canvasHeight;
+    let particlesFading = false;
+    let particlesAlpha = 1.0;
 
     function initCanvas() {
       if (!elements.canvas) return;
@@ -936,6 +938,17 @@
     }
 
     function animateCanvas() {
+      if (particlesFading) {
+          particlesAlpha -= 0.015; 
+          if (particlesAlpha <= 0) {
+              canvasCtx.clearRect(0, 0, canvasWidth, canvasHeight);
+              return; 
+          }
+          canvasCtx.globalAlpha = particlesAlpha;
+      } else {
+          canvasCtx.globalAlpha = 1.0;
+      }
+
       canvasCtx.clearRect(0, 0, canvasWidth, canvasHeight);
       for (const p of particlesArray) {
         p.update();
@@ -1025,7 +1038,6 @@
       countdownInterval = setInterval(updateOnce, 1000);
     }
 
-    /* ===== NEW: CINEMATIC COUNTDOWN ===== */
     function startFinalCountdown() {
       if (elements.countdownScreen) elements.countdownScreen.style.display = 'block';
       let count = 5;
@@ -1173,6 +1185,12 @@
         document.body.appendChild(container);
 
         const maxBalloons = window.innerWidth < 600 ? 12 : 25;
+        
+        // NEW: Fade out background particles ONLY on mobile phones (<768px)
+        if (window.innerWidth <= 767) {
+            particlesFading = true;
+        }
+
         let htmlStr = '';
         const delays = [];
         
