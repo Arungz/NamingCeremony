@@ -46,28 +46,18 @@
       --gold-3: #b38728;
       --muted: rgba(255, 255, 255, 0.5);
       --glass: rgba(20, 20, 20, 0.4);
-      --glass-border: rgba(191, 149, 63, 0.3);
       --safe-area-top: env(safe-area-inset-top);
       --safe-area-bottom: env(safe-area-inset-bottom);
       
-      /* Cinematic Easing */
       --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
       --ease-in-out-circ: cubic-bezier(0.85, 0, 0.15, 1);
       --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
-    * { 
-      box-sizing: border-box; 
-      margin: 0; 
-      padding: 0; 
-      /* Absolute fix for mobile tap highlights */
-      -webkit-tap-highlight-color: transparent !important;
-      outline: none !important;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     
     html, body { 
       height: 100%; 
-      /* Modern Mobile Fix: Dynamic Viewport Height prevents jumping */
       height: 100dvh; 
       overflow: hidden; 
       background-color: var(--bg);
@@ -80,7 +70,6 @@
       color: #fff;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
-      text-rendering: optimizeLegibility;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -88,6 +77,7 @@
       padding-bottom: var(--safe-area-bottom);
       perspective: 1200px; 
       user-select: none; 
+      -webkit-tap-highlight-color: transparent; 
     }
 
     body::before {
@@ -104,7 +94,7 @@
         position: fixed;
         top: 50%; left: 50%;
         width: 100vw; height: 100vh;
-        background: radial-gradient(circle, rgba(191, 149, 63, 0.06) 0%, transparent 65%);
+        background: radial-gradient(circle, rgba(191, 149, 63, 0.05) 0%, transparent 60%);
         transform: translate3d(-50%, -50%, 0);
         z-index: 2; 
         pointer-events: none;
@@ -246,10 +236,11 @@
       text-shadow: 0 0 20px rgba(253, 245, 201, 0.6), 0 0 40px rgba(191, 149, 63, 0.4);
       cursor: pointer;
       animation: invitePulse 2.5s infinite alternate ease-in-out;
-      transition: transform 0.4s var(--ease-spring), box-shadow 0.4s ease, background 0.4s ease;
+      transition: all 0.4s var(--ease-spring);
       font-weight: 700;
       position: relative;
       z-index: 103;
+      outline: none;
       will-change: transform, box-shadow;
     }
     
@@ -338,7 +329,7 @@
     }
     @keyframes hintFade { 0% { opacity: 0.3; } 100% { opacity: 1; } }
 
-    /* ===== BULLETPROOF 3D TIMER SCREEN ===== */
+    /* ===== BULLETPROOF MOBILE TIMER SCREEN ===== */
     #timer-screen {
       position: absolute;
       z-index: 50;
@@ -352,7 +343,6 @@
       width: 100%;
       padding: clamp(10px, 2vw, 20px);
       box-sizing: border-box;
-      perspective: 1200px;
     }
     
     #timer-title {
@@ -374,7 +364,6 @@
       max-width: 650px;
       padding: 0 10px;
       box-sizing: border-box;
-      perspective: 1000px;
     }
     
     .time-unit {
@@ -391,17 +380,12 @@
       border-radius: 12px;
       box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
       text-align: center;
-      
       opacity: 0;
-      /* Mobile fix: Use translate3d and keep backface hidden for smooth 3D */
-      transform: translate3d(0, -30px, -50px) rotateX(45deg);
-      transition: opacity 0.6s ease, transform 1s var(--ease-spring);
+      transform: translate3d(0, 40px, 0) scale(0.9);
+      transition: opacity 0.6s ease, transform 0.8s var(--ease-out-expo);
       position: relative;
       overflow: hidden; 
       will-change: transform, opacity;
-      transform-style: preserve-3d;
-      backface-visibility: hidden;
-      -webkit-backface-visibility: hidden;
     }
     
     .time-unit::after {
@@ -420,7 +404,7 @@
     
     .time-unit.show-unit {
         opacity: 1;
-        transform: translate3d(0, 0, 0) rotateX(0deg);
+        transform: translate3d(0, 0, 0) scale(1);
     }
     
     .time-unit div { 
@@ -428,7 +412,6 @@
       font-size: clamp(20px, 5.5vw, 65px); 
       line-height: 1; 
       text-shadow: 0 2px 8px rgba(0,0,0,0.6);
-      transform: translateZ(0); /* Force GPU text rendering */
     }
     .time-unit span { 
       display: block; 
@@ -440,26 +423,35 @@
       font-family: 'Cinzel', serif;
     }
 
-    /* ===== REALISTIC DOUBLE HEARTBEAT COUNTDOWN ===== */
+    /* ===== ADVANCED EPIC COUNTDOWN SCREEN ===== */
     #countdown-screen {
       position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
       z-index: 60;
       display: none;
       font-family: 'Cinzel', serif;
       color: transparent;
       -webkit-text-stroke: 2px var(--gold-1);
-      font-size: clamp(120px, 30vw, 320px);
+      /* Golden gradient text */
+      background: linear-gradient(180deg, var(--gold-2), var(--gold-1));
+      -webkit-background-clip: text;
+      background-clip: text;
+      font-size: clamp(150px, 40vw, 350px);
+      font-weight: 800;
       pointer-events: none;
-      /* Realistic double heartbeat sequence */
-      animation: doubleHeartbeat 1s infinite linear;
-      will-change: transform, opacity, text-shadow;
+      will-change: transform, opacity, filter;
     }
-    @keyframes doubleHeartbeat {
-      0% { transform: scale(0.8); opacity: 0; }
-      15% { transform: scale(1.15); opacity: 1; text-shadow: 0 0 60px rgba(191, 149, 63, 0.6); }
-      30% { transform: scale(1.05); opacity: 0.8; text-shadow: 0 0 30px rgba(191, 149, 63, 0.4); }
-      45% { transform: scale(1.2); opacity: 1; text-shadow: 0 0 80px rgba(191, 149, 63, 0.8), 0 0 20px rgba(253, 245, 201, 0.6); }
-      100% { transform: scale(1.6); opacity: 0; text-shadow: 0 0 0 transparent; }
+    
+    .countdown-pop {
+        /* Triggers the exact moment JS updates the number */
+        animation: countdownPop 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
+    }
+    
+    @keyframes countdownPop {
+        0% { transform: translate(-50%, -50%) scale(0.3); opacity: 0; filter: blur(10px); }
+        40% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; filter: blur(0px); }
+        100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; filter: blur(20px); }
     }
 
     /* ===== PERFECTLY POSITIONED REVEAL SCREEN ===== */
@@ -480,34 +472,39 @@
       #reveal-screen { justify-content: center; padding-top: 0; }
     }
     
+    /* ADVANCED CINEMATIC SUBTITLE: 3D Flip down + Light Sweep */
     #reveal-subtitle {
       font-family: 'Cinzel', serif;
       font-weight: 400;
       font-size: clamp(16px, 4vw, 32px);
-      letter-spacing: clamp(2px, 1vw, 6px); 
-      color: var(--gold-2);
+      /* Static letter spacing to prevent mobile layout thrashing */
+      letter-spacing: clamp(4px, 2vw, 12px); 
       margin-bottom: 40px;
       text-transform: uppercase;
-      opacity: 0;
-      transform: translate3d(0, -20px, 0);
-      text-shadow: 0 5px 20px rgba(0,0,0,0.9);
       text-align: center;
-      will-change: transform, opacity, letter-spacing;
+      
+      /* High-performance Gold Shimmer Sweep */
+      background: linear-gradient(90deg, var(--gold-3) 0%, var(--gold-2) 40%, #fff 50%, var(--gold-2) 60%, var(--gold-3) 100%);
+      background-size: 200% auto;
+      color: transparent;
+      -webkit-background-clip: text;
+      background-clip: text;
+      
+      opacity: 0;
+      transform: translate3d(0, 40px, -100px) rotateX(-60deg);
+      will-change: transform, opacity, background-position;
     }
     
     .subtitle-show { 
         animation: 
-            cinematicSettle 2.5s var(--ease-out-expo) forwards,
-            goldSweep 4s infinite linear 2.5s; 
+            cinematicSettle 2s cubic-bezier(0.25, 1, 0.5, 1) forwards,
+            shimmerSweep 4s linear infinite 2s; 
     }
     @keyframes cinematicSettle {
-        0% { opacity: 0; transform: translate3d(0, -40px, 0) scale(1.1); letter-spacing: clamp(10px, 4vw, 24px); filter: blur(8px); }
-        100% { opacity: 1; transform: translate3d(0, -20px, 0) scale(1); letter-spacing: clamp(2px, 1vw, 6px); filter: blur(0px); text-shadow: 0 5px 20px rgba(0,0,0,0.9); }
+        to { opacity: 1; transform: translate3d(0, 0, 0) rotateX(0deg); }
     }
-    @keyframes goldSweep {
-        0%, 20% { text-shadow: 0 5px 20px rgba(0,0,0,0.9); color: var(--gold-2); }
-        50% { text-shadow: 0 5px 30px rgba(253, 245, 201, 0.8), 0 0 20px #fff; color: #fff; }
-        80%, 100% { text-shadow: 0 5px 20px rgba(0,0,0,0.9); color: var(--gold-2); }
+    @keyframes shimmerSweep {
+        to { background-position: 200% center; }
     }
 
     /* ===== SMART ANIMATION NAME CONTAINER ===== */
@@ -517,7 +514,6 @@
       align-items: center;
       white-space: nowrap; 
       max-width: 95vw;
-      transform-style: preserve-3d;
     }
     
     .rest-part-wrapper {
@@ -532,7 +528,6 @@
         overflow: hidden;
         display: flex;
         align-items: center;
-        /* Padding prevents box-shadow clipping during animation */
         padding: 20px 0;
         margin: -20px 0;
     }
@@ -565,13 +560,14 @@
 
     .is-name { opacity: 0; margin-left: clamp(2px, 1.5vw, 15px); }
 
+    /* Highly Optimized Reveal Flash */
     @keyframes popFlash {
         0% { opacity: 0; transform: translate3d(0, 50px, -150px) rotateX(-70deg) scale(0.8); color: transparent; text-shadow: 0 0 40px rgba(253, 245, 201, 0); filter: blur(12px); }
         50% { opacity: 1; transform: translate3d(0, -10px, 30px) rotateX(10deg) scale(1.1); color: #fff; text-shadow: 0 0 50px rgba(253, 245, 201, 1), 0 10px 20px rgba(0,0,0,0.8); filter: blur(0px); }
         100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1) rotateX(0deg); color: var(--gold-2); text-shadow: 0 1px 0 #b38728, 0 2px 0 #9f7622, 0 3px 0 #8c661c, 0 15px 25px rgba(0,0,0,0.8); filter: blur(0px); }
     }
 
-    /* ===== LIFELIKE KAWAII BABY GIRL SVG & SPARKLES ===== */
+    /* ===== ADVANCED KAWAII BABY GIRL SVG & SPARKLES ===== */
     #baby-girl-container {
         position: relative;
         margin-top: 30px;
@@ -612,7 +608,6 @@
         100% { transform: rotate(35deg); }
     }
 
-    /* NEW: Realistic Eye Blinking & Head Bobbing */
     .eyes {
         transform-origin: 100px 98px;
         animation: blink 4s infinite;
@@ -715,7 +710,7 @@
   <div id="countdown-screen" aria-live="assertive" aria-atomic="true">5</div>
 
   <div id="reveal-screen" aria-hidden="true">
-    <h3 id="reveal-subtitle" class="gold-shimmer">Welcome To The World</h3>
+    <h3 id="reveal-subtitle">Welcome To The World</h3>
     <div class="name-container" id="baby-name" aria-hidden="true"></div>
     
     <div id="baby-girl-container">
@@ -801,7 +796,7 @@
       canvas: qs('#canvas-bg')
     };
 
-    /* ===== PARABOLIC PULL TO REFRESH LOGIC ===== */
+    /* ===== PULL TO REFRESH LOGIC ===== */
     let startY = 0;
     let currentPull = 0;
     const ptrWrapper = qs('#ptr-wrapper');
@@ -817,7 +812,6 @@
     function handleDragMove(y) {
         if (startY === 0) return;
         const diff = y - startY;
-        
         if (diff > 0) {
             // Realistic iOS rubber-band math
             currentPull = Math.pow(diff, 0.8) * 1.5; 
@@ -836,7 +830,6 @@
     function handleDragEnd() {
         if (startY === 0) return;
         startY = 0;
-
         ptrWrapper.style.transition = 'transform 0.4s var(--ease-out-expo), box-shadow 0.3s ease, background 0.3s ease';
         ptrIcon.style.transition = 'transform 0.4s ease';
 
@@ -854,11 +847,9 @@
         if (e.touches.length > 1) return;
         handleDragStart(e.touches[0].clientY);
     }, { passive: true });
-    
     document.addEventListener('touchmove', e => {
         handleDragMove(e.touches[0].clientY);
     }, { passive: true });
-    
     document.addEventListener('touchend', handleDragEnd);
 
     let isMouseDown = false;
@@ -900,7 +891,6 @@
           this.alphaChange = (Math.random() * 0.01) + 0.005;
           if (Math.random() > 0.5) this.alphaChange *= -1;
 
-          // Trigonometric sway variables for realism
           this.angle = Math.random() * Math.PI * 2;
           this.angleSpeed = Math.random() * 0.02 + 0.01;
         }
@@ -931,7 +921,6 @@
         }
       }
 
-      // Automatically lower particle count on mobile to keep 60fps
       const particleCount = window.innerWidth < 600 ? 50 : 120;
       particlesArray = [];
       for (let i = 0; i < particleCount; i++) particlesArray.push(new Particle());
@@ -1044,15 +1033,20 @@
       if (elements.countdownScreen) elements.countdownScreen.style.display = 'block';
       let count = 5;
       
-      if (elements.countdownScreen) elements.countdownScreen.textContent = String(count);
+      // Force instant display of '5'
+      if (elements.countdownScreen) {
+          elements.countdownScreen.textContent = String(count);
+          elements.countdownScreen.classList.add('countdown-pop');
+      }
 
       finalTimer = setInterval(() => {
         count--;
         if (count > 0) {
           if (elements.countdownScreen) {
-             elements.countdownScreen.style.animation = 'none';
+             // Retrigger the CSS animation cleanly
+             elements.countdownScreen.classList.remove('countdown-pop');
              void elements.countdownScreen.offsetWidth; 
-             elements.countdownScreen.style.animation = 'heartbeatPulse 1s infinite var(--ease-out-expo)';
+             elements.countdownScreen.classList.add('countdown-pop');
              elements.countdownScreen.textContent = String(count);
           }
         } else {
@@ -1075,12 +1069,13 @@
 
       if (!reducedMotion) {
         elements.letterN.classList.add('shatter');
+        elements.sealAura.classList.add('explode');
       }
 
       setTimeout(() => {
         elements.gateLeft?.classList.add('open-left');
         elements.gateRight?.classList.add('open-right');
-      }, 300); 
+      }, 400); 
 
       setTimeout(() => {
         if(elements.sceneContainer) {
