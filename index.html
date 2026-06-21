@@ -46,6 +46,7 @@
       --gold-3: #b38728;
       --muted: rgba(255, 255, 255, 0.5);
       --glass: rgba(20, 20, 20, 0.4);
+      --glass-border: rgba(191, 149, 63, 0.3);
       --safe-area-top: env(safe-area-inset-top);
       --safe-area-bottom: env(safe-area-inset-bottom);
     }
@@ -80,6 +81,23 @@
       pointer-events: none;
     }
 
+    /* ===== AMBIENT MAGIC GLOW ===== */
+    .ambient-light {
+        position: fixed;
+        top: 50%; left: 50%;
+        width: 90vw; height: 90vh;
+        background: radial-gradient(circle, rgba(191, 149, 63, 0.08) 0%, transparent 70%);
+        transform: translate(-50%, -50%);
+        z-index: 2; 
+        pointer-events: none;
+        animation: breatheLight 8s infinite alternate ease-in-out;
+    }
+    @keyframes breatheLight {
+        0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.4; }
+        100% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+    }
+
+    /* ===== CANVAS BACKGROUND ===== */
     #canvas-bg {
       position: fixed;
       inset: 0;
@@ -116,7 +134,7 @@
         backdrop-filter: blur(15px);
         border: 1px solid var(--gold-1);
         border-radius: 50%;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.8);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.8), 0 0 0px rgba(212, 175, 55, 0);
         transition: box-shadow 0.3s ease, background 0.3s ease;
         pointer-events: none; 
     }
@@ -158,6 +176,7 @@
       z-index: 101;
       overflow: hidden;
     }
+
     .gate::before {
         content: '';
         position: absolute;
@@ -218,11 +237,10 @@
       color: #3d2b07;
       text-shadow: 1px 1px 2px rgba(255,255,255,0.8), -1px -1px 2px rgba(0,0,0,0.4);
       cursor: pointer;
-      box-shadow: 
-        inset 0 0 20px rgba(0,0,0,0.5), 
-        0 20px 40px rgba(0,0,0,0.9), 
-        0 0 0 8px #111, 
-        0 0 0 12px var(--gold-1);
+      
+      /* NEW: Magical Invite Pulse Animation */
+      animation: invitePulse 2.5s infinite alternate ease-in-out;
+      
       transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
       font-weight: 700;
       position: relative;
@@ -231,7 +249,13 @@
       outline: none;
     }
     
+    @keyframes invitePulse {
+        from { box-shadow: inset 0 0 20px rgba(0,0,0,0.5), 0 20px 40px rgba(0,0,0,0.9), 0 0 0 8px #111, 0 0 0 10px var(--gold-1); }
+        to { box-shadow: inset 0 0 20px rgba(0,0,0,0.5), 0 20px 40px rgba(0,0,0,0.9), 0 0 0 8px #111, 0 0 20px 14px rgba(253, 245, 201, 0.4); }
+    }
+    
     #letter-N:hover, #letter-N:active { 
+        animation: none; /* Stops pulse on touch */
         transform: scale(1.05); 
         box-shadow: 
             inset 0 0 15px rgba(0,0,0,0.7), 
@@ -241,6 +265,7 @@
     }
 
     #letter-N.shatter {
+        animation: none;
         transform: scale(2) rotate(15deg);
         opacity: 0;
         filter: blur(10px);
@@ -265,7 +290,7 @@
     }
     @keyframes fadeInOut { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
 
-    /* ===== BULLETPROOF MOBILE TIMER SCREEN ===== */
+    /* ===== CASCADING TIMER SCREEN ===== */
     #timer-screen {
       position: absolute;
       z-index: 50;
@@ -291,7 +316,6 @@
       white-space: nowrap;
     }
     
-    /* Strictly constrained flexbox ensures NO wrapping on any phone */
     .timer-box { 
       display: flex; 
       gap: 8px; 
@@ -317,7 +341,18 @@
       border-radius: 12px;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
       text-align: center;
+      
+      /* NEW: Cascading Slide-up Entrance */
+      opacity: 0;
+      transform: translateY(40px) scale(0.9);
+      transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
+    
+    .time-unit.show-unit {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    
     .time-unit div { 
       font-weight: 300; 
       font-size: clamp(20px, 5.5vw, 65px); 
@@ -353,14 +388,13 @@
       100% { transform: scale(1.4); opacity: 0; filter: blur(5px); }
     }
 
-    /* ===== REVEAL SCREEN (MOBILE TOP, DESKTOP CENTER) ===== */
+    /* ===== PERFECTLY POSITIONED REVEAL SCREEN ===== */
     #reveal-screen { 
       position: absolute; 
       inset: 0;
       z-index: 70; 
       display: none; 
       flex-direction: column;
-      /* Mobile & Tablet Default: Locked to the top */
       justify-content: flex-start; 
       padding-top: 15vh; 
       align-items: center;
@@ -368,7 +402,6 @@
       width: 100%; 
     }
     
-    /* Desktop PC, Mac OS, and large Tablets: Dead Center */
     @media (min-width: 768px) {
       #reveal-screen {
         justify-content: center;
@@ -390,8 +423,17 @@
       text-align: center;
     }
     
-    .subtitle-show { animation: cinematicFloatIn 2s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+    /* NEW: Cinematic floating transition with a continuous subtle glow */
+    .subtitle-show { 
+        animation: 
+            cinematicFloatIn 2s cubic-bezier(0.25, 1, 0.5, 1) forwards,
+            subtleGlow 3s infinite alternate 2s; 
+    }
     @keyframes cinematicFloatIn { to { opacity: 1; transform: translateY(0) scale(1); } }
+    @keyframes subtleGlow {
+        from { text-shadow: 0 5px 20px rgba(0,0,0,0.9); }
+        to { text-shadow: 0 5px 20px rgba(0,0,0,0.9), 0 0 20px rgba(253, 245, 201, 0.4); }
+    }
 
     /* ===== SMART ANIMATION NAME CONTAINER ===== */
     .name-container { 
@@ -445,7 +487,7 @@
         100% { opacity: 1; transform: translateZ(0) scale(1) rotateX(0deg); filter: brightness(1); color: var(--gold-2); }
     }
 
-    /* ===== ADVANCED KAWAII BABY GIRL SVG ===== */
+    /* ===== ADVANCED KAWAII BABY GIRL SVG & SPARKLES ===== */
     #baby-girl-container {
         position: relative;
         margin-top: 30px;
@@ -462,7 +504,6 @@
     #baby-girl-container.slide-in {
         transform: translateX(0); 
         opacity: 1;
-        /* Adds a lifelike floating/breathing animation after she arrives */
         animation: floatBaby 3s ease-in-out infinite forwards;
         animation-delay: 1.8s;
     }
@@ -481,6 +522,19 @@
         100% { transform: rotate(35deg); }
     }
 
+    /* Magical Sparkling Stars around the baby */
+    .sparkle {
+        position: absolute;
+        font-size: clamp(14px, 3vw, 20px);
+        opacity: 0;
+        animation: twinkle 2s infinite ease-in-out;
+        pointer-events: none;
+    }
+    @keyframes twinkle {
+        0%, 100% { opacity: 0; transform: scale(0.5) rotate(0deg); }
+        50% { opacity: 1; transform: scale(1.2) rotate(20deg); text-shadow: 0 0 10px #fdf5c9; }
+    }
+
     /* ===== HEART BALLOON ANIMATIONS ===== */
     .balloon-anim {
         position: absolute;
@@ -494,7 +548,7 @@
 
     /* ===== REDUCED MOTION ===== */
     @media (prefers-reduced-motion: reduce) {
-      .gold-shimmer, #letter-N::after, .click-hint, #countdown-screen, .letter, .gate, #scene-container, .balloon-anim, .subtitle-show, #baby-girl-container, .waving-arm, #baby-girl-container.slide-in {
+      .gold-shimmer, #letter-N::after, .click-hint, #countdown-screen, .letter, .gate, #scene-container, .balloon-anim, .subtitle-show, #baby-girl-container, .waving-arm, #baby-girl-container.slide-in, .ambient-light, #letter-N, .sparkle {
         animation-duration: 0.001ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 1ms !important;
@@ -504,6 +558,8 @@
 </head>
 <body>
   
+  <div class="ambient-light"></div>
+
   <div id="ptr-wrapper">
       <svg id="ptr-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path d="M12 2.75a9.25 9.25 0 1 0 4.737 17.197l-1.373-1.637A7.25 7.25 0 1 1 19.25 12h-2.5l3.625 4.5L24 12h-2.75a9.25 9.25 0 0 0-9.25-9.25z"/>
@@ -540,8 +596,12 @@
     <div class="name-container" id="baby-name" aria-hidden="true"></div>
     
     <div id="baby-girl-container">
+        <div class="sparkle" style="top: 10px; left: 10px; animation-delay: 0s;">✨</div>
+        <div class="sparkle" style="top: 40px; right: 0px; animation-delay: 0.5s;">✨</div>
+        <div class="sparkle" style="top: 110px; left: 5px; animation-delay: 1.2s;">✨</div>
+        <div class="sparkle" style="top: -5px; right: 30px; animation-delay: 0.8s;">✨</div>
+
         <svg width="100%" height="100%" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-            
             <path d="M 65,190 C 65,135 135,135 135,190 Z" fill="#fff" stroke="#ff80ab" stroke-width="3"/>
             <path d="M 65,185 Q 82.5,200 100,185 Q 117.5,200 135,185" fill="none" stroke="#ff80ab" stroke-width="4"/>
             
@@ -558,8 +618,11 @@
             <ellipse cx="128" cy="108" rx="8" ry="5" fill="#ff80ab" opacity="0.7"/>
             
             <circle cx="78" cy="98" r="6.5" fill="#3e2723"/>
-            <circle cx="76" cy="96" r="2.5" fill="#ffffff"/> <circle cx="122" cy="98" r="6.5" fill="#3e2723"/>
-            <circle cx="120" cy="96" r="2.5" fill="#ffffff"/> <path d="M 94,112 Q 100,120 106,112" fill="none" stroke="#d81b60" stroke-width="2.5" stroke-linecap="round"/>
+            <circle cx="76" cy="96" r="2.5" fill="#ffffff"/> 
+            <circle cx="122" cy="98" r="6.5" fill="#3e2723"/>
+            <circle cx="120" cy="96" r="2.5" fill="#ffffff"/> 
+            
+            <path d="M 94,112 Q 100,120 106,112" fill="none" stroke="#d81b60" stroke-width="2.5" stroke-linecap="round"/>
             
             <path d="M 55,95 C 55,30 145,30 145,95 C 145,65 120,45 100,45 C 80,45 55,65 55,95 Z" fill="#4e342e"/>
             <path d="M 75,50 Q 100,75 112,50" fill="none" stroke="#4e342e" stroke-width="6" stroke-linecap="round"/>
@@ -875,6 +938,13 @@
             void elements.timerScreen.offsetWidth; 
             elements.timerScreen && (elements.timerScreen.style.opacity = '1');
             elements.timerScreen && (elements.timerScreen.style.transform = 'scale(1)');
+            
+            // Cascading timer unit entrance
+            const units = qsa('.time-unit');
+            units.forEach((u, i) => {
+                setTimeout(() => u.classList.add('show-unit'), 100 + (i * 150));
+            });
+            
             startTimer();
         }
       }, 2500); 
@@ -909,7 +979,6 @@
               setTimeout(() => { 
                   fireFourCornerBlast(); 
                   
-                  // Launch Balloons 
                   fireHeartBalloons();
                   
                   // Wave Hello! 7.5s after balloons launch, slide the cute baby in
