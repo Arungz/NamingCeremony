@@ -46,6 +46,7 @@
       --gold-3: #b38728;
       --muted: rgba(255, 255, 255, 0.5);
       --glass: rgba(20, 20, 20, 0.4);
+      --glass-border: rgba(191, 149, 63, 0.3);
       --safe-area-top: env(safe-area-inset-top);
       --safe-area-bottom: env(safe-area-inset-bottom);
       
@@ -365,7 +366,6 @@
       white-space: nowrap;
     }
     
-    /* STRICT GRID prevents wrapping on any device */
     .timer-box { 
       display: grid; 
       grid-template-columns: repeat(4, 1fr);
@@ -594,16 +594,17 @@
         100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1) rotateX(0deg); color: var(--gold-2); text-shadow: 0 1px 0 #b38728, 0 2px 0 #9f7622, 0 3px 0 #8c661c, 0 15px 25px rgba(0,0,0,0.8); filter: blur(0px); }
     }
 
-    /* ===== ADVANCED REALISTIC KAWAII BABY SVG ===== */
+    /* ===== ADVANCED MAGICAL BABY GIRL REVEAL ===== */
     #baby-girl-container {
         position: relative;
         margin-top: 30px;
-        transform: translate3d(0, 50px, -50px) rotateX(-90deg) scale(0.8); 
-        width: 180px;
-        height: 180px;
+        /* Magical Stardust Materialization */
+        transform: scale(0.5) translate3d(0, 50px, 0); 
+        width: 160px;
+        height: 160px;
         opacity: 0;
-        filter: drop-shadow(0 20px 20px rgba(0,0,0,0.6)) blur(8px);
-        transition: transform 1.5s var(--ease-spring), opacity 1.2s ease, filter 1.2s ease;
+        filter: blur(15px) brightness(2);
+        transition: transform 2s var(--ease-spring), opacity 1.5s ease, filter 2s ease;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -613,16 +614,16 @@
     }
     
     #baby-girl-container.slide-in {
-        transform: translate3d(0, 0, 0) rotateX(0deg) scale(1); 
+        transform: scale(1) translate3d(0, 0, 0); 
         opacity: 1;
-        filter: drop-shadow(0 20px 20px rgba(0,0,0,0.6)) blur(0px);
-        animation: floatBaby 4s ease-in-out infinite forwards;
-        animation-delay: 1.5s;
+        filter: blur(0px) brightness(1);
+        animation: floatBaby 4s ease-in-out infinite alternate forwards;
+        animation-delay: 2s;
     }
     
     @keyframes floatBaby {
-        0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
-        50% { transform: translate3d(0, -12px, 0) scale(1.02); }
+        0%, 100% { transform: scale(1) translate3d(0, 0, 0); }
+        50% { transform: scale(1.02) translate3d(0, -12px, 0); }
     }
     
     .waving-arm {
@@ -663,7 +664,7 @@
     }
     @keyframes twinkle {
         0%, 100% { opacity: 0; transform: scale(0.5) rotate(0deg); }
-        50% { opacity: 1; transform: scale(1.2) rotate(20deg); text-shadow: 0 0 15px #fdf5c9; }
+        50% { opacity: 1; transform: scale(1.2) rotate(20deg); text-shadow: 0 0 10px #fdf5c9; }
     }
 
     /* ===== HARDWARE ACCELERATED BALLOONS ===== */
@@ -742,10 +743,10 @@
     <div class="name-container" id="baby-name" aria-hidden="true"></div>
     
     <div id="baby-girl-container">
-        <div class="sparkle" style="top: 15px; left: 15px; animation-delay: 0s;">✨</div>
-        <div class="sparkle" style="top: 50px; right: 5px; animation-delay: 0.5s;">✨</div>
-        <div class="sparkle" style="top: 130px; left: 10px; animation-delay: 1.2s;">✨</div>
-        <div class="sparkle" style="top: 5px; right: 35px; animation-delay: 0.8s;">✨</div>
+        <div class="sparkle" style="top: 10px; left: 10px; animation-delay: 0s;">✨</div>
+        <div class="sparkle" style="top: 40px; right: 0px; animation-delay: 0.5s;">✨</div>
+        <div class="sparkle" style="top: 110px; left: 5px; animation-delay: 1.2s;">✨</div>
+        <div class="sparkle" style="top: -5px; right: 30px; animation-delay: 0.8s;">✨</div>
 
         <svg width="100%" height="100%" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
             <defs>
@@ -757,8 +758,19 @@
                     <stop offset="0%" stop-color="#ffffff"/>
                     <stop offset="100%" stop-color="#fce4ec"/>
                 </linearGradient>
+                <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#fdf5c9"/>
+                    <stop offset="50%" stop-color="#bf953f"/>
+                    <stop offset="100%" stop-color="#b38728"/>
+                </linearGradient>
+                <radialGradient id="haloGrad" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stop-color="#fdf5c9" stop-opacity="0.4"/>
+                    <stop offset="100%" stop-color="#bf953f" stop-opacity="0"/>
+                </radialGradient>
             </defs>
             
+            <circle cx="100" cy="100" r="90" fill="url(#haloGrad)" />
+
             <path d="M 50,190 C 50,110 150,110 150,190 Z" fill="url(#swaddleGrad)" stroke="#f8bbd0" stroke-width="3"/>
             <path d="M 60,150 Q 100,175 140,150" fill="none" stroke="#f8bbd0" stroke-width="4" stroke-linecap="round"/>
             <path d="M 75,170 Q 100,185 125,170" fill="none" stroke="#f8bbd0" stroke-width="2" stroke-linecap="round"/>
@@ -790,11 +802,10 @@
                 <path d="M 85,45 Q 100,25 115,45 Q 105,35 85,45 Z" fill="#5d4037"/>
                 <path d="M 65,65 Q 80,45 100,60" fill="none" stroke="#5d4037" stroke-width="4" stroke-linecap="round"/>
                 
-                <g transform="translate(120, 48) rotate(15)">
-                    <path d="M 0,0 L -14,-12 L -14,12 Z" fill="#ff4081"/>
-                    <path d="M 0,0 L 14,-12 L 14,12 Z" fill="#ff4081"/>
-                    <circle cx="0" cy="0" r="5" fill="#c2185b"/>
-                </g>
+                <path d="M 75,55 L 82,30 L 100,45 L 118,30 L 125,55 Z" fill="url(#goldGrad)" stroke="#b38728" stroke-width="2"/>
+                <circle cx="82" cy="30" r="3" fill="#fff"/>
+                <circle cx="100" cy="45" r="3" fill="#fff"/>
+                <circle cx="118" cy="30" r="3" fill="#fff"/>
             </g>
         </svg>
     </div>
@@ -815,6 +826,7 @@
     /* ===== CONFIGURATION ===== */
     const CONFIG = {
       ceremonyName: window.__ceremonyName || 'A.NURA',
+      // The event date. If this date is in the past, the timer will perfectly bypass and go straight to the countdown.
       ceremonyEventDate: null, 
       timerDemoSeconds: 8
     };
@@ -1042,7 +1054,9 @@
     /* ===== TIMER LOGIC ===== */
     let countdownInterval = null;
     let finalTimer = null;
-    let eventDate = null; 
+    
+    // Scoped globally so it is preserved securely.
+    let eventDate = CONFIG.ceremonyEventDate;
 
     function safeSetText(id, text) {
       const el = document.getElementById(id);
@@ -1105,7 +1119,7 @@
             clearInterval(finalTimer);
             if (elements.countdownScreen) elements.countdownScreen.style.display = 'none';
             
-            // White Flash Transition
+            // White Flash Transition for epic reveal
             if (elements.flashOverlay) {
                 elements.flashOverlay.classList.add('flash');
                 setTimeout(() => elements.flashOverlay.classList.remove('flash'), 100);
@@ -1121,8 +1135,11 @@
       if (!elements.letterN || elements.letterN.getAttribute('data-activated') === 'true') return;
       elements.letterN.setAttribute('data-activated', 'true');
       
-      // BUG FIX: Set the exact timer strictly on click so it always perfectly executes 8s demo
-      eventDate = new Date(Date.now() + (CONFIG.timerDemoSeconds * 1000));
+      // BUG FIX: The timer will completely bypass if eventDate is already in the past. 
+      // If no valid date was given, set the demo timer on click.
+      if (!eventDate) {
+          eventDate = new Date(Date.now() + (CONFIG.timerDemoSeconds * 1000));
+      }
 
       if (elements.clickHint) {
           elements.clickHint.style.animation = 'none';
@@ -1145,16 +1162,25 @@
             setTimeout(() => elements.sceneContainer.style.display = 'none', 1500);
         }
         
-        elements.timerScreen && (elements.timerScreen.style.display = 'flex');
-        void elements.timerScreen.offsetWidth; 
-        elements.timerScreen && (elements.timerScreen.style.opacity = '1');
-        
-        const units = qsa('.time-unit');
-        units.forEach((u, i) => {
-            setTimeout(() => u.classList.add('show-unit'), 100 + (i * 120));
-        });
-        
-        startTimer();
+        const now = Date.now();
+        const dist = eventDate.getTime() - now;
+
+        if (dist <= 0) {
+            // TIME HAS ALREADY PASSED: Completely skip the timer screen layout!
+            startFinalCountdown();
+        } else {
+            // Display normal timer
+            elements.timerScreen && (elements.timerScreen.style.display = 'flex');
+            void elements.timerScreen.offsetWidth; 
+            elements.timerScreen && (elements.timerScreen.style.opacity = '1');
+            
+            const units = qsa('.time-unit');
+            units.forEach((u, i) => {
+                setTimeout(() => u.classList.add('show-unit'), 100 + (i * 120));
+            });
+            
+            startTimer();
+        }
       }, 2000); 
     }
 
@@ -1231,7 +1257,6 @@
 
         const maxBalloons = window.innerWidth < 600 ? 12 : 25;
         
-        // Mobile performance override
         if (window.innerWidth <= 767) {
             particlesFading = true;
         }
