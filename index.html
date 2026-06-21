@@ -92,7 +92,7 @@
       content: "";
       position: absolute;
       inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' result='noise'/%3E%3CfeDisplacementMap in='SourceGraphic' in2='noise' scale='20'/%3E%3C/filter%3E%3Crect width='200' height='200' fill='%23050505' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
       z-index: 0;
       pointer-events: none;
     }
@@ -661,7 +661,7 @@
     @keyframes popFlash {
         0% { opacity: 0; transform: translate3d(0, 50px, -150px) rotateX(-70deg) scale(0.8); color: transparent; text-shadow: 0 0 40px rgba(253, 245, 201, 0); filter: blur(12px); }
         50% { opacity: 1; transform: translate3d(0, -10px, 30px) rotateX(10deg) scale(1.1); color: #fff; text-shadow: 0 0 50px rgba(253, 245, 201, 1), 0 10px 20px rgba(0,0,0,0.8); filter: blur(0px); }
-        100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1) rotateX(0deg); color: var(--gold-2); text-shadow: 0 1px 0 #b38728, 0 2px 0 #9f7622, 0 3px 0 #8c661c, 0 15px 25px rgba(0,0,0,0.8); filter: blur(0px); }
+        100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1) rotateX(0deg); color: var(--gold-2); text-shadow: 0 1px 0 #b38728, 0 2px 0 #9f7622, 0 3px 0 #8c661c, 0 15px 25px rgba(0,0,0,0.8); }
     }
 
     /* ===== ADVANCED KAWAII BABY GIRL SVG & SPARKLES ===== */
@@ -1009,413 +1009,244 @@
         handleDragEnd();
     });
 
-    /* ===== OPTIMIZED FIREFLY CANVAS ===== */
-    let animationId = null;
-    let particlesArray = [];
-    let canvasCtx = null;
-    let canvasWidth, canvasHeight;
-    let particlesFading = false;
-    let particlesAlpha = 1.0;
+    /* ===== TIMER & COUNTDOWN LOGIC ===== */
+    function updateTimer() {
+        const eventDate = new Date(CONFIG.ceremonyEventDate).getTime();
+        const now = new Date().getTime();
+        const diff = eventDate - now;
 
-    function initCanvas() {
-      if (!elements.canvas) return;
-      canvasCtx = elements.canvas.getContext('2d', { alpha: true });
-      resizeCanvas();
-      window.addEventListener('resize', resizeCanvas, { passive: true });
-
-      class Particle {
-        constructor() {
-          this.x = Math.random() * canvasWidth;
-          this.y = Math.random() * canvasHeight;
-          this.size = Math.random() * 1.5 + 0.5;
-          this.speedY = Math.random() * 0.15 - 0.075;
-          this.speedX = Math.random() * 0.15 - 0.075;
-          
-          this.alpha = Math.random() * 0.5 + 0.1;
-          this.alphaChange = (Math.random() * 0.01) + 0.005;
-          if (Math.random() > 0.5) this.alphaChange *= -1;
-
-          this.angle = Math.random() * Math.PI * 2;
-          this.angleSpeed = Math.random() * 0.02 + 0.01;
+        if (diff <= 0) {
+            triggerReveal();
+            return;
         }
-        update() {
-          this.angle += this.angleSpeed;
-          this.x += this.speedX + Math.sin(this.angle) * 0.4;
-          this.y += this.speedY - Math.cos(this.angle) * 0.2;
-          
-          if (this.y > canvasHeight) this.y = 0;
-          if (this.y < 0) this.y = canvasHeight;
-          if (this.x > canvasWidth) this.x = 0;
-          if (this.x < 0) this.x = canvasWidth;
-          
-          this.alpha += this.alphaChange;
-          if (this.alpha <= 0.05) {
-              this.alpha = 0.05;
-              this.alphaChange *= -1;
-          } else if (this.alpha >= 0.6) {
-              this.alpha = 0.6;
-              this.alphaChange *= -1;
-          }
-        }
-        draw() {
-          canvasCtx.fillStyle = `rgba(212, 175, 55, ${this.alpha})`;
-          canvasCtx.beginPath();
-          canvasCtx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-          canvasCtx.fill();
-        }
-      }
 
-      const particleCount = window.innerWidth < 600 ? 50 : 120;
-      particlesArray = [];
-      for (let i = 0; i < particleCount; i++) particlesArray.push(new Particle());
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const secs = Math.floor((diff % (1000 * 60)) / 1000);
 
-      if (!reducedMotion) animateCanvas();
-    }
+        // Update timer display
+        qs('#days').textContent = String(days).padStart(2, '0');
+        qs('#hours').textContent = String(hours).padStart(2, '0');
+        qs('#mins').textContent = String(mins).padStart(2, '0');
+        qs('#secs').textContent = String(secs).padStart(2, '0');
 
-    function resizeCanvas() {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      canvasWidth = window.innerWidth;
-      canvasHeight = window.innerHeight;
-      elements.canvas.width = Math.round(canvasWidth * dpr);
-      elements.canvas.height = Math.round(canvasHeight * dpr);
-      elements.canvas.style.width = canvasWidth + 'px';
-      elements.canvas.style.height = canvasHeight + 'px';
-      canvasCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    }
-
-    function animateCanvas() {
-      if (particlesFading) {
-          particlesAlpha -= 0.015; 
-          if (particlesAlpha <= 0) {
-              canvasCtx.clearRect(0, 0, canvasWidth, canvasHeight);
-              return; 
-          }
-          canvasCtx.globalAlpha = particlesAlpha;
-      } else {
-          canvasCtx.globalAlpha = 1.0;
-      }
-
-      canvasCtx.clearRect(0, 0, canvasWidth, canvasHeight);
-      for (const p of particlesArray) {
-        p.update();
-        p.draw();
-      }
-      animationId = requestAnimationFrame(animateCanvas);
-    }
-
-    /* ===== SMART NAME RENDERER ===== */
-    function renderName(nameStr) {
-      const container = elements.babyNameContainer;
-      if (!container) return;
-      container.innerHTML = '';
-      const final = (nameStr && nameStr.trim().length > 0) ? nameStr.trim().toUpperCase() : 'A.NURA';
-
-      let initialEndIdx = final.indexOf('.');
-      if (initialEndIdx === -1) initialEndIdx = final.indexOf(' ');
-      if (initialEndIdx === -1) initialEndIdx = 0; 
-
-      const initialStr = final.substring(0, initialEndIdx + 1);
-      const restStr = final.substring(initialEndIdx + 1).trim();
-
-      const initialDiv = document.createElement('div');
-      initialDiv.className = 'initial-part letter';
-      initialDiv.textContent = initialStr;
-      container.appendChild(initialDiv);
-
-      const restWrapper = document.createElement('div');
-      restWrapper.className = 'rest-part-wrapper';
-      
-      const restInner = document.createElement('div');
-      restInner.className = 'rest-part-inner';
-
-      Array.from(restStr).forEach(ch => {
-        const el = document.createElement('div');
-        el.className = 'letter is-name';
-        el.innerHTML = ch === ' ' ? '&nbsp;' : ch;
-        restInner.appendChild(el);
-      });
-
-      restWrapper.appendChild(restInner);
-      container.appendChild(restWrapper);
-    }
-
-    /* ===== TIMER LOGIC ===== */
-    let countdownInterval = null;
-    let finalTimer = null;
-    let eventDate = CONFIG.ceremonyEventDate ? new Date(CONFIG.ceremonyEventDate) : null;
-
-    function safeSetText(id, text) {
-      const el = document.getElementById(id);
-      if (el) el.textContent = text;
-    }
-
-    function startTimer() {
-      if (countdownInterval) clearInterval(countdownInterval);
-      function updateOnce() {
-        const now = Date.now();
-        const dist = eventDate.getTime() - now;
-        
-        if (dist <= 0) {
-          clearInterval(countdownInterval);
-          if (elements.timerScreen) {
-              elements.timerScreen.style.opacity = '0';
-          }
-          setTimeout(() => {
-              if (elements.timerScreen) elements.timerScreen.style.display = 'none';
-              startFinalCountdown();
-          }, 1000); 
-          return;
-        }
-        
-        const days = Math.floor(dist / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((dist % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((dist % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((dist % (1000 * 60)) / 1000);
-        safeSetText('days', days < 10 ? '0' + days : String(days));
-        safeSetText('hours', hours < 10 ? '0' + hours : String(hours));
-        safeSetText('mins', minutes < 10 ? '0' + minutes : String(minutes));
-        safeSetText('secs', seconds < 10 ? '0' + seconds : String(seconds));
-      }
-      updateOnce();
-      countdownInterval = setInterval(updateOnce, 1000);
-    }
-
-    /* ===== BUG-FREE CINEMATIC COUNTDOWN ===== */
-    function startFinalCountdown() {
-      if (elements.countdownScreen) elements.countdownScreen.style.display = 'flex';
-      let count = 5;
-      
-      function popNumber(num) {
-          if (!elements.countdownScreen) return;
-          elements.countdownScreen.innerHTML = '';
-          const span = document.createElement('span');
-          span.className = 'countdown-num';
-          span.textContent = String(num);
-          elements.countdownScreen.appendChild(span);
-      }
-
-      popNumber(count);
-
-      finalTimer = setInterval(() => {
-        count--;
-        if (count > 0) {
-            popNumber(count);
-        } else {
-            clearInterval(finalTimer);
-            if (elements.countdownScreen) elements.countdownScreen.style.display = 'none';
-            
-            if (elements.flashOverlay) {
-                elements.flashOverlay.classList.add('flash');
-                setTimeout(() => elements.flashOverlay.classList.remove('flash'), 100);
+        // SHOW NAMING SUGGESTIONS ONLY IF 2 OR MORE DAYS REMAINING
+        if (days >= 2) {
+            if (elements.suggestionContainer.style.display !== 'flex') {
+                elements.suggestionContainer.style.display = 'flex';
+                setTimeout(() => {
+                    elements.suggestionContainer.classList.add('show-suggestion');
+                }, 100);
             }
-            
-            triggerGrandReveal();
+        } else {
+            // Hide suggestions if less than 2 days
+            elements.suggestionContainer.classList.remove('show-suggestion');
+            setTimeout(() => {
+                elements.suggestionContainer.style.display = 'none';
+            }, 800);
         }
-      }, 1000);
     }
 
-    /* ===== ENTRANCE & REVEAL LOGIC ===== */
-    function triggerEntrance() {
-      if (!elements.letterN || elements.letterN.getAttribute('data-activated') === 'true') return;
-      elements.letterN.setAttribute('data-activated', 'true');
-      
-      if (!eventDate) {
-          eventDate = new Date(Date.now() + (CONFIG.timerDemoSeconds * 1000));
-      }
+    function showTimerScreen() {
+        elements.sceneContainer.style.opacity = '0';
+        setTimeout(() => {
+            elements.sceneContainer.style.display = 'none';
+            elements.timerScreen.style.display = 'flex';
+            setTimeout(() => {
+                elements.timerScreen.style.opacity = '1';
+                const timeUnits = qsa('.time-unit');
+                timeUnits.forEach((unit, idx) => {
+                    setTimeout(() => {
+                        unit.classList.add('show-unit');
+                    }, idx * 100);
+                });
+            }, 50);
+        }, 1500);
 
-      if (elements.clickHint) {
-          elements.clickHint.style.animation = 'none';
-          elements.clickHint.style.opacity = '0';
-      }
+        updateTimer();
+        setInterval(updateTimer, 1000);
+    }
 
-      if (!reducedMotion) {
+    function triggerReveal() {
+        elements.timerScreen.style.opacity = '0';
+        elements.countdownScreen.style.display = 'flex';
+
+        let countdown = 3;
+        function showCountdown() {
+            if (countdown > 0) {
+                const num = document.createElement('div');
+                num.className = 'countdown-num';
+                num.textContent = countdown;
+                elements.countdownScreen.appendChild(num);
+                countdown--;
+                setTimeout(showCountdown, 1000);
+            } else {
+                elements.countdownScreen.innerHTML = '';
+                elements.countdownScreen.style.display = 'none';
+                elements.flashOverlay.classList.add('flash');
+                setTimeout(() => {
+                    elements.flashOverlay.classList.remove('flash');
+                    elements.flashOverlay.style.opacity = '0';
+                    elements.revealScreen.style.display = 'flex';
+                    elements.revealSubtitle.classList.add('subtitle-show');
+                    displayBabyName();
+                }, 600);
+            }
+        }
+        showCountdown();
+    }
+
+    function displayBabyName() {
+        const name = CONFIG.ceremonyName;
+        const container = elements.babyNameContainer;
+        container.innerHTML = '';
+
+        const firstLetter = name.charAt(0);
+        const restName = name.slice(1);
+
+        const initialSpan = document.createElement('span');
+        initialSpan.className = 'letter initial-part';
+        initialSpan.textContent = firstLetter;
+        container.appendChild(initialSpan);
+
+        const restWrapper = document.createElement('div');
+        restWrapper.className = 'rest-part-wrapper';
+        const restInner = document.createElement('div');
+        restInner.className = 'rest-part-inner';
+        restName.split('').forEach(char => {
+            const span = document.createElement('span');
+            span.className = 'letter';
+            span.textContent = char;
+            restInner.appendChild(span);
+        });
+        restWrapper.appendChild(restInner);
+        container.appendChild(restWrapper);
+
+        setTimeout(() => {
+            initialSpan.classList.add('show');
+            restWrapper.classList.add('expand');
+        }, 500);
+
+        setTimeout(() => {
+            elements.babyNameContainer.style.opacity = '1';
+            elements.babyNameContainer.style.transform = 'translate3d(0, 0, 0)';
+            const babyContainer = qs('#baby-girl-container');
+            if (babyContainer) {
+                babyContainer.classList.add('slide-in');
+            }
+        }, 1500);
+
+        if (window.confetti) {
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+        }
+    }
+
+    /* ===== SEAL INTERACTION LOGIC ===== */
+    function enterCeremony() {
         elements.letterN.classList.add('shatter');
         elements.sealAura.classList.add('explode');
-      }
-
-      setTimeout(() => {
-        elements.gateLeft?.classList.add('open-left');
-        elements.gateRight?.classList.add('open-right');
-      }, 400); 
-
-      setTimeout(() => {
-        if(elements.sceneContainer) {
-            elements.sceneContainer.style.opacity = '0';
-            setTimeout(() => elements.sceneContainer.style.display = 'none', 1500);
-        }
         
-        const now = Date.now();
-        const dist = eventDate.getTime() - now;
-
-        if (dist <= 0) {
-            startFinalCountdown();
+        if (reducedMotion) {
+            showTimerScreen();
         } else {
-            elements.timerScreen && (elements.timerScreen.style.display = 'flex');
-            void elements.timerScreen.offsetWidth; 
-            elements.timerScreen && (elements.timerScreen.style.opacity = '1');
-            
-            const units = qsa('.time-unit');
-            units.forEach((u, i) => {
-                setTimeout(() => u.classList.add('show-unit'), 100 + (i * 120));
-            });
-            
-            // ===== NEW: Suggestion Feature Display Logic =====
-            const twoDaysMs = 2 * 24 * 60 * 60 * 1000;
-            if (dist > twoDaysMs) {
-                if (elements.suggestionContainer) {
-                    elements.suggestionContainer.style.display = 'flex';
-                    // Elegantly slide up after the timer units
-                    setTimeout(() => {
-                        elements.suggestionContainer.classList.add('show-suggestion');
-                    }, 100 + (units.length * 120) + 300);
-                }
-            } else {
-                if (elements.suggestionContainer) elements.suggestionContainer.style.display = 'none';
-            }
-            
-            startTimer();
+            setTimeout(showTimerScreen, 1200);
         }
-      }, 2000); 
     }
 
-    function triggerGrandReveal() {
-      elements.revealScreen && (elements.revealScreen.style.display = 'flex');
-      
-      if (elements.revealSubtitle) {
-          elements.revealSubtitle.classList.add('subtitle-show');
-      }
-
-      setTimeout(() => {
-          const initialPart = qs('.initial-part');
-          if (initialPart) initialPart.classList.add('show');
-
-          setTimeout(() => {
-              const wrapper = qs('.rest-part-wrapper');
-              if(wrapper) wrapper.classList.add('expand');
-
-              const restLetters = qsa('.is-name', elements.babyNameContainer);
-              restLetters.forEach((letter, idx) => {
-                  setTimeout(() => {
-                      letter.classList.add('show');
-                      if (!reducedMotion) {
-                          letter.style.animation = 'popFlash 1.2s var(--ease-out-expo) forwards';
-                      }
-                  }, idx * 100);
-              });
-
-              const totalDelay = (restLetters.length * 100) + 500;
-              setTimeout(() => { 
-                  
-                  if (!reducedMotion && typeof confetti === 'function') {
-                      const isMobile = window.innerWidth <= 767;
-                      const mobileAnimationEnd = Date.now() + 10500; 
-
-                      const interval = setInterval(() => {
-                          if (isMobile) {
-                              if (Date.now() > mobileAnimationEnd) return clearInterval(interval);
-                          } else {
-                              const timeLeft = (Date.now() + 4000) - Date.now();
-                              if (timeLeft <= 0) return clearInterval(interval);
-                          }
-
-                          const pCount = window.innerWidth < 600 ? 4 : 8; 
-                          const cColors = ['#d4af37', '#e6ca7b', '#ffffff'];
-                          const settings = { particleCount: pCount, spread: 45, colors: cColors, zIndex: 80, gravity: 1.1, shapes: ['square', 'circle'] };
-
-                          confetti({ ...settings, origin: { x: 0, y: 0 }, angle: 315, startVelocity: 35 });
-                          confetti({ ...settings, origin: { x: 1, y: 0 }, angle: 225, startVelocity: 35 });
-                          confetti({ ...settings, origin: { x: 0, y: 1 }, angle: 45, startVelocity: 60 });
-                          confetti({ ...settings, origin: { x: 1, y: 1 }, angle: 135, startVelocity: 60 });
-                      }, 300); 
-                  }
-                  
-                  fireHeartBalloons();
-                  
-                  setTimeout(() => {
-                      const babyGirl = qs('#baby-girl-container');
-                      if(babyGirl) babyGirl.classList.add('slide-in');
-                  }, 6500);
-
-              }, totalDelay);
-
-          }, 1200); 
-          
-      }, 1500);
-    }
-
-    function fireHeartBalloons() {
-        const container = document.createElement('div');
-        container.style.position = 'fixed';
-        container.style.inset = '0';
-        container.style.pointerEvents = 'none';
-        container.style.zIndex = '90';
-        container.style.overflow = 'hidden';
-        document.body.appendChild(container);
-
-        const maxBalloons = window.innerWidth < 600 ? 12 : 25;
-        
-        if (window.innerWidth <= 767) {
-            particlesFading = true;
+    elements.letterN.addEventListener('click', enterCeremony);
+    elements.letterN.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            enterCeremony();
         }
+    });
 
-        let htmlStr = '';
-        const delays = [];
-        
-        for (let i = 0; i < maxBalloons; i++) {
-            const startX = Math.random() * 100; 
-            const endX = (Math.random() - 0.5) * 150; 
-            const scale = 0.5 + Math.random() * 0.7;
-            const animDelay = Math.random() * 2.5; 
-            const swayDelay = -(Math.random() * 3);
-            delays.push(animDelay * 1000);
+    /* ===== NAME SUGGESTION SUBMISSION ===== */
+    elements.submitSuggestion.addEventListener('click', () => {
+        const nameValue = elements.nameSuggestion.value.trim();
+        if (nameValue) {
+            // Log suggestion (in real app, would send to server)
+            console.log('Name suggestion:', nameValue);
             
-            htmlStr += `
-                <div class="balloon-anim" style="left: ${startX}vw; --drift: ${endX}px; animation-delay: ${animDelay}s;">
-                    <div class="balloon-sway" style="transform: scale(${scale}); animation-delay: ${swayDelay}s;">
-                        <svg width="80" height="80" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <defs>
-                                <radialGradient id="balloonGrad${i}" cx="30%" cy="30%" r="70%">
-                                    <stop offset="0%" stop-color="#ff8080" />
-                                    <stop offset="50%" stop-color="#e60000" />
-                                    <stop offset="100%" stop-color="#990000" />
-                                </radialGradient>
-                            </defs>
-                            <path fill="url(#balloonGrad${i})" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                        </svg>
-                        <div style="width: 2px; height: 60px; background: rgba(255,255,255,0.4); margin: 0 auto; margin-top: -8px;"></div>
-                    </div>
-                </div>
-            `;
+            // Show thank you message
+            elements.suggestionInputWrapper.style.display = 'none';
+            elements.suggestionThankYou.style.display = 'block';
+            
+            // Reset after 3 seconds
+            setTimeout(() => {
+                elements.nameSuggestion.value = '';
+                elements.suggestionInputWrapper.style.display = 'flex';
+                elements.suggestionThankYou.style.display = 'none';
+            }, 3000);
         }
-        
-        container.innerHTML = htmlStr;
-        const maxWait = Math.max(...delays) + 8000;
-        setTimeout(() => container.remove(), maxWait); 
+    });
+
+    elements.nameSuggestion.addEventListener('keypress', e => {
+        if (e.key === 'Enter') {
+            elements.submitSuggestion.click();
+        }
+    });
+
+    /* ===== CANVAS ANIMATION SETUP ===== */
+    const canvas = elements.canvas;
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    class Particle {
+        constructor() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.vx = (Math.random() - 0.5) * 2;
+            this.vy = (Math.random() - 0.5) * 2;
+            this.alpha = Math.random() * 0.5 + 0.2;
+            this.size = Math.random() * 2 + 1;
+            this.life = 1;
+        }
+
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            this.life -= 0.002;
+            this.alpha = this.life * 0.5;
+        }
+
+        draw() {
+            ctx.fillStyle = `rgba(191, 149, 63, ${this.alpha})`;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+        }
     }
 
-    /* ===== INITIALIZATION ===== */
-    (function init() {
-      initCanvas();
-      renderName(CONFIG.ceremonyName);
+    function generateParticles() {
+        if (particles.length < 50 && Math.random() > 0.9) {
+            particles.push(new Particle());
+        }
+        particles = particles.filter(p => p.life > 0);
+        particles.forEach(p => {
+            p.update();
+            p.draw();
+        });
+    }
 
-      elements.letterN?.addEventListener('click', triggerEntrance, { passive: true });
-      
-      // ===== NEW: Suggestion Submit Listener =====
-      elements.submitSuggestion?.addEventListener('click', () => {
-          if (elements.nameSuggestion && elements.nameSuggestion.value.trim() !== '') {
-              // Clear input and hide the wrapper
-              elements.nameSuggestion.value = '';
-              if(elements.suggestionInputWrapper) elements.suggestionInputWrapper.style.display = 'none';
-              
-              // Show and animate thank you message
-              if(elements.suggestionThankYou) {
-                  elements.suggestionThankYou.style.display = 'block';
-                  elements.suggestionThankYou.style.animation = 'fadeInOut 3s forwards';
-              }
-          }
-      });
-      
-    })();
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        generateParticles();
+        requestAnimationFrame(animate);
+    }
+    animate();
   </script>
 </body>
 </html>
