@@ -246,7 +246,7 @@
       text-shadow: 0 0 20px rgba(253, 245, 201, 0.6), 0 0 40px rgba(191, 149, 63, 0.4);
       cursor: pointer;
       animation: invitePulse 2.5s infinite alternate ease-in-out;
-      transition: all 0.4s var(--ease-spring);
+      transition: transform 0.4s var(--ease-spring), box-shadow 0.4s ease, background 0.4s ease;
       font-weight: 700;
       position: relative;
       z-index: 103;
@@ -594,13 +594,13 @@
         100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1) rotateX(0deg); color: var(--gold-2); text-shadow: 0 1px 0 #b38728, 0 2px 0 #9f7622, 0 3px 0 #8c661c, 0 15px 25px rgba(0,0,0,0.8); filter: blur(0px); }
     }
 
-    /* ===== BEAUTIFUL, REALISTIC KAWAII BABY SVG ===== */
+    /* ===== BEAUTIFUL REALISTIC BABY GIRL SVG & SPARKLES ===== */
     #baby-girl-container {
         position: relative;
         margin-top: 30px;
         transform: translate3d(0, 50px, -50px) rotateX(-90deg) scale(0.8); 
-        width: 180px;
-        height: 180px;
+        width: 160px;
+        height: 160px;
         opacity: 0;
         filter: drop-shadow(0 20px 20px rgba(0,0,0,0.6)) blur(8px);
         transition: transform 1.5s var(--ease-spring), opacity 1.2s ease, filter 1.2s ease;
@@ -626,17 +626,17 @@
     }
     
     .waving-arm {
-        transform-origin: 140px 140px; 
+        transform-origin: 135px 125px; 
         animation: wave-hand 0.8s infinite alternate ease-in-out;
         will-change: transform;
     }
     @keyframes wave-hand {
         0% { transform: rotate(-5deg); }
-        100% { transform: rotate(30deg); }
+        100% { transform: rotate(35deg); }
     }
 
     .eyes {
-        transform-origin: 100px 92px;
+        transform-origin: 100px 98px;
         animation: blink 4s infinite;
     }
     @keyframes blink {
@@ -645,7 +645,7 @@
     }
     
     .head-group {
-        transform-origin: 100px 130px;
+        transform-origin: 100px 140px;
         animation: headBob 3s infinite alternate ease-in-out;
     }
     @keyframes headBob {
@@ -663,7 +663,7 @@
     }
     @keyframes twinkle {
         0%, 100% { opacity: 0; transform: scale(0.5) rotate(0deg); }
-        50% { opacity: 1; transform: scale(1.2) rotate(20deg); text-shadow: 0 0 15px #fdf5c9; }
+        50% { opacity: 1; transform: scale(1.2) rotate(20deg); text-shadow: 0 0 10px #fdf5c9; }
     }
 
     /* ===== HARDWARE ACCELERATED BALLOONS ===== */
@@ -742,83 +742,71 @@
     <div class="name-container" id="baby-name" aria-hidden="true"></div>
     
     <div id="baby-girl-container">
-        <div class="sparkle" style="top: 15px; left: 15px; animation-delay: 0s;">✨</div>
-        <div class="sparkle" style="top: 50px; right: 5px; animation-delay: 0.5s;">✨</div>
-        <div class="sparkle" style="top: 130px; left: 10px; animation-delay: 1.2s;">✨</div>
-        <div class="sparkle" style="top: 5px; right: 35px; animation-delay: 0.8s;">✨</div>
+        <div class="sparkle" style="top: 10px; left: 10px; animation-delay: 0s;">✨</div>
+        <div class="sparkle" style="top: 40px; right: 0px; animation-delay: 0.5s;">✨</div>
+        <div class="sparkle" style="top: 110px; left: 5px; animation-delay: 1.2s;">✨</div>
+        <div class="sparkle" style="top: -5px; right: 30px; animation-delay: 0.8s;">✨</div>
 
         <svg width="100%" height="100%" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
             <defs>
-                <radialGradient id="glow" cx="50%" cy="50%" r="50%">
-                    <stop offset="0%" stop-color="#fdf5c9" stop-opacity="0.5"/>
-                    <stop offset="100%" stop-color="#fdf5c9" stop-opacity="0"/>
+                <radialGradient id="skinGrad" cx="50%" cy="50%" r="50%">
+                    <stop offset="40%" stop-color="#ffe4c4"/>
+                    <stop offset="100%" stop-color="#f5c29b"/>
                 </radialGradient>
                 <linearGradient id="swaddleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#ffffff"/>
-                    <stop offset="100%" stop-color="#f8bbd0"/>
-                </linearGradient>
-                <linearGradient id="skinGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stop-color="#fff0e6"/>
-                    <stop offset="100%" stop-color="#fce4ec"/>
-                </linearGradient>
-                <linearGradient id="hairGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stop-color="#4e342e"/>
-                    <stop offset="100%" stop-color="#3e2723"/>
+                    <stop offset="0%" stop-color="#fff0f5"/>
+                    <stop offset="100%" stop-color="#f48fb1"/>
                 </linearGradient>
             </defs>
-
-            <circle cx="100" cy="100" r="90" fill="url(#glow)"/>
-
-            <path d="M 40,190 C 40,130 160,130 160,190 Z" fill="url(#swaddleGrad)" stroke="#f48fb1" stroke-width="2"/>
-            <path d="M 50,150 Q 100,180 150,150" fill="none" stroke="#f48fb1" stroke-width="3" stroke-linecap="round"/>
-            <path d="M 70,170 Q 100,190 130,170" fill="none" stroke="#f48fb1" stroke-width="2" stroke-linecap="round"/>
-
-            <path d="M 60,140 Q 45,165 60,180" fill="none" stroke="url(#skinGrad)" stroke-width="12" stroke-linecap="round"/>
-
+            
+            <path d="M 50,190 C 40,130 160,130 150,190 Z" fill="url(#swaddleGrad)" stroke="#d81b60" stroke-width="2"/>
+            <path d="M 60,150 Q 100,170 140,150" fill="none" stroke="#f8bbd0" stroke-width="3" stroke-linecap="round"/>
+            <path d="M 75,170 Q 100,185 125,170" fill="none" stroke="#f8bbd0" stroke-width="2" stroke-linecap="round"/>
+            
+            <path d="M 70,135 Q 50,155 75,175" fill="none" stroke="url(#skinGrad)" stroke-width="14" stroke-linecap="round"/>
+            
             <g class="waving-arm">
-                <path d="M 140,140 Q 170,115 160,85" fill="none" stroke="url(#skinGrad)" stroke-width="12" stroke-linecap="round"/>
-                <circle cx="160" cy="85" r="6" fill="url(#skinGrad)"/>
-                <path d="M 156,80 L 154,74" stroke="url(#skinGrad)" stroke-width="3" stroke-linecap="round"/>
-                <path d="M 160,79 L 160,72" stroke="url(#skinGrad)" stroke-width="3" stroke-linecap="round"/>
-                <path d="M 164,81 L 166,75" stroke="url(#skinGrad)" stroke-width="3" stroke-linecap="round"/>
+                <path d="M 130,135 Q 165,110 160,75" fill="none" stroke="url(#skinGrad)" stroke-width="14" stroke-linecap="round"/>
+                <circle cx="160" cy="75" r="7" fill="url(#skinGrad)"/>
+                <path d="M 155,70 L 150,62 M 160,68 L 157,59 M 165,70 L 164,62" fill="none" stroke="url(#skinGrad)" stroke-width="3.5" stroke-linecap="round"/>
             </g>
-
+            
             <g class="head-group">
                 <circle cx="100" cy="85" r="48" fill="#3e2723"/>
-
-                <circle cx="100" cy="85" r="45" fill="url(#skinGrad)"/>
-
+                
+                <circle cx="100" cy="90" r="45" fill="url(#skinGrad)"/>
+                
+                <circle cx="68" cy="105" r="8" fill="#ff80ab" opacity="0.6"/>
+                <circle cx="132" cy="105" r="8" fill="#ff80ab" opacity="0.6"/>
+                
+                <path d="M 97,105 Q 100,108 103,105" fill="none" stroke="#dca782" stroke-width="2.5" stroke-linecap="round"/>
+                
                 <g class="eyes">
-                    <path d="M 68,90 Q 75,82 82,90" fill="none" stroke="#4e342e" stroke-width="2.5" stroke-linecap="round"/>
-                    <path d="M 69,91 Q 75,85 81,91 Q 75,97 69,91" fill="#ffffff"/>
-                    <circle cx="75" cy="91" r="4" fill="#5d4037"/>
-                    <circle cx="75" cy="91" r="2" fill="#111111"/>
-                    <circle cx="73.5" cy="89.5" r="1.5" fill="#ffffff"/>
-                    <circle cx="76.5" cy="92.5" r="0.5" fill="#ffffff"/>
+                    <circle cx="75" cy="95" r="7" fill="#3e2723"/>
+                    <circle cx="73" cy="92" r="2.5" fill="#ffffff"/>
+                    <circle cx="77" cy="96" r="1" fill="#ffffff"/>
+                    <path d="M 68,90 Q 75,85 82,88" fill="none" stroke="#3e2723" stroke-width="2" stroke-linecap="round"/>
 
-                    <path d="M 118,90 Q 125,82 132,90" fill="none" stroke="#4e342e" stroke-width="2.5" stroke-linecap="round"/>
-                    <path d="M 119,91 Q 125,85 131,91 Q 125,97 119,91" fill="#ffffff"/>
-                    <circle cx="125" cy="91" r="4" fill="#5d4037"/>
-                    <circle cx="125" cy="91" r="2" fill="#111111"/>
-                    <circle cx="123.5" cy="89.5" r="1.5" fill="#ffffff"/>
-                    <circle cx="126.5" cy="92.5" r="0.5" fill="#ffffff"/>
+                    <circle cx="125" cy="95" r="7" fill="#3e2723"/>
+                    <circle cx="123" cy="92" r="2.5" fill="#ffffff"/>
+                    <circle cx="127" cy="96" r="1" fill="#ffffff"/>
+                    <path d="M 118,88 Q 125,85 132,90" fill="none" stroke="#3e2723" stroke-width="2" stroke-linecap="round"/>
                 </g>
-
-                <ellipse cx="68" cy="95" rx="8" ry="5" fill="#ff80ab" opacity="0.4"/>
-                <ellipse cx="132" cy="95" rx="8" ry="5" fill="#ff80ab" opacity="0.4"/>
-
-                <path d="M 98,92 Q 100,95 102,92" fill="none" stroke="#e6b3b3" stroke-width="2" stroke-linecap="round"/>
-
-                <path d="M 92,102 Q 100,112 108,102 Q 100,108 92,102" fill="#f06292"/>
-
-                <path d="M 55,85 Q 55,40 100,38 Q 145,40 145,85 Q 130,50 100,55 Q 70,50 55,85 Z" fill="url(#hairGrad)"/>
-
-                <g transform="translate(125, 45) rotate(20)">
-                    <path d="M 0,0 C -15,-15 -20,5 0,0" fill="#ff4081"/>
-                    <path d="M 0,0 C 15,-15 20,5 0,0" fill="#ff4081"/>
-                    <circle cx="0" cy="0" r="4" fill="#c2185b"/>
-                    <path d="M -2,2 L -8,15 L 2,12 Z" fill="#f50057"/>
-                    <path d="M 2,2 L 8,15 L -2,12 Z" fill="#f50057"/>
+                
+                <path d="M 93,112 Q 100,122 107,112 Z" fill="#d81b60"/>
+                <path d="M 96,116 Q 100,119 104,116 Z" fill="#f48fb1"/>
+                
+                <path d="M 52,90 C 52,30 148,30 148,90 C 148,65 125,45 100,45 C 75,45 52,65 52,90 Z" fill="#4e342e"/>
+                
+                <path d="M 85,45 Q 100,25 115,45 Q 105,35 85,45 Z" fill="#5d4037"/>
+                
+                <path d="M 53,70 Q 100,45 147,70" fill="none" stroke="#f8bbd0" stroke-width="4"/>
+                <g transform="translate(115, 55)">
+                    <circle cx="0" cy="-6" r="5" fill="#ff4081"/>
+                    <circle cx="0" cy="6" r="5" fill="#ff4081"/>
+                    <circle cx="-6" cy="0" r="5" fill="#ff4081"/>
+                    <circle cx="6" cy="0" r="5" fill="#ff4081"/>
+                    <circle cx="0" cy="0" r="4" fill="#fdf5c9"/>
                 </g>
             </g>
         </svg>
@@ -840,6 +828,7 @@
     /* ===== CONFIGURATION ===== */
     const CONFIG = {
       ceremonyName: window.__ceremonyName || 'A.NURA',
+      // Set to null to use demo timer. To bypass timer entirely, use a past date e.g. new Date('2023-01-01')
       ceremonyEventDate: null, 
       timerDemoSeconds: 8
     };
@@ -1067,7 +1056,7 @@
     /* ===== TIMER LOGIC ===== */
     let countdownInterval = null;
     let finalTimer = null;
-    let eventDate = null; 
+    let eventDate = CONFIG.ceremonyEventDate; 
 
     function safeSetText(id, text) {
       const el = document.getElementById(id);
@@ -1105,6 +1094,7 @@
       countdownInterval = setInterval(updateOnce, 1000);
     }
 
+    /* ===== BUG-FREE CINEMATIC COUNTDOWN ===== */
     function startFinalCountdown() {
       if (elements.countdownScreen) elements.countdownScreen.style.display = 'flex';
       let count = 5;
