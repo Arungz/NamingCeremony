@@ -130,7 +130,9 @@
       color: transparent;
       -webkit-background-clip: text;
       background-clip: text;
+      animation: shine 4s linear infinite;
     }
+    @keyframes shine { to { background-position: 200% center; } }
 
     /* ===== PULL TO REFRESH UI ===== */
     #ptr-wrapper {
@@ -437,7 +439,7 @@
       font-family: 'Cinzel', serif;
     }
 
-    /* ===== SUGGESTION BOX UI ===== */
+    /* ===== ADVANCED SUGGESTION BOX UI ===== */
     #suggestion-container {
         margin-top: clamp(25px, 5vw, 40px);
         display: none; 
@@ -452,13 +454,20 @@
         opacity: 1;
         transform: translate3d(0, 0, 0);
     }
-    .suggestion-text {
+    #suggestion-text {
         font-family: 'Cinzel', serif;
-        color: var(--gold-1);
         font-size: clamp(12px, 2.5vw, 15px);
         letter-spacing: 2px;
         text-transform: uppercase;
         text-shadow: 0 2px 5px rgba(0,0,0,0.8);
+        transition: opacity 0.4s var(--ease-out-expo);
+        /* Subtle shimmer on text */
+        background: linear-gradient(90deg, var(--gold-1), var(--gold-2), var(--gold-3), var(--gold-2), var(--gold-1));
+        background-size: 200% auto;
+        color: transparent;
+        -webkit-background-clip: text;
+        background-clip: text;
+        animation: shine 4s linear infinite;
     }
     .suggestion-input-wrapper {
         display: flex;
@@ -470,7 +479,7 @@
         border-radius: 30px;
         border: 1px solid rgba(191, 149, 63, 0.3);
         box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease, opacity 0.4s var(--ease-out-expo);
     }
     .suggestion-input-wrapper:focus-within {
         border-color: var(--gold-1);
@@ -495,7 +504,8 @@
         color: rgba(255, 255, 255, 0.4);
     }
     #submit-suggestion {
-        background: linear-gradient(90deg, var(--gold-1), var(--gold-3));
+        background: linear-gradient(90deg, var(--gold-1), var(--gold-2), var(--gold-1));
+        background-size: 200% auto;
         border: none;
         border-radius: 25px;
         color: #050505;
@@ -503,7 +513,12 @@
         font-weight: 800;
         padding: 10px 25px;
         cursor: pointer;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, background-position 0.4s ease;
+    }
+    #submit-suggestion:hover {
+        background-position: right center;
+        box-shadow: 0 0 15px rgba(253, 245, 201, 0.5);
+        transform: scale(1.05);
     }
     #submit-suggestion:active {
         transform: scale(0.95);
@@ -513,16 +528,16 @@
         color: var(--gold-2);
         font-size: clamp(14px, 3vw, 18px);
         letter-spacing: 2px;
-        text-shadow: 0 0 10px rgba(191, 149, 63, 0.8);
         display: none;
         opacity: 0;
     }
 
-    @keyframes thankYouFade {
-        0% { opacity: 0; transform: scale(0.9); }
-        15% { opacity: 1; transform: scale(1); }
-        85% { opacity: 1; transform: scale(1); }
-        100% { opacity: 0; transform: scale(1.05); }
+    /* Cinematic Pop for Thank You Text */
+    @keyframes thankYouPop {
+        0% { opacity: 0; transform: scale(0.8) translateY(20px); filter: blur(5px); }
+        15% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0px); text-shadow: 0 0 20px rgba(253, 245, 201, 0.8); }
+        85% { opacity: 1; transform: scale(1); filter: blur(0px); text-shadow: 0 0 10px rgba(191, 149, 63, 0.5); }
+        100% { opacity: 0; transform: scale(1.05) translateY(-10px); filter: blur(5px); }
     }
 
     /* ===== FLAWLESS CINEMATIC COUNTDOWN SCREEN ===== */
@@ -751,7 +766,7 @@
     }
     @keyframes twinkle {
         0%, 100% { opacity: 0; transform: scale(0.5) rotate(0deg); }
-        50% { opacity: 1; transform: scale(1.2) rotate(20deg); text-shadow: 0 0 10px #fdf5c9; }
+        50% { opacity: 1; transform: scale(1.2) rotate(20deg); text-shadow: 0 0 15px #fdf5c9; }
     }
 
     /* ===== HARDWARE ACCELERATED BALLOONS ===== */
@@ -823,7 +838,7 @@
     </div>
     
     <div id="suggestion-container">
-        <p class="suggestion-text">Have a beautiful name in mind?</p>
+        <p class="suggestion-text" id="suggestion-text">Have a beautiful name in mind?</p>
         <div class="suggestion-input-wrapper">
             <input type="text" id="name-suggestion" placeholder="Enter name suggestion..." maxlength="25" autocomplete="off" />
             <button id="submit-suggestion" aria-label="Submit Name">Send</button>
@@ -948,6 +963,7 @@
       
       // Suggestion Elements
       suggestionContainer: qs('#suggestion-container'),
+      suggestionText: qs('#suggestion-text'),
       suggestionInputWrapper: qs('.suggestion-input-wrapper'),
       nameSuggestion: qs('#name-suggestion'),
       submitSuggestion: qs('#submit-suggestion'),
@@ -1456,15 +1472,36 @@
                   body: formData
               }).catch(error => console.error('Error!', error.message));
 
-              // Clear input and hide the wrapper
-              elements.nameSuggestion.value = '';
-              if(elements.suggestionInputWrapper) elements.suggestionInputWrapper.style.display = 'none';
-              
-              // Show and animate thank you message
-              if(elements.suggestionThankYou) {
-                  elements.suggestionThankYou.style.display = 'block';
-                  elements.suggestionThankYou.style.animation = 'thankYouFade 4s forwards';
+              // Show Confetti Burst specifically from the button
+              if (typeof confetti === 'function') {
+                  const rect = elements.submitSuggestion.getBoundingClientRect();
+                  const x = (rect.left + rect.width / 2) / window.innerWidth;
+                  const y = (rect.top + rect.height / 2) / window.innerHeight;
+                  confetti({
+                      particleCount: 50,
+                      spread: 60,
+                      origin: { x, y },
+                      colors: ['#d4af37', '#e6ca7b', '#ffffff'],
+                      zIndex: 9999,
+                      disableForReducedMotion: true
+                  });
               }
+
+              // Fade out text and input wrapper smoothly
+              if(elements.suggestionText) elements.suggestionText.style.opacity = '0';
+              if(elements.suggestionInputWrapper) elements.suggestionInputWrapper.style.opacity = '0';
+              
+              setTimeout(() => {
+                  elements.nameSuggestion.value = '';
+                  if(elements.suggestionText) elements.suggestionText.style.display = 'none';
+                  if(elements.suggestionInputWrapper) elements.suggestionInputWrapper.style.display = 'none';
+                  
+                  // Show and animate thank you message
+                  if(elements.suggestionThankYou) {
+                      elements.suggestionThankYou.style.display = 'block';
+                      elements.suggestionThankYou.style.animation = 'thankYouPop 4s forwards';
+                  }
+              }, 400);
           }
       });
       
