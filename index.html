@@ -147,7 +147,7 @@
         -webkit-backdrop-filter: blur(10px);
         border: 1px solid var(--gold-1);
         border-radius: 50%;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.8);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.8), 0 0 0px rgba(212, 175, 55, 0);
         transition: box-shadow 0.3s ease, background 0.3s ease;
         pointer-events: none;
         will-change: transform;
@@ -179,7 +179,7 @@
       transform-style: preserve-3d;
       will-change: transform, opacity;
       transition: opacity 1.5s ease;
-      perspective: 2000px; /* Deep perspective for the massive doors */
+      perspective: 2000px;
     }
 
     /* ADVANCED: 3D Swinging Doors */
@@ -214,7 +214,6 @@
     .gate.left { left: 0; border-right: 2px solid var(--gold-1); transform-origin: left center; }
     .gate.right { right: 0; border-left: 2px solid var(--gold-1); transform-origin: right center; }
     
-    /* Swinging Open 90 Degrees in 3D Space */
     .gate.open-left { transform: rotateY(-95deg) scale(1.1); opacity: 0; filter: blur(15px); }
     .gate.open-right { transform: rotateY(95deg) scale(1.1); opacity: 0; filter: blur(15px); }
 
@@ -339,7 +338,7 @@
     }
     @keyframes hintFade { 0% { opacity: 0.3; } 100% { opacity: 1; } }
 
-    /* ===== BULLETPROOF GRID TIMER SCREEN (BUG FIXED) ===== */
+    /* ===== BULLETPROOF GRID TIMER SCREEN ===== */
     #timer-screen {
       position: absolute;
       z-index: 50;
@@ -366,7 +365,6 @@
       white-space: nowrap;
     }
     
-    /* STRICT GRID prevents ANY wrapping on mobile devices */
     .timer-box { 
       display: grid; 
       grid-template-columns: repeat(4, 1fr);
@@ -438,7 +436,7 @@
       font-family: 'Cinzel', serif;
     }
 
-    /* ===== FLAWLESS CINEMATIC COUNTDOWN SCREEN (BUG FIXED) ===== */
+    /* ===== FLAWLESS CINEMATIC COUNTDOWN SCREEN ===== */
     #countdown-screen {
       position: absolute;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -460,7 +458,6 @@
       background-clip: text;
       color: transparent;
       will-change: transform, opacity, filter;
-      /* Guaranteed to fire perfectly every time via JS element creation */
       animation: epicCount 1s var(--ease-out-expo) forwards;
     }
 
@@ -596,7 +593,7 @@
         100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1) rotateX(0deg); color: var(--gold-2); text-shadow: 0 1px 0 #b38728, 0 2px 0 #9f7622, 0 3px 0 #8c661c, 0 15px 25px rgba(0,0,0,0.8); filter: blur(0px); }
     }
 
-    /* ===== CUTE KAWAII BABY GIRL SVG (FIXED & BEAUTIFIED) ===== */
+    /* ===== ADVANCED KAWAII BABY GIRL SVG & SPARKLES ===== */
     #baby-girl-container {
         position: relative;
         margin-top: 30px;
@@ -628,7 +625,7 @@
     }
     
     .waving-arm {
-        transform-origin: 130px 130px; /* Perfect shoulder pivot */
+        transform-origin: 135px 125px; 
         animation: wave-hand 0.8s infinite alternate ease-in-out;
         will-change: transform;
     }
@@ -638,7 +635,7 @@
     }
 
     .eyes {
-        transform-origin: 100px 95px;
+        transform-origin: 100px 98px;
         animation: blink 4s infinite;
     }
     @keyframes blink {
@@ -647,7 +644,7 @@
     }
     
     .head-group {
-        transform-origin: 100px 130px;
+        transform-origin: 100px 140px;
         animation: headBob 3s infinite alternate ease-in-out;
     }
     @keyframes headBob {
@@ -668,7 +665,7 @@
         50% { opacity: 1; transform: scale(1.2) rotate(20deg); text-shadow: 0 0 10px #fdf5c9; }
     }
 
-    /* ===== HARDWARE ACCELERATED FAN BALLOONS ===== */
+    /* ===== HARDWARE ACCELERATED FULL-WIDTH BALLOONS ===== */
     .balloon-anim {
         position: absolute;
         bottom: -200px;
@@ -706,7 +703,9 @@
 <body>
   
   <div class="ambient-light"></div>
-  <div id="flash-overlay"></div> <div id="ptr-wrapper">
+  <div id="flash-overlay"></div>
+
+  <div id="ptr-wrapper">
       <svg id="ptr-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path d="M12 2.75a9.25 9.25 0 1 0 4.737 17.197l-1.373-1.637A7.25 7.25 0 1 1 19.25 12h-2.5l3.625 4.5L24 12h-2.75a9.25 9.25 0 0 0-9.25-9.25z"/>
       </svg>
@@ -735,8 +734,7 @@
     </div>
   </div>
 
-  <div id="countdown-screen" aria-live="assertive" aria-atomic="true">
-      </div>
+  <div id="countdown-screen" aria-live="assertive" aria-atomic="true"></div>
 
   <div id="reveal-screen" aria-hidden="true">
     <h3 id="reveal-subtitle">Welcome To The World</h3>
@@ -974,7 +972,7 @@
           particlesAlpha -= 0.015; 
           if (particlesAlpha <= 0) {
               canvasCtx.clearRect(0, 0, canvasWidth, canvasHeight);
-              return; // Stop animation loop completely on mobile
+              return; 
           }
           canvasCtx.globalAlpha = particlesAlpha;
       } else {
@@ -1070,12 +1068,10 @@
       countdownInterval = setInterval(updateOnce, 1000);
     }
 
-    /* ===== BUG-FREE CINEMATIC COUNTDOWN ===== */
     function startFinalCountdown() {
       if (elements.countdownScreen) elements.countdownScreen.style.display = 'flex';
       let count = 5;
       
-      // Creating new DOM elements prevents the notorious iOS Safari animation restart bug
       function popNumber(num) {
           if (!elements.countdownScreen) return;
           elements.countdownScreen.innerHTML = '';
@@ -1095,7 +1091,6 @@
             clearInterval(finalTimer);
             if (elements.countdownScreen) elements.countdownScreen.style.display = 'none';
             
-            // White Flash Transition for epic reveal
             if (elements.flashOverlay) {
                 elements.flashOverlay.classList.add('flash');
                 setTimeout(() => elements.flashOverlay.classList.remove('flash'), 100);
@@ -1213,7 +1208,7 @@
       }, 300); 
     }
 
-    /* ===== OPTIMIZED HARDWARE-ACCELERATED BALLOONS ===== */
+    /* ===== FULL SCREEN BALLOON SPAWN ===== */
     function fireHeartBalloons() {
         const container = document.createElement('div');
         container.style.position = 'fixed';
@@ -1223,9 +1218,8 @@
         container.style.overflow = 'hidden';
         document.body.appendChild(container);
 
-        const maxBalloons = window.innerWidth < 600 ? 12 : 25;
+        const maxBalloons = window.innerWidth < 600 ? 15 : 35;
         
-        // Fades out canvas fireflies completely on mobile devices to preserve frame rate
         if (window.innerWidth <= 767) {
             particlesFading = true;
         }
@@ -1234,9 +1228,9 @@
         const delays = [];
         
         for (let i = 0; i < maxBalloons; i++) {
-            // Makes them start closer to the center and fan out elegantly
-            const startX = 40 + Math.random() * 20; 
-            const endX = (Math.random() - 0.5) * 400;
+            // FULL SCREEN WIDTH SPAWN
+            const startX = Math.random() * 100; 
+            const endX = (Math.random() - 0.5) * 150; 
             const scale = 0.5 + Math.random() * 0.7;
             const animDelay = Math.random() * 2.5; 
             const swayDelay = -(Math.random() * 3);
