@@ -121,7 +121,7 @@
         border-radius: 50%;
         box-shadow: 0 5px 15px rgba(0,0,0,0.8), 0 0 0px rgba(212, 175, 55, 0);
         transition: box-shadow 0.3s ease, background 0.3s ease;
-        pointer-events: none; /* Ignore clicks so it doesn't block UI */
+        pointer-events: none; 
     }
     #ptr-wrapper.ready {
         box-shadow: 0 5px 25px rgba(0,0,0,0.9), 0 0 25px rgba(212, 175, 55, 0.8);
@@ -310,11 +310,22 @@
       z-index: 70; 
       display: none; 
       flex-direction: column;
+      
+      /* Mobile & Tablet Default: Locked to the top */
       justify-content: flex-start; 
       padding-top: 18vh; 
+      
       align-items: center;
       perspective: 1000px; 
       width: 100%; 
+    }
+    
+    /* PC & Mac Desktop Override: Exact Center */
+    @media (hover: hover) and (pointer: fine) {
+      #reveal-screen {
+        justify-content: center;
+        padding-top: 0;
+      }
     }
     
     #reveal-subtitle {
@@ -500,7 +511,7 @@
     let currentPull = 0;
     const ptrWrapper = qs('#ptr-wrapper');
     const ptrIcon = qs('#ptr-icon');
-    const ptrThreshold = 100; // How far to pull to trigger refresh
+    const ptrThreshold = 100; 
 
     function handleDragStart(y) {
         startY = y;
@@ -512,15 +523,12 @@
         if (startY === 0) return;
         const diff = y - startY;
         
-        // Only pull down
         if (diff > 0) {
-            currentPull = diff * 0.4; // 0.4 adds friction so it feels heavy/stretchy
+            currentPull = diff * 0.4; 
             
-            // Move orb down and rotate icon
             ptrWrapper.style.transform = `translate(-50%, calc(-50px + ${currentPull}px))`;
             ptrIcon.style.transform = `rotate(${currentPull * 2.5}deg)`;
 
-            // Glow golden when threshold crossed
             if (currentPull > ptrThreshold) {
                 ptrWrapper.classList.add('ready');
             } else {
@@ -537,20 +545,17 @@
         ptrIcon.style.transition = 'transform 0.4s ease';
 
         if (currentPull > ptrThreshold) {
-            // Trigger Refresh! Snap to top partway and spin
             ptrWrapper.style.transform = `translate(-50%, 30px)`;
             ptrIcon.classList.add('ptr-spin');
             setTimeout(() => {
                 window.location.reload();
-            }, 500); // Small delay to enjoy the spin animation
+            }, 500); 
         } else {
-            // Cancelled. Snap back hidden
             ptrWrapper.style.transform = `translate(-50%, 0)`;
         }
         currentPull = 0;
     }
 
-    // Touch Support (Mobiles/Tablets)
     document.addEventListener('touchstart', e => {
         if (e.touches.length > 1) return;
         handleDragStart(e.touches[0].clientY);
@@ -562,7 +567,6 @@
     
     document.addEventListener('touchend', handleDragEnd);
 
-    // Mouse Support (Desktop dragging)
     let isMouseDown = false;
     document.addEventListener('mousedown', e => {
         isMouseDown = true;
@@ -879,4 +883,4 @@
     })();
   </script>
 </body>
-  </html>
+</html>
