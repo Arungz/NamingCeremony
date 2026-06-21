@@ -908,7 +908,7 @@
     const CONFIG = {
       ceremonyName: window.__ceremonyName || 'A.NURA',
       // Set to null to use demo timer. To bypass timer entirely, use a past date e.g. new Date('2023-01-01')
-      ceremonyEventDate: '2026-06-23T09:30:00',, 
+      ceremonyEventDate: '2026-06-23T09:30:00',
       timerDemoSeconds: 8
     };
 
@@ -1142,7 +1142,7 @@
     /* ===== TIMER LOGIC ===== */
     let countdownInterval = null;
     let finalTimer = null;
-    let eventDate = null; 
+    let eventDate = CONFIG.ceremonyEventDate ? new Date(CONFIG.ceremonyEventDate) : null;
 
     function safeSetText(id, text) {
       const el = document.getElementById(id);
