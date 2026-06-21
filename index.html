@@ -69,7 +69,6 @@
       overflow: hidden;
       perspective: 1500px;
       user-select: none; 
-      /* Fixes overall page touch highlights on some older Androids */
       -webkit-tap-highlight-color: transparent; 
     }
 
@@ -250,13 +249,9 @@
       position: relative;
       overflow: hidden;
       z-index: 103;
-      
-      /* CRITICAL FIX: Removes the blue highlight square on mobile tap */
-      -webkit-tap-highlight-color: transparent;
       outline: none;
     }
     
-    /* Magnetic hover/touch effect */
     #letter-N:hover, #letter-N:active { 
         transform: scale(1.05); 
         box-shadow: 
@@ -287,22 +282,28 @@
       text-transform: uppercase;
       color: var(--muted);
       animation: fadeInOut 2s infinite;
-      transition: opacity 0.3s ease;
+      /* Adjusted transition for an instant fade when clicked */
+      transition: opacity 0.4s ease;
     }
     @keyframes fadeInOut { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
 
-    /* ===== FROSTED GLASS TIMER SCREEN ===== */
+    /* ===== FULLY CENTERED TIMER SCREEN ===== */
     #timer-screen {
       position: absolute;
+      inset: 0;
       z-index: 50;
       opacity: 0;
       transform: scale(0.9);
-      display: none;
+      display: none; /* Changed to flex dynamically */
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
       transition: opacity 1.5s ease, transform 1.5s ease;
       text-align: center;
       width: 100%;
-      padding: clamp(12px, 2.5vw, 32px);
+      padding: clamp(10px, 2vw, 20px);
     }
+    
     #timer-title {
       font-family: 'Cinzel', serif;
       font-size: clamp(22px, 4vw, 36px);
@@ -310,6 +311,7 @@
       letter-spacing: 6px;
       text-transform: uppercase;
       text-shadow: 0 5px 15px rgba(0,0,0,0.8);
+      white-space: nowrap;
     }
     .timer-box { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; }
     .time-unit {
@@ -468,13 +470,19 @@
         100% { transform: translateY(-120vh) translateX(var(--drift)) rotate(15deg); opacity: 0; }
     }
 
-    /* ===== RESPONSIVE ===== */
+    /* ===== MOBILE ANDROID/IOS OVERRIDES ===== */
     @media (max-width: 520px) {
-      .timer-box { gap: 12px; }
-      .time-unit { padding: 15px 12px; min-width: 80px; }
-      .time-unit div { font-size: clamp(35px, 10vw, 50px); }
+      #timer-title {
+        /* Scales the text down specifically to prevent wrapping on narrow screens */
+        font-size: clamp(14px, 4.5vw, 18px);
+        letter-spacing: 3px;
+      }
+      .timer-box { gap: 10px; }
+      .time-unit { padding: 15px 10px; min-width: 70px; border-radius: 12px; }
+      .time-unit div { font-size: clamp(28px, 8vw, 40px); }
       .click-hint { letter-spacing: 5px; }
     }
+
     @media (prefers-reduced-motion: reduce) {
       .gold-shimmer, #letter-N::after, .click-hint, #countdown-screen, .letter, .gate, #scene-container, .balloon-anim, .subtitle-show {
         animation-duration: 0.001ms !important;
@@ -800,7 +808,11 @@
       if (!elements.letterN || elements.letterN.getAttribute('data-activated') === 'true') return;
       elements.letterN.setAttribute('data-activated', 'true');
       
-      if (elements.clickHint) elements.clickHint.style.opacity = '0';
+      // FIX: Force the click-hint animation to stop and fade instantly
+      if (elements.clickHint) {
+          elements.clickHint.style.animation = 'none';
+          elements.clickHint.style.opacity = '0';
+      }
 
       if (!reducedMotion) {
         elements.letterN.classList.add('shatter');
@@ -820,7 +832,8 @@
         if (dist <= 0) {
             startFinalCountdown();
         } else {
-            elements.timerScreen && (elements.timerScreen.style.display = 'block');
+            // Updated to use flex so it automatically centers properly
+            elements.timerScreen && (elements.timerScreen.style.display = 'flex');
             void elements.timerScreen.offsetWidth; 
             elements.timerScreen && (elements.timerScreen.style.opacity = '1');
             elements.timerScreen && (elements.timerScreen.style.transform = 'scale(1)');
