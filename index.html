@@ -77,6 +77,7 @@
       color: #fff;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -182,7 +183,6 @@
       perspective: 2000px;
     }
 
-    /* ADVANCED: 3D Swinging Doors */
     .gate {
       position: absolute;
       top: 0;
@@ -245,7 +245,7 @@
       text-shadow: 0 0 20px rgba(253, 245, 201, 0.6), 0 0 40px rgba(191, 149, 63, 0.4);
       cursor: pointer;
       animation: invitePulse 2.5s infinite alternate ease-in-out;
-      transition: all 0.4s var(--ease-spring);
+      transition: transform 0.4s var(--ease-spring), box-shadow 0.4s ease, background 0.4s ease;
       font-weight: 700;
       position: relative;
       z-index: 103;
@@ -365,6 +365,7 @@
       white-space: nowrap;
     }
     
+    /* STRICT GRID prevents wrapping on any device */
     .timer-box { 
       display: grid; 
       grid-template-columns: repeat(4, 1fr);
@@ -593,15 +594,15 @@
         100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1) rotateX(0deg); color: var(--gold-2); text-shadow: 0 1px 0 #b38728, 0 2px 0 #9f7622, 0 3px 0 #8c661c, 0 15px 25px rgba(0,0,0,0.8); filter: blur(0px); }
     }
 
-    /* ===== ADVANCED KAWAII BABY GIRL SVG & SPARKLES ===== */
+    /* ===== ADVANCED REALISTIC KAWAII BABY SVG ===== */
     #baby-girl-container {
         position: relative;
         margin-top: 30px;
-        transform: translate3d(0, 50px, -50px) rotateX(-90deg); 
-        width: 160px;
-        height: 160px;
+        transform: translate3d(0, 50px, -50px) rotateX(-90deg) scale(0.8); 
+        width: 180px;
+        height: 180px;
         opacity: 0;
-        filter: blur(8px);
+        filter: drop-shadow(0 20px 20px rgba(0,0,0,0.6)) blur(8px);
         transition: transform 1.5s var(--ease-spring), opacity 1.2s ease, filter 1.2s ease;
         display: flex;
         justify-content: center;
@@ -612,16 +613,16 @@
     }
     
     #baby-girl-container.slide-in {
-        transform: translate3d(0, 0, 0) rotateX(0deg); 
+        transform: translate3d(0, 0, 0) rotateX(0deg) scale(1); 
         opacity: 1;
-        filter: blur(0px);
+        filter: drop-shadow(0 20px 20px rgba(0,0,0,0.6)) blur(0px);
         animation: floatBaby 4s ease-in-out infinite forwards;
         animation-delay: 1.5s;
     }
     
     @keyframes floatBaby {
-        0%, 100% { transform: translate3d(0, 0, 0); }
-        50% { transform: translate3d(0, -10px, 0); }
+        0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+        50% { transform: translate3d(0, -12px, 0) scale(1.02); }
     }
     
     .waving-arm {
@@ -648,8 +649,8 @@
         animation: headBob 3s infinite alternate ease-in-out;
     }
     @keyframes headBob {
-        0% { transform: rotate(-2deg); }
-        100% { transform: rotate(3deg); }
+        0% { transform: rotate(-1.5deg); }
+        100% { transform: rotate(2.5deg); }
     }
 
     .sparkle {
@@ -662,10 +663,10 @@
     }
     @keyframes twinkle {
         0%, 100% { opacity: 0; transform: scale(0.5) rotate(0deg); }
-        50% { opacity: 1; transform: scale(1.2) rotate(20deg); text-shadow: 0 0 10px #fdf5c9; }
+        50% { opacity: 1; transform: scale(1.2) rotate(20deg); text-shadow: 0 0 15px #fdf5c9; }
     }
 
-    /* ===== HARDWARE ACCELERATED FULL-WIDTH BALLOONS ===== */
+    /* ===== HARDWARE ACCELERATED BALLOONS ===== */
     .balloon-anim {
         position: absolute;
         bottom: -200px;
@@ -741,43 +742,58 @@
     <div class="name-container" id="baby-name" aria-hidden="true"></div>
     
     <div id="baby-girl-container">
-        <div class="sparkle" style="top: 10px; left: 10px; animation-delay: 0s;">✨</div>
-        <div class="sparkle" style="top: 40px; right: 0px; animation-delay: 0.5s;">✨</div>
-        <div class="sparkle" style="top: 110px; left: 5px; animation-delay: 1.2s;">✨</div>
-        <div class="sparkle" style="top: -5px; right: 30px; animation-delay: 0.8s;">✨</div>
+        <div class="sparkle" style="top: 15px; left: 15px; animation-delay: 0s;">✨</div>
+        <div class="sparkle" style="top: 50px; right: 5px; animation-delay: 0.5s;">✨</div>
+        <div class="sparkle" style="top: 130px; left: 10px; animation-delay: 1.2s;">✨</div>
+        <div class="sparkle" style="top: 5px; right: 35px; animation-delay: 0.8s;">✨</div>
 
         <svg width="100%" height="100%" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-            <path d="M 50,190 C 50,120 150,120 150,190 Z" fill="#ffffff" stroke="#ffb6c1" stroke-width="4"/>
-            <path d="M 60,150 Q 100,175 140,150" fill="none" stroke="#ffb6c1" stroke-width="3" stroke-linecap="round"/>
+            <defs>
+                <radialGradient id="skinGrad" cx="50%" cy="50%" r="50%">
+                    <stop offset="60%" stop-color="#fff0e6"/>
+                    <stop offset="100%" stop-color="#f5d6c6"/>
+                </radialGradient>
+                <linearGradient id="swaddleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#ffffff"/>
+                    <stop offset="100%" stop-color="#fce4ec"/>
+                </linearGradient>
+            </defs>
             
-            <path d="M 70,135 Q 50,155 60,180" fill="none" stroke="#ffe0bd" stroke-width="14" stroke-linecap="round"/>
+            <path d="M 50,190 C 50,110 150,110 150,190 Z" fill="url(#swaddleGrad)" stroke="#f8bbd0" stroke-width="3"/>
+            <path d="M 60,150 Q 100,175 140,150" fill="none" stroke="#f8bbd0" stroke-width="4" stroke-linecap="round"/>
+            <path d="M 75,170 Q 100,185 125,170" fill="none" stroke="#f8bbd0" stroke-width="2" stroke-linecap="round"/>
+            
+            <path d="M 65,135 Q 40,155 55,180" fill="none" stroke="url(#skinGrad)" stroke-width="14" stroke-linecap="round"/>
             
             <g class="waving-arm">
-                <path d="M 130,135 Q 165,110 155,80" fill="none" stroke="#ffe0bd" stroke-width="14" stroke-linecap="round"/>
-                <circle cx="155" cy="80" r="7" fill="#ffe0bd"/>
+                <path d="M 135,135 Q 170,110 160,80" fill="none" stroke="url(#skinGrad)" stroke-width="14" stroke-linecap="round"/>
+                <circle cx="160" cy="80" r="7" fill="url(#skinGrad)"/>
             </g>
             
             <g class="head-group">
-                <circle cx="100" cy="90" r="48" fill="#ffe0bd"/>
+                <circle cx="100" cy="95" r="46" fill="url(#skinGrad)"/>
                 
-                <ellipse cx="68" cy="105" rx="9" ry="5" fill="#ff99a8" opacity="0.6"/>
-                <ellipse cx="132" cy="105" rx="9" ry="5" fill="#ff99a8" opacity="0.6"/>
+                <ellipse cx="68" cy="106" rx="9" ry="5" fill="#ff80ab" opacity="0.5"/>
+                <ellipse cx="132" cy="106" rx="9" ry="5" fill="#ff80ab" opacity="0.5"/>
                 
                 <g class="eyes">
-                    <path d="M 60,95 Q 68,103 76,95" fill="none" stroke="#5d4037" stroke-width="3.5" stroke-linecap="round"/>
-                    <path d="M 124,95 Q 132,103 140,95" fill="none" stroke="#5d4037" stroke-width="3.5" stroke-linecap="round"/>
+                    <path d="M 62,96 Q 70,105 78,96" fill="none" stroke="#5d4037" stroke-width="3.5" stroke-linecap="round"/>
+                    <path d="M 122,96 Q 130,105 138,96" fill="none" stroke="#5d4037" stroke-width="3.5" stroke-linecap="round"/>
                 </g>
                 
-                <path d="M 94,112 Q 100,120 106,112" fill="none" stroke="#d81b60" stroke-width="3" stroke-linecap="round"/>
+                <circle cx="100" cy="115" r="12" fill="#ff4081" opacity="0.9"/>
+                <circle cx="100" cy="115" r="8" fill="#fce4ec"/>
+                <path d="M 90,115 Q 85,115 85,110 Q 85,120 90,120" fill="none" stroke="#ff4081" stroke-width="2.5" stroke-linecap="round"/>
                 
-                <path d="M 52,90 C 52,30 148,30 148,90 C 148,65 125,45 100,45 C 75,45 52,65 52,90 Z" fill="#4e342e"/>
+                <path d="M 52,95 C 52,25 148,25 148,95 C 148,65 125,40 100,40 C 75,40 52,65 52,95 Z" fill="#3e2723"/>
                 
-                <path d="M 90,45 Q 100,25 110,45 Q 105,35 90,45 Z" fill="#4e342e"/>
+                <path d="M 85,45 Q 100,25 115,45 Q 105,35 85,45 Z" fill="#5d4037"/>
+                <path d="M 65,65 Q 80,45 100,60" fill="none" stroke="#5d4037" stroke-width="4" stroke-linecap="round"/>
                 
-                <g transform="translate(115, 45) rotate(15)">
-                    <path d="M 0,0 L -12,-10 L -12,10 Z" fill="#ff4081"/>
-                    <path d="M 0,0 L 12,-10 L 12,10 Z" fill="#ff4081"/>
-                    <circle cx="0" cy="0" r="4" fill="#c2185b"/>
+                <g transform="translate(120, 48) rotate(15)">
+                    <path d="M 0,0 L -14,-12 L -14,12 Z" fill="#ff4081"/>
+                    <path d="M 0,0 L 14,-12 L 14,12 Z" fill="#ff4081"/>
+                    <circle cx="0" cy="0" r="5" fill="#c2185b"/>
                 </g>
             </g>
         </svg>
@@ -799,7 +815,7 @@
     /* ===== CONFIGURATION ===== */
     const CONFIG = {
       ceremonyName: window.__ceremonyName || 'A.NURA',
-      ceremonyEventDate: window.__ceremonyEventDate || null,
+      ceremonyEventDate: null, 
       timerDemoSeconds: 8
     };
 
@@ -1026,11 +1042,7 @@
     /* ===== TIMER LOGIC ===== */
     let countdownInterval = null;
     let finalTimer = null;
-    let eventDate = CONFIG.ceremonyEventDate || (function() {
-      const d = new Date();
-      d.setSeconds(d.getSeconds() + CONFIG.timerDemoSeconds);
-      return d;
-    })();
+    let eventDate = null; 
 
     function safeSetText(id, text) {
       const el = document.getElementById(id);
@@ -1068,10 +1080,12 @@
       countdownInterval = setInterval(updateOnce, 1000);
     }
 
+    /* ===== BUG-FREE CINEMATIC COUNTDOWN ===== */
     function startFinalCountdown() {
       if (elements.countdownScreen) elements.countdownScreen.style.display = 'flex';
       let count = 5;
       
+      // Dynamic element creation prevents iOS animation caching bugs completely
       function popNumber(num) {
           if (!elements.countdownScreen) return;
           elements.countdownScreen.innerHTML = '';
@@ -1091,6 +1105,7 @@
             clearInterval(finalTimer);
             if (elements.countdownScreen) elements.countdownScreen.style.display = 'none';
             
+            // White Flash Transition
             if (elements.flashOverlay) {
                 elements.flashOverlay.classList.add('flash');
                 setTimeout(() => elements.flashOverlay.classList.remove('flash'), 100);
@@ -1106,6 +1121,9 @@
       if (!elements.letterN || elements.letterN.getAttribute('data-activated') === 'true') return;
       elements.letterN.setAttribute('data-activated', 'true');
       
+      // BUG FIX: Set the exact timer strictly on click so it always perfectly executes 8s demo
+      eventDate = new Date(Date.now() + (CONFIG.timerDemoSeconds * 1000));
+
       if (elements.clickHint) {
           elements.clickHint.style.animation = 'none';
           elements.clickHint.style.opacity = '0';
@@ -1127,23 +1145,16 @@
             setTimeout(() => elements.sceneContainer.style.display = 'none', 1500);
         }
         
-        const now = Date.now();
-        const dist = eventDate.getTime() - now;
-
-        if (dist <= 0) {
-            startFinalCountdown();
-        } else {
-            elements.timerScreen && (elements.timerScreen.style.display = 'flex');
-            void elements.timerScreen.offsetWidth; 
-            elements.timerScreen && (elements.timerScreen.style.opacity = '1');
-            
-            const units = qsa('.time-unit');
-            units.forEach((u, i) => {
-                setTimeout(() => u.classList.add('show-unit'), 100 + (i * 120));
-            });
-            
-            startTimer();
-        }
+        elements.timerScreen && (elements.timerScreen.style.display = 'flex');
+        void elements.timerScreen.offsetWidth; 
+        elements.timerScreen && (elements.timerScreen.style.opacity = '1');
+        
+        const units = qsa('.time-unit');
+        units.forEach((u, i) => {
+            setTimeout(() => u.classList.add('show-unit'), 100 + (i * 120));
+        });
+        
+        startTimer();
       }, 2000); 
     }
 
@@ -1208,7 +1219,7 @@
       }, 300); 
     }
 
-    /* ===== FULL SCREEN BALLOON SPAWN ===== */
+    /* ===== OPTIMIZED HARDWARE-ACCELERATED BALLOONS ===== */
     function fireHeartBalloons() {
         const container = document.createElement('div');
         container.style.position = 'fixed';
@@ -1218,8 +1229,9 @@
         container.style.overflow = 'hidden';
         document.body.appendChild(container);
 
-        const maxBalloons = window.innerWidth < 600 ? 15 : 35;
+        const maxBalloons = window.innerWidth < 600 ? 12 : 25;
         
+        // Mobile performance override
         if (window.innerWidth <= 767) {
             particlesFading = true;
         }
@@ -1228,7 +1240,6 @@
         const delays = [];
         
         for (let i = 0; i < maxBalloons; i++) {
-            // FULL SCREEN WIDTH SPAWN
             const startX = Math.random() * 100; 
             const endX = (Math.random() - 0.5) * 150; 
             const scale = 0.5 + Math.random() * 0.7;
@@ -1264,7 +1275,6 @@
     (function init() {
       initCanvas();
       renderName(CONFIG.ceremonyName);
-
       elements.letterN?.addEventListener('click', triggerEntrance, { passive: true });
     })();
   </script>
