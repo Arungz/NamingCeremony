@@ -594,13 +594,13 @@
         100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1) rotateX(0deg); color: var(--gold-2); text-shadow: 0 1px 0 #b38728, 0 2px 0 #9f7622, 0 3px 0 #8c661c, 0 15px 25px rgba(0,0,0,0.8); filter: blur(0px); }
     }
 
-    /* ===== BEAUTIFUL REALISTIC BABY GIRL SVG & SPARKLES ===== */
+    /* ===== ADVANCED KAWAII BABY GIRL SVG & SPARKLES ===== */
     #baby-girl-container {
         position: relative;
         margin-top: 30px;
         transform: translate3d(0, 50px, -50px) rotateX(-90deg) scale(0.8); 
-        width: 160px;
-        height: 160px;
+        width: 180px;
+        height: 180px;
         opacity: 0;
         filter: drop-shadow(0 20px 20px rgba(0,0,0,0.6)) blur(8px);
         transition: transform 1.5s var(--ease-spring), opacity 1.2s ease, filter 1.2s ease;
@@ -626,7 +626,7 @@
     }
     
     .waving-arm {
-        transform-origin: 135px 125px; 
+        transform-origin: 140px 140px; 
         animation: wave-hand 0.8s infinite alternate ease-in-out;
         will-change: transform;
     }
@@ -636,7 +636,7 @@
     }
 
     .eyes {
-        transform-origin: 100px 98px;
+        transform-origin: 100px 92px;
         animation: blink 4s infinite;
     }
     @keyframes blink {
@@ -645,7 +645,7 @@
     }
     
     .head-group {
-        transform-origin: 100px 140px;
+        transform-origin: 100px 130px;
         animation: headBob 3s infinite alternate ease-in-out;
     }
     @keyframes headBob {
@@ -663,7 +663,7 @@
     }
     @keyframes twinkle {
         0%, 100% { opacity: 0; transform: scale(0.5) rotate(0deg); }
-        50% { opacity: 1; transform: scale(1.2) rotate(20deg); text-shadow: 0 0 10px #fdf5c9; }
+        50% { opacity: 1; transform: scale(1.2) rotate(20deg); text-shadow: 0 0 15px #fdf5c9; }
     }
 
     /* ===== HARDWARE ACCELERATED BALLOONS ===== */
@@ -828,7 +828,6 @@
     /* ===== CONFIGURATION ===== */
     const CONFIG = {
       ceremonyName: window.__ceremonyName || 'A.NURA',
-      // Set to null to use demo timer. To bypass timer entirely, use a past date e.g. new Date('2023-01-01')
       ceremonyEventDate: null, 
       timerDemoSeconds: 8
     };
@@ -1056,7 +1055,7 @@
     /* ===== TIMER LOGIC ===== */
     let countdownInterval = null;
     let finalTimer = null;
-    let eventDate = CONFIG.ceremonyEventDate; 
+    let eventDate = null; 
 
     function safeSetText(id, text) {
       const el = document.getElementById(id);
@@ -1205,7 +1204,31 @@
 
               const totalDelay = (restLetters.length * 100) + 500;
               setTimeout(() => { 
-                  fireFourCornerBlast(); 
+                  
+                  /* ===== OPTIMIZED CANNON BLAST (MOBILE SHUTOFF) ===== */
+                  if (!reducedMotion && typeof confetti === 'function') {
+                      const isMobile = window.innerWidth <= 767;
+                      const mobileAnimationEnd = Date.now() + 10500; // Stops completely on mobile
+
+                      const interval = setInterval(() => {
+                          if (isMobile) {
+                              if (Date.now() > mobileAnimationEnd) return clearInterval(interval);
+                          } else {
+                              const timeLeft = (Date.now() + 4000) - Date.now();
+                              if (timeLeft <= 0) return clearInterval(interval);
+                          }
+
+                          const pCount = window.innerWidth < 600 ? 4 : 8; 
+                          const cColors = ['#d4af37', '#e6ca7b', '#ffffff'];
+                          const settings = { particleCount: pCount, spread: 45, colors: cColors, zIndex: 80, gravity: 1.1, shapes: ['square', 'circle'] };
+
+                          confetti({ ...settings, origin: { x: 0, y: 0 }, angle: 315, startVelocity: 35 });
+                          confetti({ ...settings, origin: { x: 1, y: 0 }, angle: 225, startVelocity: 35 });
+                          confetti({ ...settings, origin: { x: 0, y: 1 }, angle: 45, startVelocity: 60 });
+                          confetti({ ...settings, origin: { x: 1, y: 1 }, angle: 135, startVelocity: 60 });
+                      }, 300); 
+                  }
+                  
                   fireHeartBalloons();
                   
                   setTimeout(() => {
@@ -1218,25 +1241,6 @@
           }, 1200); 
           
       }, 1500);
-    }
-
-    /* ===== OPTIMIZED CANNON BLAST ===== */
-    function fireFourCornerBlast() {
-      if (reducedMotion || typeof confetti !== 'function') return;
-      
-      const interval = setInterval(() => {
-        const timeLeft = (Date.now() + 4000) - Date.now();
-        if (timeLeft <= 0) return clearInterval(interval);
-
-        const pCount = window.innerWidth < 600 ? 4 : 8; 
-        const cColors = ['#d4af37', '#e6ca7b', '#ffffff'];
-        const settings = { particleCount: pCount, spread: 45, colors: cColors, zIndex: 80, gravity: 1.1, shapes: ['square', 'circle'] };
-
-        confetti({ ...settings, origin: { x: 0, y: 0 }, angle: 315, startVelocity: 35 });
-        confetti({ ...settings, origin: { x: 1, y: 0 }, angle: 225, startVelocity: 35 });
-        confetti({ ...settings, origin: { x: 0, y: 1 }, angle: 45, startVelocity: 60 });
-        confetti({ ...settings, origin: { x: 1, y: 1 }, angle: 135, startVelocity: 60 });
-      }, 300); 
     }
 
     /* ===== OPTIMIZED HARDWARE-ACCELERATED BALLOONS ===== */
