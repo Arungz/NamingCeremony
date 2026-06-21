@@ -38,7 +38,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Cinzel+Decorative:wght@700&family=Montserrat:wght@200;300;400&display=swap" rel="stylesheet" />
 
   <style>
-    /* ===== VARIABLES & HARDWARE ACCELERATION ===== */
+    /* ===== VARIABLES & RESETS ===== */
     :root {
       --bg: #050505;
       --gold-1: #bf953f;
@@ -194,7 +194,7 @@
     .gate.open-left { transform: translate3d(-100%, 0, 0); }
     .gate.open-right { transform: translate3d(100%, 0, 0); }
 
-    /* ===== MACHINED GOLD SEAL ===== */
+    /* ===== NEW: ELEGANT DARK GLASS SEAL ===== */
     .seal-wrapper {
       position: relative;
       z-index: 102;
@@ -213,12 +213,20 @@
       justify-content: center;
       align-items: center;
       border-radius: 50%;
-      background: conic-gradient(from 0deg, var(--gold-2), var(--gold-3), #fff, var(--gold-3), var(--gold-2));
-      color: #3d2b07;
-      text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+      
+      /* REMOVED SILVER PLATE - ADDED LUXURY DARK GLASS */
+      background: radial-gradient(circle, rgba(191, 149, 63, 0.15) 0%, rgba(5, 5, 5, 0.8) 70%);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(191, 149, 63, 0.3);
+      
+      /* GLOWING GOLD TEXT */
+      color: var(--gold-2);
+      text-shadow: 0 0 20px rgba(253, 245, 201, 0.6), 0 0 40px rgba(191, 149, 63, 0.4);
+      
       cursor: pointer;
-      animation: invitePulse 2s infinite alternate ease-in-out;
-      transition: transform 0.4s var(--ease-spring), opacity 0.5s ease, filter 0.5s ease;
+      animation: invitePulse 2.5s infinite alternate ease-in-out;
+      transition: all 0.4s var(--ease-spring);
       font-weight: 700;
       position: relative;
       z-index: 103;
@@ -226,6 +234,7 @@
       will-change: transform, box-shadow;
     }
     
+    /* Expanding Ripple Ring */
     #letter-N::before {
         content: '';
         position: absolute;
@@ -235,25 +244,48 @@
         opacity: 0;
         animation: rippleRing 2s infinite var(--ease-out-expo);
     }
-    
     @keyframes rippleRing {
-        0% { transform: scale(1); opacity: 0.6; }
-        100% { transform: scale(1.6); opacity: 0; }
+        0% { transform: scale(1); opacity: 0.5; }
+        100% { transform: scale(1.5); opacity: 0; }
+    }
+
+    /* NEW: Majestic Rotating Orbital Light Ring */
+    #letter-N::after {
+        content: '';
+        position: absolute;
+        inset: -4px;
+        border-radius: 50%;
+        border: 2px solid transparent;
+        border-top: 2px solid var(--gold-2);
+        border-bottom: 2px solid var(--gold-1);
+        opacity: 0.8;
+        animation: spinEdge 4s linear infinite;
+        pointer-events: none;
+        box-shadow: inset 0 2px 10px rgba(191, 149, 63, 0.5);
+    }
+    @keyframes spinEdge {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
     }
 
     @keyframes invitePulse {
-        from { box-shadow: inset 0 0 20px rgba(0,0,0,0.6), 0 15px 35px rgba(0,0,0,0.9), 0 0 0 6px #111, 0 0 0 8px var(--gold-1); }
-        to { box-shadow: inset 0 0 20px rgba(0,0,0,0.6), 0 15px 35px rgba(0,0,0,0.9), 0 0 0 6px #111, 0 0 15px 12px rgba(253, 245, 201, 0.3); }
+        from { box-shadow: 0 10px 30px rgba(0,0,0,0.9), 0 0 0 0 rgba(191, 149, 63, 0.1); }
+        to { box-shadow: 0 10px 30px rgba(0,0,0,0.9), 0 0 25px 5px rgba(191, 149, 63, 0.4); }
     }
     
     #letter-N:hover, #letter-N:active { 
         animation: none; 
         transform: scale(1.05); 
-        box-shadow: inset 0 0 15px rgba(0,0,0,0.7), 0 20px 40px rgba(0,0,0,0.9), 0 0 0 6px #111, 0 0 0 12px var(--gold-2);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.9), 0 0 30px 10px rgba(253, 245, 201, 0.3);
+        background: radial-gradient(circle, rgba(191, 149, 63, 0.25) 0%, rgba(5, 5, 5, 0.9) 70%);
     }
-    #letter-N:hover::before, #letter-N:active::before { display: none; }
+    
+    #letter-N:hover::before, #letter-N:active::before,
+    #letter-N:hover::after, #letter-N:active::after { 
+        display: none; 
+    }
 
-    /* Optimized Shatter - No Blur for performance */
+    /* Optimized Shatter */
     #letter-N.shatter {
         animation: none;
         transform: scale(1.8) rotate(15deg);
@@ -261,18 +293,22 @@
         pointer-events: none;
     }
 
-    #letter-N::after {
-      content: '';
-      position: absolute;
-      top: -50%; left: -50%; width: 200%; height: 200%;
-      background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%);
-      transform: rotate(45deg) translateX(-100%);
-      animation: lightSweep 4s infinite ease-in-out;
-      border-radius: 50%;
+    .seal-aura {
+        position: absolute;
+        top: 50%; left: 50%;
+        width: 10px; height: 10px;
+        background: var(--gold-2);
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        filter: blur(20px);
+        opacity: 0;
+        z-index: 101;
+        transition: all 1.5s ease;
     }
-    @keyframes lightSweep {
-        0%, 20% { transform: rotate(45deg) translateX(-100%); }
-        80%, 100% { transform: rotate(45deg) translateX(100%); }
+    .seal-aura.explode {
+        transform: translate(-50%, -50%) scale(100);
+        opacity: 0;
+        filter: blur(50px);
     }
 
     .click-hint {
@@ -480,7 +516,6 @@
       color: var(--gold-2);
       -webkit-font-smoothing: antialiased;
       will-change: transform, opacity, color, text-shadow;
-      /* Using a lighter text-shadow for performance, still looks 3D */
       text-shadow: 
         0 1px 0 #b38728, 0 2px 0 #9f7622, 0 3px 0 #8c661c,
         0 15px 25px rgba(0,0,0,0.8);
@@ -499,7 +534,6 @@
 
     .is-name { opacity: 0; margin-left: clamp(2px, 1.5vw, 15px); }
 
-    /* Highly Optimized Reveal Flash */
     @keyframes popFlash {
         0% { opacity: 0; transform: translate3d(0, 0, -100px) scale(0.8) rotateX(-45deg); color: #fff; }
         50% { opacity: 1; transform: translate3d(0, 0, 20px) scale(1.1) rotateX(0deg); color: #fff; text-shadow: 0 0 30px rgba(253, 245, 201, 1), 0 10px 20px rgba(0,0,0,0.8); }
@@ -510,7 +544,7 @@
     #baby-girl-container {
         position: relative;
         margin-top: 30px;
-        transform: translate3d(0, 50px, 0) rotateX(-90deg); /* Replaced horizontal slide with elegant 3D popup */
+        transform: translate3d(0, 50px, 0) rotateX(-90deg); 
         width: 160px;
         height: 160px;
         opacity: 0;
@@ -563,7 +597,6 @@
         position: absolute;
         bottom: -200px;
         will-change: transform, opacity;
-        /* Using pure translate3d for the rise to ensure GPU layer */
         animation: floatUp 7s linear forwards;
     }
     
@@ -611,6 +644,7 @@
     <div class="gate right" id="gate-right" aria-hidden="true"></div>
 
     <div class="seal-wrapper" id="seal-wrapper">
+      <div class="seal-aura" id="seal-aura"></div>
       <div id="letter-N" role="button" tabindex="0" aria-label="Enter Ceremony">N</div>
       <div class="click-hint gold-shimmer" id="click-hint">Click to Enter</div>
     </div>
@@ -698,6 +732,7 @@
     const elements = {
       letterN: qs('#letter-N'),
       sealWrapper: qs('#seal-wrapper'),
+      sealAura: qs('#seal-aura'),
       clickHint: qs('#click-hint'),
       gateLeft: qs('#gate-left'),
       gateRight: qs('#gate-right'),
@@ -826,7 +861,6 @@
         }
       }
 
-      // Smart particle count based on screen size for performance
       const particleCount = window.innerWidth < 600 ? 60 : 150;
       particlesArray = [];
       for (let i = 0; i < particleCount; i++) particlesArray.push(new Particle());
@@ -1034,7 +1068,6 @@
                   fireFourCornerBlast(); 
                   fireHeartBalloons();
                   
-                  // 3D Flip/Slide baby entrance
                   setTimeout(() => {
                       const babyGirl = qs('#baby-girl-container');
                       if(babyGirl) babyGirl.classList.add('slide-in');
@@ -1058,7 +1091,6 @@
         const timeLeft = animationEnd - Date.now();
         if (timeLeft <= 0) return clearInterval(interval);
 
-        // Lowered particle count per tick to ensure smooth mobile performance
         const pCount = window.innerWidth < 600 ? 5 : 8; 
         const cColors = ['#d4af37', '#e6ca7b', '#ffffff'];
         const settings = { particleCount: pCount, spread: 45, colors: cColors, zIndex: 80, gravity: 1.1, shapes: ['square', 'circle'] };
@@ -1081,10 +1113,7 @@
         container.style.overflow = 'hidden';
         document.body.appendChild(container);
 
-        // Limit balloons on mobile to preserve 60fps
         const maxBalloons = window.innerWidth < 600 ? 15 : 25;
-
-        // Build HTML string to prevent reflow looping
         let htmlStr = '';
         const delays = [];
         
