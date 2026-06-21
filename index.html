@@ -69,6 +69,8 @@
       overflow: hidden;
       perspective: 1500px;
       user-select: none; 
+      /* Fixes overall page touch highlights on some older Androids */
+      -webkit-tap-highlight-color: transparent; 
     }
 
     body::before {
@@ -148,9 +150,10 @@
       justify-content: center;
       align-items: center;
       transform-style: preserve-3d;
+      transition: transform 3.5s cubic-bezier(0.25, 1, 0.5, 1);
     }
 
-    /* ===== MODERN SLIDING GATES ===== */
+    /* ===== HEAVY 3D GATES ===== */
     .gate {
       position: absolute;
       top: 0;
@@ -158,13 +161,11 @@
       height: 100%;
       background: linear-gradient(135deg, #111, #050505);
       box-shadow: 0 0 50px rgba(0,0,0,0.9);
-      /* Modern transition: Smooth slide instead of swing */
       transition: transform 2.5s cubic-bezier(0.77, 0, 0.175, 1), opacity 2s ease;
       z-index: 101;
       overflow: hidden;
     }
 
-    /* Subtle glass overlay for modern feel */
     .gate::before {
         content: '';
         position: absolute;
@@ -187,7 +188,6 @@
       border-left: 2px solid var(--gold-1); 
     }
     
-    /* The Modern Slide-Open Animation */
     .gate.open-left { 
         transform: translateX(-100%) scale(1.1); 
         opacity: 0;
@@ -197,7 +197,7 @@
         opacity: 0;
     }
 
-    /* ===== OVERDRIVE SEAL ===== */
+    /* ===== MACHINED GOLD SEAL ===== */
     .seal-wrapper {
       position: relative;
       z-index: 102;
@@ -208,7 +208,6 @@
       transition: transform 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
-    /* The glowing aura behind the seal */
     .seal-aura {
         position: absolute;
         top: 50%; left: 50%;
@@ -246,17 +245,27 @@
         0 20px 40px rgba(0,0,0,0.9), 
         0 0 0 8px #111, 
         0 0 0 12px var(--gold-1);
-      transition: all 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+      transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
       font-weight: 700;
       position: relative;
       overflow: hidden;
       z-index: 103;
+      
+      /* CRITICAL FIX: Removes the blue highlight square on mobile tap */
+      -webkit-tap-highlight-color: transparent;
+      outline: none;
     }
     
-    #letter-N:hover { transform: scale(1.05); }
-    #letter-N:active { transform: scale(0.95); }
+    /* Magnetic hover/touch effect */
+    #letter-N:hover, #letter-N:active { 
+        transform: scale(1.05); 
+        box-shadow: 
+            inset 0 0 15px rgba(0,0,0,0.7), 
+            0 30px 50px rgba(0,0,0,0.9), 
+            0 0 0 8px #111, 
+            0 0 0 15px var(--gold-2);
+    }
 
-    /* The Shatter Animation */
     #letter-N.shatter {
         transform: scale(2) rotate(15deg);
         opacity: 0;
@@ -786,27 +795,23 @@
       }, 1000);
     }
 
-    /* ===== MODERN ENTRANCE & REVEAL LOGIC ===== */
+    /* ===== ENTRANCE & REVEAL LOGIC ===== */
     function triggerEntrance() {
       if (!elements.letterN || elements.letterN.getAttribute('data-activated') === 'true') return;
       elements.letterN.setAttribute('data-activated', 'true');
       
-      // 1. Hide the hint text immediately
       if (elements.clickHint) elements.clickHint.style.opacity = '0';
 
       if (!reducedMotion) {
-        // 2. Trigger the "Supernova" Medallion Shatter
         elements.letterN.classList.add('shatter');
         elements.sealAura.classList.add('explode');
       }
 
-      // 3. Smooth Modern Slide Open
       setTimeout(() => {
         elements.gateLeft?.classList.add('open-left');
         elements.gateRight?.classList.add('open-right');
-      }, 400); // Slight delay for the explosion effect
+      }, 400); 
 
-      // 4. Cleanup and Timer start
       setTimeout(() => {
         elements.sceneContainer && (elements.sceneContainer.style.display = 'none');
         const now = Date.now();
@@ -821,7 +826,7 @@
             elements.timerScreen && (elements.timerScreen.style.transform = 'scale(1)');
             startTimer();
         }
-      }, 2500); // Matches the new 2.5s gate animation
+      }, 2500); 
     }
 
     function triggerGrandReveal() {
