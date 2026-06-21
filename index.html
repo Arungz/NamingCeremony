@@ -46,15 +46,23 @@
       --gold-3: #b38728;
       --muted: rgba(255, 255, 255, 0.5);
       --glass: rgba(20, 20, 20, 0.4);
+      --glass-border: rgba(191, 149, 63, 0.3);
       --safe-area-top: env(safe-area-inset-top);
       --safe-area-bottom: env(safe-area-inset-bottom);
       
+      /* Cinematic Easing */
       --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
       --ease-in-out-circ: cubic-bezier(0.85, 0, 0.15, 1);
       --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+      -webkit-tap-highlight-color: transparent !important;
+      outline: none !important;
+    }
     
     html, body { 
       height: 100%; 
@@ -70,6 +78,7 @@
       color: #fff;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -77,7 +86,6 @@
       padding-bottom: var(--safe-area-bottom);
       perspective: 1200px; 
       user-select: none; 
-      -webkit-tap-highlight-color: transparent; 
     }
 
     body::before {
@@ -94,7 +102,7 @@
         position: fixed;
         top: 50%; left: 50%;
         width: 100vw; height: 100vh;
-        background: radial-gradient(circle, rgba(191, 149, 63, 0.05) 0%, transparent 60%);
+        background: radial-gradient(circle, rgba(191, 149, 63, 0.06) 0%, transparent 65%);
         transform: translate3d(-50%, -50%, 0);
         z-index: 2; 
         pointer-events: none;
@@ -236,7 +244,7 @@
       text-shadow: 0 0 20px rgba(253, 245, 201, 0.6), 0 0 40px rgba(191, 149, 63, 0.4);
       cursor: pointer;
       animation: invitePulse 2.5s infinite alternate ease-in-out;
-      transition: all 0.4s var(--ease-spring);
+      transition: transform 0.4s var(--ease-spring), box-shadow 0.4s ease, background 0.4s ease;
       font-weight: 700;
       position: relative;
       z-index: 103;
@@ -423,35 +431,34 @@
       font-family: 'Cinzel', serif;
     }
 
-    /* ===== ADVANCED EPIC COUNTDOWN SCREEN ===== */
+    /* ===== NEW: CINEMATIC COUNTDOWN SCREEN ===== */
     #countdown-screen {
       position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
+      top: 50%;
+      left: 50%;
+      transform: translate3d(-50%, -50%, 0);
       z-index: 60;
       display: none;
       font-family: 'Cinzel', serif;
-      color: transparent;
-      -webkit-text-stroke: 2px var(--gold-1);
-      /* Golden gradient text */
-      background: linear-gradient(180deg, var(--gold-2), var(--gold-1));
+      font-size: clamp(150px, 35vw, 350px);
+      font-weight: 800;
+      /* Beautiful Solid Gold Gradient */
+      background: linear-gradient(180deg, var(--gold-2) 0%, var(--gold-1) 100%);
       -webkit-background-clip: text;
       background-clip: text;
-      font-size: clamp(150px, 40vw, 350px);
-      font-weight: 800;
+      color: transparent;
       pointer-events: none;
       will-change: transform, opacity, filter;
     }
     
-    .countdown-pop {
-        /* Triggers the exact moment JS updates the number */
-        animation: countdownPop 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
+    .countdown-anim {
+      animation: cinematicCount 1s cubic-bezier(0.19, 1, 0.22, 1) forwards !important;
     }
-    
-    @keyframes countdownPop {
-        0% { transform: translate(-50%, -50%) scale(0.3); opacity: 0; filter: blur(10px); }
-        40% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; filter: blur(0px); }
-        100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; filter: blur(20px); }
+
+    @keyframes cinematicCount {
+      0% { transform: translate3d(-50%, -50%, -100px) scale(0.5); opacity: 0; filter: blur(15px); }
+      25% { transform: translate3d(-50%, -50%, 0) scale(1.1); opacity: 1; filter: blur(0px); text-shadow: 0 10px 40px rgba(191, 149, 63, 0.6); }
+      100% { transform: translate3d(-50%, -50%, 100px) scale(1.8); opacity: 0; filter: blur(20px); }
     }
 
     /* ===== PERFECTLY POSITIONED REVEAL SCREEN ===== */
@@ -472,39 +479,34 @@
       #reveal-screen { justify-content: center; padding-top: 0; }
     }
     
-    /* ADVANCED CINEMATIC SUBTITLE: 3D Flip down + Light Sweep */
     #reveal-subtitle {
       font-family: 'Cinzel', serif;
       font-weight: 400;
       font-size: clamp(16px, 4vw, 32px);
-      /* Static letter spacing to prevent mobile layout thrashing */
-      letter-spacing: clamp(4px, 2vw, 12px); 
+      letter-spacing: clamp(2px, 1vw, 6px); 
+      color: var(--gold-2);
       margin-bottom: 40px;
       text-transform: uppercase;
-      text-align: center;
-      
-      /* High-performance Gold Shimmer Sweep */
-      background: linear-gradient(90deg, var(--gold-3) 0%, var(--gold-2) 40%, #fff 50%, var(--gold-2) 60%, var(--gold-3) 100%);
-      background-size: 200% auto;
-      color: transparent;
-      -webkit-background-clip: text;
-      background-clip: text;
-      
       opacity: 0;
-      transform: translate3d(0, 40px, -100px) rotateX(-60deg);
-      will-change: transform, opacity, background-position;
+      transform: translate3d(0, -20px, 0);
+      text-shadow: 0 5px 20px rgba(0,0,0,0.9);
+      text-align: center;
+      will-change: transform, opacity;
     }
     
     .subtitle-show { 
         animation: 
-            cinematicSettle 2s cubic-bezier(0.25, 1, 0.5, 1) forwards,
-            shimmerSweep 4s linear infinite 2s; 
+            cinematicSettle 2.5s var(--ease-out-expo) forwards,
+            goldSweep 4s infinite linear 2.5s; 
     }
     @keyframes cinematicSettle {
-        to { opacity: 1; transform: translate3d(0, 0, 0) rotateX(0deg); }
+        0% { opacity: 0; transform: translate3d(0, -40px, 0) scale(1.1); filter: blur(8px); }
+        100% { opacity: 1; transform: translate3d(0, -20px, 0) scale(1); filter: blur(0px); text-shadow: 0 5px 20px rgba(0,0,0,0.9); }
     }
-    @keyframes shimmerSweep {
-        to { background-position: 200% center; }
+    @keyframes goldSweep {
+        0%, 20% { text-shadow: 0 5px 20px rgba(0,0,0,0.9); color: var(--gold-2); }
+        50% { text-shadow: 0 5px 30px rgba(253, 245, 201, 0.8), 0 0 20px #fff; color: #fff; }
+        80%, 100% { text-shadow: 0 5px 20px rgba(0,0,0,0.9); color: var(--gold-2); }
     }
 
     /* ===== SMART ANIMATION NAME CONTAINER ===== */
@@ -528,8 +530,6 @@
         overflow: hidden;
         display: flex;
         align-items: center;
-        padding: 20px 0;
-        margin: -20px 0;
     }
 
     .letter {
@@ -538,7 +538,7 @@
       font-weight: 800;
       color: var(--gold-2);
       -webkit-font-smoothing: antialiased;
-      will-change: transform, opacity, color, text-shadow;
+      will-change: transform, opacity, color, text-shadow, filter;
       text-shadow: 
         0 1px 0 #b38728, 0 2px 0 #9f7622, 0 3px 0 #8c661c,
         0 15px 25px rgba(0,0,0,0.8);
@@ -560,7 +560,6 @@
 
     .is-name { opacity: 0; margin-left: clamp(2px, 1.5vw, 15px); }
 
-    /* Highly Optimized Reveal Flash */
     @keyframes popFlash {
         0% { opacity: 0; transform: translate3d(0, 50px, -150px) rotateX(-70deg) scale(0.8); color: transparent; text-shadow: 0 0 40px rgba(253, 245, 201, 0); filter: blur(12px); }
         50% { opacity: 1; transform: translate3d(0, -10px, 30px) rotateX(10deg) scale(1.1); color: #fff; text-shadow: 0 0 50px rgba(253, 245, 201, 1), 0 10px 20px rgba(0,0,0,0.8); filter: blur(0px); }
@@ -710,7 +709,7 @@
   <div id="countdown-screen" aria-live="assertive" aria-atomic="true">5</div>
 
   <div id="reveal-screen" aria-hidden="true">
-    <h3 id="reveal-subtitle">Welcome To The World</h3>
+    <h3 id="reveal-subtitle" class="gold-shimmer">Welcome To The World</h3>
     <div class="name-container" id="baby-name" aria-hidden="true"></div>
     
     <div id="baby-girl-container">
@@ -813,12 +812,9 @@
         if (startY === 0) return;
         const diff = y - startY;
         if (diff > 0) {
-            // Realistic iOS rubber-band math
             currentPull = Math.pow(diff, 0.8) * 1.5; 
-            
             ptrWrapper.style.transform = `translate3d(-50%, calc(-50px + ${currentPull}px), 0)`;
             ptrIcon.style.transform = `rotate(${currentPull * 2.5}deg)`;
-
             if (currentPull > ptrThreshold) {
                 ptrWrapper.classList.add('ready');
             } else {
@@ -867,7 +863,7 @@
         handleDragEnd();
     });
 
-    /* ===== ORGANIC PHYSICS FIREFLY CANVAS ===== */
+    /* ===== OPTIMIZED FIREFLY CANVAS ===== */
     let animationId = null;
     let particlesArray = [];
     let canvasCtx = null;
@@ -1029,29 +1025,31 @@
       countdownInterval = setInterval(updateOnce, 1000);
     }
 
+    /* ===== NEW: CINEMATIC COUNTDOWN ===== */
     function startFinalCountdown() {
       if (elements.countdownScreen) elements.countdownScreen.style.display = 'block';
       let count = 5;
       
-      // Force instant display of '5'
       if (elements.countdownScreen) {
           elements.countdownScreen.textContent = String(count);
-          elements.countdownScreen.classList.add('countdown-pop');
+          elements.countdownScreen.classList.add('countdown-anim');
       }
 
       finalTimer = setInterval(() => {
         count--;
         if (count > 0) {
           if (elements.countdownScreen) {
-             // Retrigger the CSS animation cleanly
-             elements.countdownScreen.classList.remove('countdown-pop');
+             elements.countdownScreen.classList.remove('countdown-anim');
              void elements.countdownScreen.offsetWidth; 
-             elements.countdownScreen.classList.add('countdown-pop');
+             elements.countdownScreen.classList.add('countdown-anim');
              elements.countdownScreen.textContent = String(count);
           }
         } else {
           clearInterval(finalTimer);
-          if (elements.countdownScreen) elements.countdownScreen.style.display = 'none';
+          if (elements.countdownScreen) {
+              elements.countdownScreen.style.display = 'none';
+              elements.countdownScreen.classList.remove('countdown-anim');
+          }
           triggerGrandReveal();
         }
       }, 1000);
