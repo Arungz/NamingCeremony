@@ -272,7 +272,7 @@
     }
     @keyframes fadeInOut { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
 
-    /* ===== PERFECTLY SCALED TIMER SCREEN (NO WRAP) ===== */
+    /* ===== BULLETPROOF GRID TIMER FOR MOBILE ===== */
     #timer-screen {
       position: absolute;
       z-index: 50;
@@ -286,7 +286,7 @@
     }
     #timer-title {
       font-family: 'Cinzel', serif;
-      font-size: clamp(16px, 4vw, 36px);
+      font-size: clamp(18px, 4vw, 36px);
       margin-bottom: clamp(20px, 4vw, 50px);
       letter-spacing: clamp(3px, 1vw, 6px);
       text-transform: uppercase;
@@ -294,20 +294,19 @@
       white-space: nowrap;
     }
     
-    /* Forces timer to stay on one line across all phones */
+    /* Strict 4-column Grid ensures it perfectly fits any device width */
     .timer-box { 
-      display: flex; 
-      gap: clamp(5px, 2vw, 24px); 
+      display: grid; 
+      grid-template-columns: repeat(4, 1fr); 
+      gap: clamp(8px, 2vw, 24px); 
       justify-content: center; 
-      flex-wrap: nowrap; 
       width: 100%;
-      max-width: 100vw;
+      max-width: 600px;
+      margin: 0 auto;
       padding: 0 10px;
     }
     
     .time-unit {
-      flex: 1 1 0; /* Allows flexible shrinking */
-      min-width: 0; 
       background: var(--glass);
       backdrop-filter: blur(20px) saturate(120%);
       -webkit-backdrop-filter: blur(20px) saturate(120%);
@@ -315,19 +314,20 @@
       border-left: 1px solid rgba(255, 255, 255, 0.05);
       border-bottom: 1px solid rgba(0, 0, 0, 0.6);
       border-right: 1px solid rgba(0, 0, 0, 0.6);
-      padding: clamp(10px, 3vw, 30px) clamp(5px, 1vw, 20px);
+      padding: clamp(15px, 3vw, 30px) clamp(5px, 1vw, 20px);
       border-radius: 12px;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+      text-align: center;
     }
     .time-unit div { 
       font-weight: 300; 
-      font-size: clamp(22px, 7vw, 75px); 
+      font-size: clamp(24px, 6vw, 75px); 
       line-height: 1; 
       text-shadow: 0 4px 10px rgba(0,0,0,0.6);
     }
     .time-unit span { 
       display: block; 
-      font-size: clamp(8px, 2.5vw, 12px); 
+      font-size: clamp(9px, 2vw, 12px); 
       color: var(--gold-1); 
       margin-top: clamp(8px, 2vw, 15px); 
       letter-spacing: clamp(1px, 0.5vw, 3px); 
@@ -362,7 +362,7 @@
       display: none; 
       flex-direction: column;
       
-      /* Default Mobile/Tablet: Top alignment */
+      /* Mobile & Tablet Default: Locked to the top */
       justify-content: flex-start; 
       padding-top: 18vh; 
       
@@ -382,7 +382,7 @@
     #reveal-subtitle {
       font-family: 'Cinzel', serif;
       font-weight: 400;
-      font-size: clamp(14px, 4vw, 32px);
+      font-size: clamp(16px, 4vw, 32px);
       letter-spacing: clamp(4px, 2vw, 12px);
       color: var(--gold-2);
       margin-bottom: 40px;
@@ -400,7 +400,7 @@
         to { opacity: 1; transform: translateY(0) scale(1); } 
     }
 
-    /* ===== SMART ANIMATION NAME CONTAINER ===== */
+    /* ===== THE SMART ANIMATION CONTAINER ===== */
     .name-container { 
       display: flex; 
       justify-content: center; 
@@ -425,7 +425,7 @@
 
     .letter {
       font-family: 'Cinzel', serif;
-      font-size: clamp(24px, 9vw, 140px); /* Smart scaling prevents overflow */
+      font-size: clamp(30px, 10vw, 140px); 
       font-weight: 800;
       color: var(--gold-2);
       -webkit-font-smoothing: antialiased;
@@ -447,7 +447,7 @@
 
     .is-name {
       opacity: 0;
-      margin-left: clamp(1px, 1vw, 15px);
+      margin-left: clamp(2px, 1.5vw, 15px);
     }
 
     @keyframes popFlash {
@@ -456,29 +456,29 @@
         100% { opacity: 1; transform: translateZ(0) scale(1) rotateX(0deg); filter: brightness(1); color: var(--gold-2); }
     }
 
-    /* ===== ANIMATED BABY GIRL CSS & SVG ===== */
+    /* ===== NEW: SUPER CUTE KAWAII BABY GIRL SVG ===== */
     #baby-girl-container {
         position: relative;
-        margin-top: 40px;
-        transform: translateX(-150vw); /* Hidden off-screen left initially */
-        width: 150px;
-        height: 150px;
+        margin-top: 30px;
+        transform: translateX(-150vw); 
+        width: 120px;
+        height: 120px;
         opacity: 0;
         transition: transform 2s cubic-bezier(0.25, 1, 0.5, 1), opacity 1.5s ease;
         display: flex;
         justify-content: center;
     }
     #baby-girl-container.slide-in {
-        transform: translateX(0); /* Slides into place perfectly below the name */
+        transform: translateX(0); 
         opacity: 1;
     }
     
     .waving-arm {
-        transform-origin: 135px 140px; /* Pivot point at the shoulder */
+        transform-origin: 135px 125px; /* Perfect pivot for wave */
         animation: wave-hand 0.8s infinite alternate ease-in-out;
     }
     @keyframes wave-hand {
-        0% { transform: rotate(-15deg); }
+        0% { transform: rotate(-10deg); }
         100% { transform: rotate(30deg); }
     }
 
@@ -493,6 +493,7 @@
         100% { transform: translateY(-120vh) translateX(var(--drift)) rotate(15deg); opacity: 0; }
     }
 
+    /* ===== REDUCED MOTION ===== */
     @media (prefers-reduced-motion: reduce) {
       .gold-shimmer, #letter-N::after, .click-hint, #countdown-screen, .letter, .gate, #scene-container, .balloon-anim, .subtitle-show, #baby-girl-container, .waving-arm {
         animation-duration: 0.001ms !important;
@@ -543,35 +544,34 @@
         <svg width="150" height="150" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
             <defs>
                 <radialGradient id="blush" cx="50%" cy="50%" r="50%">
-                    <stop offset="0%" stop-color="#ff9999" stop-opacity="0.8"/>
-                    <stop offset="100%" stop-color="#ff9999" stop-opacity="0"/>
+                    <stop offset="0%" stop-color="#ffb6c1" stop-opacity="0.8"/>
+                    <stop offset="100%" stop-color="#ffb6c1" stop-opacity="0"/>
                 </radialGradient>
             </defs>
-            <path d="M 60,200 C 60,120 140,120 140,200" fill="#fce4ec" stroke="#f8bbd0" stroke-width="4"/>
-            <path d="M 80,135 Q 100,150 120,135" fill="none" stroke="#f8bbd0" stroke-width="3"/> 
-            
-            <path d="M 65,140 Q 40,160 55,190" stroke="#ffe0bd" stroke-width="14" stroke-linecap="round" fill="none"/>
+
+            <path d="M 60,180 C 60,130 140,130 140,180 Z" fill="#fce4ec"/>
+            <path d="M 70,140 Q 100,160 130,140" fill="none" stroke="#f8bbd0" stroke-width="4" stroke-linecap="round"/>
             
             <g class="waving-arm">
-                <path d="M 135,140 Q 165,120 165,90" stroke="#ffe0bd" stroke-width="14" stroke-linecap="round" fill="none"/>
-                <circle cx="165" cy="90" r="7" fill="#ffe0bd"/> 
+                <path d="M 135,135 Q 170,100 160,80" stroke="#ffe0bd" stroke-width="14" stroke-linecap="round" fill="none"/>
             </g>
             
-            <circle cx="100" cy="90" r="45" fill="#ffe0bd"/>
+            <circle cx="100" cy="100" r="40" fill="#ffe0bd"/>
             
-            <path d="M 55,90 Q 55,40 100,45 Q 145,40 145,90 Q 130,40 100,45 Q 70,40 55,90 Z" fill="#3e2723"/>
-            <circle cx="55" cy="80" r="15" fill="#3e2723"/>
-            <circle cx="145" cy="80" r="15" fill="#3e2723"/>
-            <path d="M 45,75 L 65,85 L 65,75 L 45,85 Z" fill="#ff4081"/>
-            <path d="M 135,75 L 155,85 L 155,75 L 135,85 Z" fill="#ff4081"/>
+            <path d="M 85,65 Q 100,45 115,65 Q 100,55 85,65" fill="#5d4037"/>
+            <path d="M 95,60 Q 105,35 110,60" fill="#5d4037"/>
+
+            <path d="M 115,55 L 130,45 L 130,65 Z" fill="#ff4081"/>
+            <path d="M 115,55 L 100,45 L 100,65 Z" fill="#ff4081"/>
+            <circle cx="115" cy="55" r="4" fill="#c2185b"/>
             
-            <path d="M 80,85 Q 85,80 90,85" stroke="#3e2723" stroke-width="3" stroke-linecap="round" fill="none"/>
-            <path d="M 110,85 Q 115,80 120,85" stroke="#3e2723" stroke-width="3" stroke-linecap="round" fill="none"/>
+            <path d="M 80,105 Q 87,97 94,105" stroke="#5d4037" stroke-width="3" stroke-linecap="round" fill="none"/>
+            <path d="M 106,105 Q 113,97 120,105" stroke="#5d4037" stroke-width="3" stroke-linecap="round" fill="none"/>
             
-            <circle cx="75" cy="95" r="8" fill="url(#blush)"/>
-            <circle cx="125" cy="95" r="8" fill="url(#blush)"/>
+            <circle cx="75" cy="112" r="7" fill="url(#blush)"/>
+            <circle cx="125" cy="112" r="7" fill="url(#blush)"/>
             
-            <path d="M 92,100 Q 100,115 108,100" stroke="#d81b60" stroke-width="3" stroke-linecap="round" fill="none"/>
+            <path d="M 96,115 Q 100,122 104,115" stroke="#d81b60" stroke-width="2.5" stroke-linecap="round" fill="none"/>
         </svg>
     </div>
   </div>
@@ -914,10 +914,10 @@
               setTimeout(() => { 
                   fireFourCornerBlast(); 
                   
-                  // Launch Balloons (they take ~8.5 seconds max)
+                  // Launch Balloons 
                   fireHeartBalloons();
                   
-                  // NEW: Slide the Baby Girl in 7.5 seconds later!
+                  // Wave Hello! 7.5s after balloons launch, slide the cute baby in
                   setTimeout(() => {
                       const babyGirl = qs('#baby-girl-container');
                       if(babyGirl) babyGirl.classList.add('slide-in');
@@ -991,7 +991,7 @@
                 container.appendChild(balloonWrapper);
                 
                 setTimeout(() => balloonWrapper.remove(), 8500); 
-            }, Math.random() * 2500); // Shorter spawn duration so they clear the screen quicker
+            }, Math.random() * 2500); 
         }
     }
 
