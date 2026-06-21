@@ -56,10 +56,19 @@
       --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+      /* Absolute fix for mobile tap highlights */
+      -webkit-tap-highlight-color: transparent !important;
+      outline: none !important;
+    }
     
     html, body { 
       height: 100%; 
+      /* Modern Mobile Fix: Dynamic Viewport Height prevents jumping */
+      height: 100dvh; 
       overflow: hidden; 
       background-color: var(--bg);
       touch-action: pan-y;
@@ -71,14 +80,14 @@
       color: #fff;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
       display: flex;
       justify-content: center;
       align-items: center;
       padding-top: var(--safe-area-top);
       padding-bottom: var(--safe-area-bottom);
-      perspective: 1200px; /* Enhanced perspective for 3D depth */
+      perspective: 1200px; 
       user-select: none; 
-      -webkit-tap-highlight-color: transparent; 
     }
 
     body::before {
@@ -95,7 +104,7 @@
         position: fixed;
         top: 50%; left: 50%;
         width: 100vw; height: 100vh;
-        background: radial-gradient(circle, rgba(191, 149, 63, 0.05) 0%, transparent 60%);
+        background: radial-gradient(circle, rgba(191, 149, 63, 0.06) 0%, transparent 65%);
         transform: translate3d(-50%, -50%, 0);
         z-index: 2; 
         pointer-events: none;
@@ -139,9 +148,10 @@
         height: 50px;
         background: rgba(20, 20, 20, 0.8);
         backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
         border: 1px solid var(--gold-1);
         border-radius: 50%;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.8), 0 0 0px rgba(212, 175, 55, 0);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.8);
         transition: box-shadow 0.3s ease, background 0.3s ease;
         pointer-events: none;
         will-change: transform;
@@ -175,7 +185,6 @@
       transition: opacity 1.5s ease;
     }
 
-    /* ADVANCED: Depth-of-Field Blur on Gate Opening */
     .gate {
       position: absolute;
       top: 0;
@@ -188,6 +197,7 @@
       overflow: hidden;
       will-change: transform, opacity, filter;
       backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
     }
 
     .gate::before {
@@ -236,12 +246,11 @@
       text-shadow: 0 0 20px rgba(253, 245, 201, 0.6), 0 0 40px rgba(191, 149, 63, 0.4);
       cursor: pointer;
       animation: invitePulse 2.5s infinite alternate ease-in-out;
-      transition: all 0.4s var(--ease-spring);
+      transition: transform 0.4s var(--ease-spring), box-shadow 0.4s ease, background 0.4s ease;
       font-weight: 700;
       position: relative;
       z-index: 103;
-      outline: none;
-      will-change: transform, box-shadow, filter;
+      will-change: transform, box-shadow;
     }
     
     #letter-N::before {
@@ -291,7 +300,6 @@
     #letter-N:hover::before, #letter-N:active::before,
     #letter-N:hover::after, #letter-N:active::after { display: none; }
 
-    /* ADVANCED: Implosion to Explosion Seal Shatter */
     #letter-N.shatter {
         animation: epicShatter 1.2s var(--ease-in-out-circ) forwards;
         pointer-events: none;
@@ -369,7 +377,6 @@
       perspective: 1000px;
     }
     
-    /* ADVANCED: 3D Flip-Down Timer Units */
     .time-unit {
       flex: 1 1 0px; 
       min-width: 0; 
@@ -386,12 +393,15 @@
       text-align: center;
       
       opacity: 0;
+      /* Mobile fix: Use translate3d and keep backface hidden for smooth 3D */
       transform: translate3d(0, -30px, -50px) rotateX(45deg);
       transition: opacity 0.6s ease, transform 1s var(--ease-spring);
       position: relative;
       overflow: hidden; 
       will-change: transform, opacity;
       transform-style: preserve-3d;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
     }
     
     .time-unit::after {
@@ -418,6 +428,7 @@
       font-size: clamp(20px, 5.5vw, 65px); 
       line-height: 1; 
       text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+      transform: translateZ(0); /* Force GPU text rendering */
     }
     .time-unit span { 
       display: block; 
@@ -429,7 +440,7 @@
       font-family: 'Cinzel', serif;
     }
 
-    /* ===== HEARTBEAT COUNTDOWN SCREEN ===== */
+    /* ===== REALISTIC DOUBLE HEARTBEAT COUNTDOWN ===== */
     #countdown-screen {
       position: absolute;
       z-index: 60;
@@ -439,13 +450,16 @@
       -webkit-text-stroke: 2px var(--gold-1);
       font-size: clamp(120px, 30vw, 320px);
       pointer-events: none;
-      animation: heartbeatPulse 1s infinite var(--ease-out-expo);
+      /* Realistic double heartbeat sequence */
+      animation: doubleHeartbeat 1s infinite linear;
       will-change: transform, opacity, text-shadow;
     }
-    @keyframes heartbeatPulse {
+    @keyframes doubleHeartbeat {
       0% { transform: scale(0.8); opacity: 0; }
-      20% { transform: scale(1.1); opacity: 1; text-shadow: 0 0 60px rgba(191, 149, 63, 0.5), 0 0 15px rgba(253, 245, 201, 0.6); }
-      100% { transform: scale(1.5); opacity: 0; text-shadow: 0 0 60px rgba(191, 149, 63, 0), 0 0 30px rgba(253, 245, 201, 0); }
+      15% { transform: scale(1.15); opacity: 1; text-shadow: 0 0 60px rgba(191, 149, 63, 0.6); }
+      30% { transform: scale(1.05); opacity: 0.8; text-shadow: 0 0 30px rgba(191, 149, 63, 0.4); }
+      45% { transform: scale(1.2); opacity: 1; text-shadow: 0 0 80px rgba(191, 149, 63, 0.8), 0 0 20px rgba(253, 245, 201, 0.6); }
+      100% { transform: scale(1.6); opacity: 0; text-shadow: 0 0 0 transparent; }
     }
 
     /* ===== PERFECTLY POSITIONED REVEAL SCREEN ===== */
@@ -470,15 +484,17 @@
       font-family: 'Cinzel', serif;
       font-weight: 400;
       font-size: clamp(16px, 4vw, 32px);
+      letter-spacing: clamp(2px, 1vw, 6px); 
       color: var(--gold-2);
       margin-bottom: 40px;
       text-transform: uppercase;
       opacity: 0;
+      transform: translate3d(0, -20px, 0);
+      text-shadow: 0 5px 20px rgba(0,0,0,0.9);
       text-align: center;
-      will-change: transform, opacity, letter-spacing, text-shadow;
+      will-change: transform, opacity, letter-spacing;
     }
     
-    /* ADVANCED: Cinematic Settle & Gold Sweep */
     .subtitle-show { 
         animation: 
             cinematicSettle 2.5s var(--ease-out-expo) forwards,
@@ -501,6 +517,7 @@
       align-items: center;
       white-space: nowrap; 
       max-width: 95vw;
+      transform-style: preserve-3d;
     }
     
     .rest-part-wrapper {
@@ -515,6 +532,9 @@
         overflow: hidden;
         display: flex;
         align-items: center;
+        /* Padding prevents box-shadow clipping during animation */
+        padding: 20px 0;
+        margin: -20px 0;
     }
 
     .letter {
@@ -523,10 +543,12 @@
       font-weight: 800;
       color: var(--gold-2);
       -webkit-font-smoothing: antialiased;
-      will-change: transform, opacity, color, text-shadow, filter;
+      will-change: transform, opacity, color, text-shadow;
       text-shadow: 
         0 1px 0 #b38728, 0 2px 0 #9f7622, 0 3px 0 #8c661c,
         0 15px 25px rgba(0,0,0,0.8);
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
     }
 
     .initial-part {
@@ -534,7 +556,6 @@
       transform: translate3d(0, 50px, -200px) rotateX(-70deg) scale(0.8);
       transition: transform 1.2s var(--ease-spring), opacity 1s ease, filter 1s ease;
       filter: blur(10px);
-      backface-visibility: hidden;
     }
     .initial-part.show { 
       opacity: 1; 
@@ -544,14 +565,13 @@
 
     .is-name { opacity: 0; margin-left: clamp(2px, 1.5vw, 15px); }
 
-    /* ADVANCED: Majestic Tumble and Flash */
     @keyframes popFlash {
         0% { opacity: 0; transform: translate3d(0, 50px, -150px) rotateX(-70deg) scale(0.8); color: transparent; text-shadow: 0 0 40px rgba(253, 245, 201, 0); filter: blur(12px); }
         50% { opacity: 1; transform: translate3d(0, -10px, 30px) rotateX(10deg) scale(1.1); color: #fff; text-shadow: 0 0 50px rgba(253, 245, 201, 1), 0 10px 20px rgba(0,0,0,0.8); filter: blur(0px); }
         100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1) rotateX(0deg); color: var(--gold-2); text-shadow: 0 1px 0 #b38728, 0 2px 0 #9f7622, 0 3px 0 #8c661c, 0 15px 25px rgba(0,0,0,0.8); filter: blur(0px); }
     }
 
-    /* ===== ADVANCED KAWAII BABY GIRL SVG & SPARKLES ===== */
+    /* ===== LIFELIKE KAWAII BABY GIRL SVG & SPARKLES ===== */
     #baby-girl-container {
         position: relative;
         margin-top: 30px;
@@ -592,6 +612,25 @@
         100% { transform: rotate(35deg); }
     }
 
+    /* NEW: Realistic Eye Blinking & Head Bobbing */
+    .eyes {
+        transform-origin: 100px 98px;
+        animation: blink 4s infinite;
+    }
+    @keyframes blink {
+        0%, 96%, 98%, 100% { transform: scaleY(1); }
+        97% { transform: scaleY(0.1); }
+    }
+    
+    .head-group {
+        transform-origin: 100px 140px;
+        animation: headBob 3s infinite alternate ease-in-out;
+    }
+    @keyframes headBob {
+        0% { transform: rotate(-2deg); }
+        100% { transform: rotate(3deg); }
+    }
+
     .sparkle {
         position: absolute;
         font-size: clamp(14px, 3vw, 20px);
@@ -623,7 +662,7 @@
         0% { transform: translate3d(0, 0, 0); opacity: 0; }
         10% { opacity: 1; }
         90% { opacity: 1; }
-        100% { transform: translate3d(var(--drift), -120vh, 0); opacity: 0; }
+        100% { transform: translate3d(var(--drift), -120dvh, 0); opacity: 0; }
     }
     @keyframes swayBalloon {
         0% { transform: rotate(-8deg); }
@@ -696,24 +735,28 @@
                 <circle cx="160" cy="95" r="6" fill="#ffe0bd"/>
             </g>
             
-            <circle cx="100" cy="95" r="45" fill="#ffe0bd"/>
-            
-            <ellipse cx="72" cy="108" rx="8" ry="5" fill="#ff80ab" opacity="0.7"/>
-            <ellipse cx="128" cy="108" rx="8" ry="5" fill="#ff80ab" opacity="0.7"/>
-            
-            <circle cx="78" cy="98" r="6.5" fill="#3e2723"/>
-            <circle cx="76" cy="96" r="2.5" fill="#ffffff"/> 
-            <circle cx="122" cy="98" r="6.5" fill="#3e2723"/>
-            <circle cx="120" cy="96" r="2.5" fill="#ffffff"/> 
-            
-            <path d="M 94,112 Q 100,120 106,112" fill="none" stroke="#d81b60" stroke-width="2.5" stroke-linecap="round"/>
-            
-            <path d="M 55,95 C 55,30 145,30 145,95 C 145,65 120,45 100,45 C 80,45 55,65 55,95 Z" fill="#4e342e"/>
-            <path d="M 75,50 Q 100,75 112,50" fill="none" stroke="#4e342e" stroke-width="6" stroke-linecap="round"/>
-            
-            <path d="M 100,45 L 85,35 L 85,55 Z" fill="#ff4081"/>
-            <path d="M 100,45 L 115,35 L 115,55 Z" fill="#ff4081"/>
-            <circle cx="100" cy="45" r="5" fill="#c2185b"/>
+            <g class="head-group">
+                <circle cx="100" cy="95" r="45" fill="#ffe0bd"/>
+                
+                <ellipse cx="72" cy="108" rx="8" ry="5" fill="#ff80ab" opacity="0.7"/>
+                <ellipse cx="128" cy="108" rx="8" ry="5" fill="#ff80ab" opacity="0.7"/>
+                
+                <g class="eyes">
+                    <circle cx="78" cy="98" r="6.5" fill="#3e2723"/>
+                    <circle cx="76" cy="96" r="2.5" fill="#ffffff"/> 
+                    <circle cx="122" cy="98" r="6.5" fill="#3e2723"/>
+                    <circle cx="120" cy="96" r="2.5" fill="#ffffff"/> 
+                </g>
+                
+                <path d="M 94,112 Q 100,120 106,112" fill="none" stroke="#d81b60" stroke-width="2.5" stroke-linecap="round"/>
+                
+                <path d="M 55,95 C 55,30 145,30 145,95 C 145,65 120,45 100,45 C 80,45 55,65 55,95 Z" fill="#4e342e"/>
+                <path d="M 75,50 Q 100,75 112,50" fill="none" stroke="#4e342e" stroke-width="6" stroke-linecap="round"/>
+                
+                <path d="M 100,45 L 85,35 L 85,55 Z" fill="#ff4081"/>
+                <path d="M 100,45 L 115,35 L 115,55 Z" fill="#ff4081"/>
+                <circle cx="100" cy="45" r="5" fill="#c2185b"/>
+            </g>
         </svg>
     </div>
   </div>
@@ -758,7 +801,7 @@
       canvas: qs('#canvas-bg')
     };
 
-    /* ===== PULL TO REFRESH LOGIC ===== */
+    /* ===== PARABOLIC PULL TO REFRESH LOGIC ===== */
     let startY = 0;
     let currentPull = 0;
     const ptrWrapper = qs('#ptr-wrapper');
@@ -774,10 +817,14 @@
     function handleDragMove(y) {
         if (startY === 0) return;
         const diff = y - startY;
+        
         if (diff > 0) {
-            currentPull = diff * 0.4; 
+            // Realistic iOS rubber-band math
+            currentPull = Math.pow(diff, 0.8) * 1.5; 
+            
             ptrWrapper.style.transform = `translate3d(-50%, calc(-50px + ${currentPull}px), 0)`;
             ptrIcon.style.transform = `rotate(${currentPull * 2.5}deg)`;
+
             if (currentPull > ptrThreshold) {
                 ptrWrapper.classList.add('ready');
             } else {
@@ -789,6 +836,7 @@
     function handleDragEnd() {
         if (startY === 0) return;
         startY = 0;
+
         ptrWrapper.style.transition = 'transform 0.4s var(--ease-out-expo), box-shadow 0.3s ease, background 0.3s ease';
         ptrIcon.style.transition = 'transform 0.4s ease';
 
@@ -806,9 +854,11 @@
         if (e.touches.length > 1) return;
         handleDragStart(e.touches[0].clientY);
     }, { passive: true });
+    
     document.addEventListener('touchmove', e => {
         handleDragMove(e.touches[0].clientY);
     }, { passive: true });
+    
     document.addEventListener('touchend', handleDragEnd);
 
     let isMouseDown = false;
@@ -826,7 +876,7 @@
         handleDragEnd();
     });
 
-    /* ===== OPTIMIZED FIREFLY CANVAS ===== */
+    /* ===== ORGANIC PHYSICS FIREFLY CANVAS ===== */
     let animationId = null;
     let particlesArray = [];
     let canvasCtx = null;
@@ -843,15 +893,22 @@
           this.x = Math.random() * canvasWidth;
           this.y = Math.random() * canvasHeight;
           this.size = Math.random() * 1.5 + 0.5;
-          this.speedY = Math.random() * 0.2 - 0.1;
-          this.speedX = Math.random() * 0.2 - 0.1;
+          this.speedY = Math.random() * 0.15 - 0.075;
+          this.speedX = Math.random() * 0.15 - 0.075;
+          
           this.alpha = Math.random() * 0.5 + 0.1;
           this.alphaChange = (Math.random() * 0.01) + 0.005;
           if (Math.random() > 0.5) this.alphaChange *= -1;
+
+          // Trigonometric sway variables for realism
+          this.angle = Math.random() * Math.PI * 2;
+          this.angleSpeed = Math.random() * 0.02 + 0.01;
         }
         update() {
-          this.x += this.speedX;
-          this.y += this.speedY;
+          this.angle += this.angleSpeed;
+          this.x += this.speedX + Math.sin(this.angle) * 0.4;
+          this.y += this.speedY - Math.cos(this.angle) * 0.2;
+          
           if (this.y > canvasHeight) this.y = 0;
           if (this.y < 0) this.y = canvasHeight;
           if (this.x > canvasWidth) this.x = 0;
@@ -874,7 +931,8 @@
         }
       }
 
-      const particleCount = window.innerWidth < 600 ? 60 : 150;
+      // Automatically lower particle count on mobile to keep 60fps
+      const particleCount = window.innerWidth < 600 ? 50 : 120;
       particlesArray = [];
       for (let i = 0; i < particleCount; i++) particlesArray.push(new Particle());
 
@@ -1017,13 +1075,12 @@
 
       if (!reducedMotion) {
         elements.letterN.classList.add('shatter');
-        elements.sealAura.classList.add('explode');
       }
 
       setTimeout(() => {
         elements.gateLeft?.classList.add('open-left');
         elements.gateRight?.classList.add('open-right');
-      }, 400); 
+      }, 300); 
 
       setTimeout(() => {
         if(elements.sceneContainer) {
@@ -1101,7 +1158,7 @@
         const timeLeft = (Date.now() + 4000) - Date.now();
         if (timeLeft <= 0) return clearInterval(interval);
 
-        const pCount = window.innerWidth < 600 ? 5 : 8; 
+        const pCount = window.innerWidth < 600 ? 4 : 8; 
         const cColors = ['#d4af37', '#e6ca7b', '#ffffff'];
         const settings = { particleCount: pCount, spread: 45, colors: cColors, zIndex: 80, gravity: 1.1, shapes: ['square', 'circle'] };
 
@@ -1122,7 +1179,7 @@
         container.style.overflow = 'hidden';
         document.body.appendChild(container);
 
-        const maxBalloons = window.innerWidth < 600 ? 15 : 25;
+        const maxBalloons = window.innerWidth < 600 ? 12 : 25;
         let htmlStr = '';
         const delays = [];
         
