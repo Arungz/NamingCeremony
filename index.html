@@ -38,7 +38,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Cinzel+Decorative:wght@700&family=Montserrat:wght@200;300;400&display=swap" rel="stylesheet" />
 
   <style>
-    /* ===== VARIABLES & HARDWARE ACCELERATION ===== */
+    /* ===== VARIABLES & CORE RESETS ===== */
     :root {
       --bg: #050505;
       --gold-1: #bf953f;
@@ -46,7 +46,6 @@
       --gold-3: #b38728;
       --muted: rgba(255, 255, 255, 0.5);
       --glass: rgba(20, 20, 20, 0.4);
-      --glass-border: rgba(191, 149, 63, 0.3);
       --safe-area-top: env(safe-area-inset-top);
       --safe-area-bottom: env(safe-area-inset-bottom);
       
@@ -56,7 +55,13 @@
       --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+      -webkit-tap-highlight-color: transparent !important;
+      outline: none !important;
+    }
     
     html, body { 
       height: 100%; 
@@ -72,15 +77,13 @@
       color: #fff;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
-      text-rendering: optimizeLegibility;
       display: flex;
       justify-content: center;
       align-items: center;
       padding-top: var(--safe-area-top);
       padding-bottom: var(--safe-area-bottom);
-      perspective: 1200px; 
+      perspective: 1500px; 
       user-select: none; 
-      -webkit-tap-highlight-color: transparent; 
     }
 
     body::before {
@@ -164,7 +167,7 @@
     .ptr-spin { animation: fastSpin 0.5s linear infinite !important; }
     @keyframes fastSpin { 100% { transform: rotate(360deg); } }
 
-    /* ===== CINEMATIC INTRO CONTAINER ===== */
+    /* ===== CINEMATIC 3D INTRO CONTAINER ===== */
     #scene-container {
       position: fixed;
       inset: 0;
@@ -176,16 +179,18 @@
       transform-style: preserve-3d;
       will-change: transform, opacity;
       transition: opacity 1.5s ease;
+      perspective: 2000px; /* Deep perspective for the massive doors */
     }
 
+    /* ADVANCED: 3D Swinging Doors */
     .gate {
       position: absolute;
       top: 0;
       width: 50%;
       height: 100%;
       background: linear-gradient(135deg, #0a0a0a, #000);
-      box-shadow: 0 0 30px rgba(0,0,0,0.9);
-      transition: transform 2.2s var(--ease-in-out-circ), opacity 2s ease, filter 2.2s ease;
+      box-shadow: inset 0 0 50px rgba(0,0,0,1);
+      transition: transform 2.5s var(--ease-in-out-circ), opacity 2.5s ease, filter 2.5s ease;
       z-index: 101;
       overflow: hidden;
       will-change: transform, opacity, filter;
@@ -209,8 +214,9 @@
     .gate.left { left: 0; border-right: 2px solid var(--gold-1); transform-origin: left center; }
     .gate.right { right: 0; border-left: 2px solid var(--gold-1); transform-origin: right center; }
     
-    .gate.open-left { transform: translate3d(-100%, 0, 0) scale(1.05); opacity: 0; filter: blur(15px); }
-    .gate.open-right { transform: translate3d(100%, 0, 0) scale(1.05); opacity: 0; filter: blur(15px); }
+    /* Swinging Open 90 Degrees in 3D Space */
+    .gate.open-left { transform: rotateY(-95deg) scale(1.1); opacity: 0; filter: blur(15px); }
+    .gate.open-right { transform: rotateY(95deg) scale(1.1); opacity: 0; filter: blur(15px); }
 
     /* ===== MACHINED GOLD SEAL ===== */
     .seal-wrapper {
@@ -220,6 +226,7 @@
       flex-direction: column;
       align-items: center;
       gap: 1.4rem;
+      transition: transform 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
     #letter-N {
@@ -239,7 +246,7 @@
       text-shadow: 0 0 20px rgba(253, 245, 201, 0.6), 0 0 40px rgba(191, 149, 63, 0.4);
       cursor: pointer;
       animation: invitePulse 2.5s infinite alternate ease-in-out;
-      transition: transform 0.4s var(--ease-spring), box-shadow 0.4s ease, background 0.4s ease;
+      transition: all 0.4s var(--ease-spring);
       font-weight: 700;
       position: relative;
       z-index: 103;
@@ -332,7 +339,7 @@
     }
     @keyframes hintFade { 0% { opacity: 0.3; } 100% { opacity: 1; } }
 
-    /* ===== BULLETPROOF MOBILE TIMER SCREEN ===== */
+    /* ===== BULLETPROOF GRID TIMER SCREEN (BUG FIXED) ===== */
     #timer-screen {
       position: absolute;
       z-index: 50;
@@ -346,6 +353,7 @@
       width: 100%;
       padding: clamp(10px, 2vw, 20px);
       box-sizing: border-box;
+      perspective: 1200px;
     }
     
     #timer-title {
@@ -358,11 +366,12 @@
       white-space: nowrap;
     }
     
+    /* STRICT GRID prevents ANY wrapping on mobile devices */
     .timer-box { 
-      display: flex; 
-      gap: 8px; 
+      display: grid; 
+      grid-template-columns: repeat(4, 1fr);
+      gap: clamp(5px, 2vw, 20px); 
       justify-content: center; 
-      flex-wrap: nowrap; 
       width: 100%;
       max-width: 650px;
       padding: 0 10px;
@@ -370,8 +379,6 @@
     }
     
     .time-unit {
-      flex: 1 1 0px; 
-      min-width: 0; 
       background: var(--glass);
       backdrop-filter: blur(15px);
       -webkit-backdrop-filter: blur(15px);
@@ -379,16 +386,20 @@
       border-left: 1px solid rgba(255, 255, 255, 0.05);
       border-bottom: 1px solid rgba(0, 0, 0, 0.6);
       border-right: 1px solid rgba(0, 0, 0, 0.6);
-      padding: 15px 5px; 
+      padding: clamp(10px, 3vw, 20px) 2px; 
       border-radius: 12px;
       box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
       text-align: center;
+      
       opacity: 0;
-      transform: translate3d(0, 40px, 0) scale(0.9);
-      transition: opacity 0.6s ease, transform 0.8s var(--ease-out-expo);
+      transform: translate3d(0, -30px, -50px) rotateX(45deg);
+      transition: opacity 0.6s ease, transform 1s var(--ease-spring);
       position: relative;
       overflow: hidden; 
       will-change: transform, opacity;
+      transform-style: preserve-3d;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
     }
     
     .time-unit::after {
@@ -407,18 +418,19 @@
     
     .time-unit.show-unit {
         opacity: 1;
-        transform: translate3d(0, 0, 0) scale(1);
+        transform: translate3d(0, 0, 0) rotateX(0deg);
     }
     
     .time-unit div { 
       font-weight: 300; 
-      font-size: clamp(20px, 5.5vw, 65px); 
+      font-size: clamp(18px, 6vw, 65px); 
       line-height: 1; 
       text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+      transform: translateZ(0);
     }
     .time-unit span { 
       display: block; 
-      font-size: clamp(8px, 2vw, 12px); 
+      font-size: clamp(7px, 1.8vw, 12px); 
       color: var(--gold-1); 
       margin-top: 10px; 
       letter-spacing: clamp(1px, 0.5vw, 3px); 
@@ -426,33 +438,51 @@
       font-family: 'Cinzel', serif;
     }
 
-    /* ===== CINEMATIC COUNTDOWN SCREEN ===== */
+    /* ===== FLAWLESS CINEMATIC COUNTDOWN SCREEN (BUG FIXED) ===== */
     #countdown-screen {
       position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate3d(-50%, -50%, 0);
+      top: 0; left: 0; width: 100%; height: 100%;
       z-index: 60;
       display: none;
+      justify-content: center;
+      align-items: center;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    
+    .countdown-num {
+      position: absolute;
       font-family: 'Cinzel', serif;
-      font-size: clamp(150px, 35vw, 350px);
+      font-size: clamp(150px, 45vw, 400px);
       font-weight: 800;
       background: linear-gradient(180deg, var(--gold-2) 0%, var(--gold-1) 100%);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
-      pointer-events: none;
       will-change: transform, opacity, filter;
-    }
-    
-    .countdown-anim {
-      animation: cinematicCount 1s cubic-bezier(0.19, 1, 0.22, 1) forwards !important;
+      /* Guaranteed to fire perfectly every time via JS element creation */
+      animation: epicCount 1s var(--ease-out-expo) forwards;
     }
 
-    @keyframes cinematicCount {
-      0% { transform: translate3d(-50%, -50%, -100px) scale(0.5); opacity: 0; filter: blur(15px); }
-      25% { transform: translate3d(-50%, -50%, 0) scale(1.1); opacity: 1; filter: blur(0px); text-shadow: 0 10px 40px rgba(191, 149, 63, 0.6); }
-      100% { transform: translate3d(-50%, -50%, 100px) scale(1.8); opacity: 0; filter: blur(20px); }
+    @keyframes epicCount {
+      0% { transform: scale(0.2) translate3d(0,0,-200px); opacity: 0; filter: blur(20px); }
+      30% { transform: scale(1) translate3d(0,0,0); opacity: 1; filter: blur(0px); text-shadow: 0 0 50px rgba(191, 149, 63, 0.7); }
+      100% { transform: scale(2.5) translate3d(0,0,200px); opacity: 0; filter: blur(30px); }
+    }
+
+    /* Cinematic White Flash Transition */
+    #flash-overlay {
+        position: fixed;
+        inset: 0;
+        background: #fff;
+        z-index: 65;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 1.5s var(--ease-out-expo);
+    }
+    #flash-overlay.flash {
+        opacity: 1;
+        transition: opacity 0.2s ease;
     }
 
     /* ===== PERFECTLY POSITIONED REVEAL SCREEN ===== */
@@ -538,7 +568,7 @@
       font-weight: 800;
       color: var(--gold-2);
       -webkit-font-smoothing: antialiased;
-      will-change: transform, opacity, color, text-shadow;
+      will-change: transform, opacity, color, text-shadow, filter;
       text-shadow: 
         0 1px 0 #b38728, 0 2px 0 #9f7622, 0 3px 0 #8c661c,
         0 15px 25px rgba(0,0,0,0.8);
@@ -566,7 +596,7 @@
         100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1) rotateX(0deg); color: var(--gold-2); text-shadow: 0 1px 0 #b38728, 0 2px 0 #9f7622, 0 3px 0 #8c661c, 0 15px 25px rgba(0,0,0,0.8); filter: blur(0px); }
     }
 
-    /* ===== ADVANCED KAWAII BABY GIRL SVG & SPARKLES ===== */
+    /* ===== CUTE KAWAII BABY GIRL SVG (FIXED & BEAUTIFIED) ===== */
     #baby-girl-container {
         position: relative;
         margin-top: 30px;
@@ -598,7 +628,7 @@
     }
     
     .waving-arm {
-        transform-origin: 135px 125px; 
+        transform-origin: 130px 130px; /* Perfect shoulder pivot */
         animation: wave-hand 0.8s infinite alternate ease-in-out;
         will-change: transform;
     }
@@ -608,7 +638,7 @@
     }
 
     .eyes {
-        transform-origin: 100px 98px;
+        transform-origin: 100px 95px;
         animation: blink 4s infinite;
     }
     @keyframes blink {
@@ -617,7 +647,7 @@
     }
     
     .head-group {
-        transform-origin: 100px 140px;
+        transform-origin: 100px 130px;
         animation: headBob 3s infinite alternate ease-in-out;
     }
     @keyframes headBob {
@@ -638,7 +668,7 @@
         50% { opacity: 1; transform: scale(1.2) rotate(20deg); text-shadow: 0 0 10px #fdf5c9; }
     }
 
-    /* ===== HARDWARE ACCELERATED BALLOONS ===== */
+    /* ===== HARDWARE ACCELERATED FAN BALLOONS ===== */
     .balloon-anim {
         position: absolute;
         bottom: -200px;
@@ -676,8 +706,7 @@
 <body>
   
   <div class="ambient-light"></div>
-
-  <div id="ptr-wrapper">
+  <div id="flash-overlay"></div> <div id="ptr-wrapper">
       <svg id="ptr-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path d="M12 2.75a9.25 9.25 0 1 0 4.737 17.197l-1.373-1.637A7.25 7.25 0 1 1 19.25 12h-2.5l3.625 4.5L24 12h-2.75a9.25 9.25 0 0 0-9.25-9.25z"/>
       </svg>
@@ -706,7 +735,8 @@
     </div>
   </div>
 
-  <div id="countdown-screen" aria-live="assertive" aria-atomic="true">5</div>
+  <div id="countdown-screen" aria-live="assertive" aria-atomic="true">
+      </div>
 
   <div id="reveal-screen" aria-hidden="true">
     <h3 id="reveal-subtitle">Welcome To The World</h3>
@@ -719,37 +749,38 @@
         <div class="sparkle" style="top: -5px; right: 30px; animation-delay: 0.8s;">✨</div>
 
         <svg width="100%" height="100%" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-            <path d="M 65,190 C 65,135 135,135 135,190 Z" fill="#fff" stroke="#ff80ab" stroke-width="3"/>
-            <path d="M 65,185 Q 82.5,200 100,185 Q 117.5,200 135,185" fill="none" stroke="#ff80ab" stroke-width="4"/>
+            <path d="M 50,190 C 50,120 150,120 150,190 Z" fill="#ffffff" stroke="#ffb6c1" stroke-width="4"/>
+            <path d="M 60,150 Q 100,175 140,150" fill="none" stroke="#ffb6c1" stroke-width="3" stroke-linecap="round"/>
             
-            <path d="M 75,135 Q 60,150 65,170" fill="none" stroke="#ffe0bd" stroke-width="12" stroke-linecap="round"/>
+            <path d="M 70,135 Q 50,155 60,180" fill="none" stroke="#ffe0bd" stroke-width="14" stroke-linecap="round"/>
             
             <g class="waving-arm">
-                <path d="M 125,135 Q 155,120 160,95" fill="none" stroke="#ffe0bd" stroke-width="12" stroke-linecap="round"/>
-                <circle cx="160" cy="95" r="6" fill="#ffe0bd"/>
+                <path d="M 130,135 Q 165,110 155,80" fill="none" stroke="#ffe0bd" stroke-width="14" stroke-linecap="round"/>
+                <circle cx="155" cy="80" r="7" fill="#ffe0bd"/>
             </g>
             
             <g class="head-group">
-                <circle cx="100" cy="95" r="45" fill="#ffe0bd"/>
+                <circle cx="100" cy="90" r="48" fill="#ffe0bd"/>
                 
-                <ellipse cx="72" cy="108" rx="8" ry="5" fill="#ff80ab" opacity="0.7"/>
-                <ellipse cx="128" cy="108" rx="8" ry="5" fill="#ff80ab" opacity="0.7"/>
+                <ellipse cx="68" cy="105" rx="9" ry="5" fill="#ff99a8" opacity="0.6"/>
+                <ellipse cx="132" cy="105" rx="9" ry="5" fill="#ff99a8" opacity="0.6"/>
                 
                 <g class="eyes">
-                    <circle cx="78" cy="98" r="6.5" fill="#3e2723"/>
-                    <circle cx="76" cy="96" r="2.5" fill="#ffffff"/> 
-                    <circle cx="122" cy="98" r="6.5" fill="#3e2723"/>
-                    <circle cx="120" cy="96" r="2.5" fill="#ffffff"/> 
+                    <path d="M 60,95 Q 68,103 76,95" fill="none" stroke="#5d4037" stroke-width="3.5" stroke-linecap="round"/>
+                    <path d="M 124,95 Q 132,103 140,95" fill="none" stroke="#5d4037" stroke-width="3.5" stroke-linecap="round"/>
                 </g>
                 
-                <path d="M 94,112 Q 100,120 106,112" fill="none" stroke="#d81b60" stroke-width="2.5" stroke-linecap="round"/>
+                <path d="M 94,112 Q 100,120 106,112" fill="none" stroke="#d81b60" stroke-width="3" stroke-linecap="round"/>
                 
-                <path d="M 55,95 C 55,30 145,30 145,95 C 145,65 120,45 100,45 C 80,45 55,65 55,95 Z" fill="#4e342e"/>
-                <path d="M 75,50 Q 100,75 112,50" fill="none" stroke="#4e342e" stroke-width="6" stroke-linecap="round"/>
+                <path d="M 52,90 C 52,30 148,30 148,90 C 148,65 125,45 100,45 C 75,45 52,65 52,90 Z" fill="#4e342e"/>
                 
-                <path d="M 100,45 L 85,35 L 85,55 Z" fill="#ff4081"/>
-                <path d="M 100,45 L 115,35 L 115,55 Z" fill="#ff4081"/>
-                <circle cx="100" cy="45" r="5" fill="#c2185b"/>
+                <path d="M 90,45 Q 100,25 110,45 Q 105,35 90,45 Z" fill="#4e342e"/>
+                
+                <g transform="translate(115, 45) rotate(15)">
+                    <path d="M 0,0 L -12,-10 L -12,10 Z" fill="#ff4081"/>
+                    <path d="M 0,0 L 12,-10 L 12,10 Z" fill="#ff4081"/>
+                    <circle cx="0" cy="0" r="4" fill="#c2185b"/>
+                </g>
             </g>
         </svg>
     </div>
@@ -792,7 +823,8 @@
       revealScreen: qs('#reveal-screen'),
       revealSubtitle: qs('#reveal-subtitle'),
       babyNameContainer: qs('#baby-name'),
-      canvas: qs('#canvas-bg')
+      canvas: qs('#canvas-bg'),
+      flashOverlay: qs('#flash-overlay')
     };
 
     /* ===== PULL TO REFRESH LOGIC ===== */
@@ -942,7 +974,7 @@
           particlesAlpha -= 0.015; 
           if (particlesAlpha <= 0) {
               canvasCtx.clearRect(0, 0, canvasWidth, canvasHeight);
-              return; 
+              return; // Stop animation loop completely on mobile
           }
           canvasCtx.globalAlpha = particlesAlpha;
       } else {
@@ -1038,31 +1070,38 @@
       countdownInterval = setInterval(updateOnce, 1000);
     }
 
+    /* ===== BUG-FREE CINEMATIC COUNTDOWN ===== */
     function startFinalCountdown() {
-      if (elements.countdownScreen) elements.countdownScreen.style.display = 'block';
+      if (elements.countdownScreen) elements.countdownScreen.style.display = 'flex';
       let count = 5;
       
-      if (elements.countdownScreen) {
-          elements.countdownScreen.textContent = String(count);
-          elements.countdownScreen.classList.add('countdown-anim');
+      // Creating new DOM elements prevents the notorious iOS Safari animation restart bug
+      function popNumber(num) {
+          if (!elements.countdownScreen) return;
+          elements.countdownScreen.innerHTML = '';
+          const span = document.createElement('span');
+          span.className = 'countdown-num';
+          span.textContent = String(num);
+          elements.countdownScreen.appendChild(span);
       }
+
+      popNumber(count);
 
       finalTimer = setInterval(() => {
         count--;
         if (count > 0) {
-          if (elements.countdownScreen) {
-             elements.countdownScreen.classList.remove('countdown-anim');
-             void elements.countdownScreen.offsetWidth; 
-             elements.countdownScreen.classList.add('countdown-anim');
-             elements.countdownScreen.textContent = String(count);
-          }
+            popNumber(count);
         } else {
-          clearInterval(finalTimer);
-          if (elements.countdownScreen) {
-              elements.countdownScreen.style.display = 'none';
-              elements.countdownScreen.classList.remove('countdown-anim');
-          }
-          triggerGrandReveal();
+            clearInterval(finalTimer);
+            if (elements.countdownScreen) elements.countdownScreen.style.display = 'none';
+            
+            // White Flash Transition for epic reveal
+            if (elements.flashOverlay) {
+                elements.flashOverlay.classList.add('flash');
+                setTimeout(() => elements.flashOverlay.classList.remove('flash'), 100);
+            }
+            
+            triggerGrandReveal();
         }
       }, 1000);
     }
@@ -1186,7 +1225,7 @@
 
         const maxBalloons = window.innerWidth < 600 ? 12 : 25;
         
-        // NEW: Fade out background particles ONLY on mobile phones (<768px)
+        // Fades out canvas fireflies completely on mobile devices to preserve frame rate
         if (window.innerWidth <= 767) {
             particlesFading = true;
         }
@@ -1195,15 +1234,16 @@
         const delays = [];
         
         for (let i = 0; i < maxBalloons; i++) {
-            const left = Math.random() * 100;
+            // Makes them start closer to the center and fan out elegantly
+            const startX = 40 + Math.random() * 20; 
+            const endX = (Math.random() - 0.5) * 400;
             const scale = 0.5 + Math.random() * 0.7;
-            const drift = (Math.random() - 0.5) * 250;
             const animDelay = Math.random() * 2.5; 
             const swayDelay = -(Math.random() * 3);
             delays.push(animDelay * 1000);
             
             htmlStr += `
-                <div class="balloon-anim" style="left: ${left}vw; --drift: ${drift}px; animation-delay: ${animDelay}s;">
+                <div class="balloon-anim" style="left: ${startX}vw; --drift: ${endX}px; animation-delay: ${animDelay}s;">
                     <div class="balloon-sway" style="transform: scale(${scale}); animation-delay: ${swayDelay}s;">
                         <svg width="80" height="80" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <defs>
