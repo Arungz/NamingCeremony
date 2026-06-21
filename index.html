@@ -46,7 +46,6 @@
       --gold-3: #b38728;
       --muted: rgba(255, 255, 255, 0.5);
       --glass: rgba(20, 20, 20, 0.4);
-      --glass-border: rgba(191, 149, 63, 0.3);
       --safe-area-top: env(safe-area-inset-top);
       --safe-area-bottom: env(safe-area-inset-bottom);
     }
@@ -81,7 +80,6 @@
       pointer-events: none;
     }
 
-    /* ===== CANVAS BACKGROUND ===== */
     #canvas-bg {
       position: fixed;
       inset: 0;
@@ -92,7 +90,6 @@
       pointer-events: none;
     }
 
-    /* ===== GOLD SHIMMER ===== */
     .gold-shimmer {
       background: linear-gradient(90deg, var(--gold-1), var(--gold-2), var(--gold-3), var(--gold-2), var(--gold-1));
       background-size: 200% auto;
@@ -119,7 +116,7 @@
         backdrop-filter: blur(15px);
         border: 1px solid var(--gold-1);
         border-radius: 50%;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.8), 0 0 0px rgba(212, 175, 55, 0);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.8);
         transition: box-shadow 0.3s ease, background 0.3s ease;
         pointer-events: none; 
     }
@@ -134,9 +131,7 @@
         fill: var(--gold-2);
         transform-origin: center;
     }
-    .ptr-spin {
-        animation: fastSpin 0.5s linear infinite !important;
-    }
+    .ptr-spin { animation: fastSpin 0.5s linear infinite !important; }
     @keyframes fastSpin { 100% { transform: rotate(360deg); } }
 
     /* ===== MODERN INTRO CONTAINER ===== */
@@ -152,7 +147,6 @@
       transition: transform 3.5s cubic-bezier(0.25, 1, 0.5, 1);
     }
 
-    /* ===== HEAVY 3D GATES ===== */
     .gate {
       position: absolute;
       top: 0;
@@ -164,7 +158,6 @@
       z-index: 101;
       overflow: hidden;
     }
-
     .gate::before {
         content: '';
         position: absolute;
@@ -272,21 +265,25 @@
     }
     @keyframes fadeInOut { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
 
-    /* ===== BULLETPROOF GRID TIMER FOR MOBILE ===== */
+    /* ===== BULLETPROOF MOBILE TIMER SCREEN ===== */
     #timer-screen {
       position: absolute;
       z-index: 50;
       opacity: 0;
       transform: scale(0.9);
       display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
       transition: opacity 1.5s ease, transform 1.5s ease;
       text-align: center;
       width: 100%;
       padding: clamp(10px, 2vw, 20px);
+      box-sizing: border-box;
     }
     #timer-title {
       font-family: 'Cinzel', serif;
-      font-size: clamp(18px, 4vw, 36px);
+      font-size: clamp(16px, 4vw, 36px);
       margin-bottom: clamp(20px, 4vw, 50px);
       letter-spacing: clamp(3px, 1vw, 6px);
       text-transform: uppercase;
@@ -294,19 +291,21 @@
       white-space: nowrap;
     }
     
-    /* Strict 4-column Grid ensures it perfectly fits any device width */
+    /* Strictly constrained flexbox ensures NO wrapping on any phone */
     .timer-box { 
-      display: grid; 
-      grid-template-columns: repeat(4, 1fr); 
-      gap: clamp(8px, 2vw, 24px); 
+      display: flex; 
+      gap: 8px; 
       justify-content: center; 
+      flex-wrap: nowrap; 
       width: 100%;
-      max-width: 600px;
-      margin: 0 auto;
+      max-width: 650px;
       padding: 0 10px;
+      box-sizing: border-box;
     }
     
     .time-unit {
+      flex: 1 1 0px; 
+      min-width: 0; 
       background: var(--glass);
       backdrop-filter: blur(20px) saturate(120%);
       -webkit-backdrop-filter: blur(20px) saturate(120%);
@@ -314,22 +313,22 @@
       border-left: 1px solid rgba(255, 255, 255, 0.05);
       border-bottom: 1px solid rgba(0, 0, 0, 0.6);
       border-right: 1px solid rgba(0, 0, 0, 0.6);
-      padding: clamp(15px, 3vw, 30px) clamp(5px, 1vw, 20px);
+      padding: 15px 5px; 
       border-radius: 12px;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
       text-align: center;
     }
     .time-unit div { 
       font-weight: 300; 
-      font-size: clamp(24px, 6vw, 75px); 
+      font-size: clamp(20px, 5.5vw, 65px); 
       line-height: 1; 
       text-shadow: 0 4px 10px rgba(0,0,0,0.6);
     }
     .time-unit span { 
       display: block; 
-      font-size: clamp(9px, 2vw, 12px); 
+      font-size: clamp(8px, 2vw, 12px); 
       color: var(--gold-1); 
-      margin-top: clamp(8px, 2vw, 15px); 
+      margin-top: 10px; 
       letter-spacing: clamp(1px, 0.5vw, 3px); 
       text-transform: uppercase; 
       font-family: 'Cinzel', serif;
@@ -354,25 +353,23 @@
       100% { transform: scale(1.4); opacity: 0; filter: blur(5px); }
     }
 
-    /* ===== PERFECTLY POSITIONED REVEAL SCREEN ===== */
+    /* ===== REVEAL SCREEN (MOBILE TOP, DESKTOP CENTER) ===== */
     #reveal-screen { 
       position: absolute; 
       inset: 0;
       z-index: 70; 
       display: none; 
       flex-direction: column;
-      
       /* Mobile & Tablet Default: Locked to the top */
       justify-content: flex-start; 
-      padding-top: 18vh; 
-      
+      padding-top: 15vh; 
       align-items: center;
       perspective: 1000px; 
       width: 100%; 
     }
     
-    /* Desktop PC Mac OS: Dead Center */
-    @media (hover: hover) and (pointer: fine) {
+    /* Desktop PC, Mac OS, and large Tablets: Dead Center */
+    @media (min-width: 768px) {
       #reveal-screen {
         justify-content: center;
         padding-top: 0;
@@ -393,14 +390,10 @@
       text-align: center;
     }
     
-    .subtitle-show {
-      animation: cinematicFloatIn 2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-    }
-    @keyframes cinematicFloatIn { 
-        to { opacity: 1; transform: translateY(0) scale(1); } 
-    }
+    .subtitle-show { animation: cinematicFloatIn 2s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+    @keyframes cinematicFloatIn { to { opacity: 1; transform: translateY(0) scale(1); } }
 
-    /* ===== THE SMART ANIMATION CONTAINER ===== */
+    /* ===== SMART ANIMATION NAME CONTAINER ===== */
     .name-container { 
       display: flex; 
       justify-content: center; 
@@ -414,9 +407,8 @@
         grid-template-columns: 0fr; 
         transition: grid-template-columns 1.5s cubic-bezier(0.25, 1, 0.5, 1);
     }
-    .rest-part-wrapper.expand {
-        grid-template-columns: 1fr; 
-    }
+    .rest-part-wrapper.expand { grid-template-columns: 1fr; }
+    
     .rest-part-inner {
         overflow: hidden;
         display: flex;
@@ -445,10 +437,7 @@
       transform: translateZ(0) rotateX(0deg); 
     }
 
-    .is-name {
-      opacity: 0;
-      margin-left: clamp(2px, 1.5vw, 15px);
-    }
+    .is-name { opacity: 0; margin-left: clamp(2px, 1.5vw, 15px); }
 
     @keyframes popFlash {
         0% { opacity: 0; transform: translateZ(-100px) scale(0.5) rotateX(-45deg); filter: brightness(1); }
@@ -456,30 +445,40 @@
         100% { opacity: 1; transform: translateZ(0) scale(1) rotateX(0deg); filter: brightness(1); color: var(--gold-2); }
     }
 
-    /* ===== NEW: SUPER CUTE KAWAII BABY GIRL SVG ===== */
+    /* ===== ADVANCED KAWAII BABY GIRL SVG ===== */
     #baby-girl-container {
         position: relative;
         margin-top: 30px;
         transform: translateX(-150vw); 
-        width: 120px;
-        height: 120px;
+        width: 160px;
+        height: 160px;
         opacity: 0;
-        transition: transform 2s cubic-bezier(0.25, 1, 0.5, 1), opacity 1.5s ease;
+        transition: transform 1.8s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 1.5s ease;
         display: flex;
         justify-content: center;
+        align-items: center;
     }
+    
     #baby-girl-container.slide-in {
         transform: translateX(0); 
         opacity: 1;
+        /* Adds a lifelike floating/breathing animation after she arrives */
+        animation: floatBaby 3s ease-in-out infinite forwards;
+        animation-delay: 1.8s;
+    }
+    
+    @keyframes floatBaby {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
     }
     
     .waving-arm {
-        transform-origin: 135px 125px; /* Perfect pivot for wave */
+        transform-origin: 135px 125px; 
         animation: wave-hand 0.8s infinite alternate ease-in-out;
     }
     @keyframes wave-hand {
-        0% { transform: rotate(-10deg); }
-        100% { transform: rotate(30deg); }
+        0% { transform: rotate(-5deg); }
+        100% { transform: rotate(35deg); }
     }
 
     /* ===== HEART BALLOON ANIMATIONS ===== */
@@ -495,7 +494,7 @@
 
     /* ===== REDUCED MOTION ===== */
     @media (prefers-reduced-motion: reduce) {
-      .gold-shimmer, #letter-N::after, .click-hint, #countdown-screen, .letter, .gate, #scene-container, .balloon-anim, .subtitle-show, #baby-girl-container, .waving-arm {
+      .gold-shimmer, #letter-N::after, .click-hint, #countdown-screen, .letter, .gate, #scene-container, .balloon-anim, .subtitle-show, #baby-girl-container, .waving-arm, #baby-girl-container.slide-in {
         animation-duration: 0.001ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 1ms !important;
@@ -541,37 +540,33 @@
     <div class="name-container" id="baby-name" aria-hidden="true"></div>
     
     <div id="baby-girl-container">
-        <svg width="150" height="150" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-                <radialGradient id="blush" cx="50%" cy="50%" r="50%">
-                    <stop offset="0%" stop-color="#ffb6c1" stop-opacity="0.8"/>
-                    <stop offset="100%" stop-color="#ffb6c1" stop-opacity="0"/>
-                </radialGradient>
-            </defs>
-
-            <path d="M 60,180 C 60,130 140,130 140,180 Z" fill="#fce4ec"/>
-            <path d="M 70,140 Q 100,160 130,140" fill="none" stroke="#f8bbd0" stroke-width="4" stroke-linecap="round"/>
+        <svg width="100%" height="100%" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            
+            <path d="M 65,190 C 65,135 135,135 135,190 Z" fill="#fff" stroke="#ff80ab" stroke-width="3"/>
+            <path d="M 65,185 Q 82.5,200 100,185 Q 117.5,200 135,185" fill="none" stroke="#ff80ab" stroke-width="4"/>
+            
+            <path d="M 75,135 Q 60,150 65,170" fill="none" stroke="#ffe0bd" stroke-width="12" stroke-linecap="round"/>
             
             <g class="waving-arm">
-                <path d="M 135,135 Q 170,100 160,80" stroke="#ffe0bd" stroke-width="14" stroke-linecap="round" fill="none"/>
+                <path d="M 125,135 Q 155,120 160,95" fill="none" stroke="#ffe0bd" stroke-width="12" stroke-linecap="round"/>
+                <circle cx="160" cy="95" r="6" fill="#ffe0bd"/>
             </g>
             
-            <circle cx="100" cy="100" r="40" fill="#ffe0bd"/>
+            <circle cx="100" cy="95" r="45" fill="#ffe0bd"/>
             
-            <path d="M 85,65 Q 100,45 115,65 Q 100,55 85,65" fill="#5d4037"/>
-            <path d="M 95,60 Q 105,35 110,60" fill="#5d4037"/>
-
-            <path d="M 115,55 L 130,45 L 130,65 Z" fill="#ff4081"/>
-            <path d="M 115,55 L 100,45 L 100,65 Z" fill="#ff4081"/>
-            <circle cx="115" cy="55" r="4" fill="#c2185b"/>
+            <ellipse cx="72" cy="108" rx="8" ry="5" fill="#ff80ab" opacity="0.7"/>
+            <ellipse cx="128" cy="108" rx="8" ry="5" fill="#ff80ab" opacity="0.7"/>
             
-            <path d="M 80,105 Q 87,97 94,105" stroke="#5d4037" stroke-width="3" stroke-linecap="round" fill="none"/>
-            <path d="M 106,105 Q 113,97 120,105" stroke="#5d4037" stroke-width="3" stroke-linecap="round" fill="none"/>
+            <circle cx="78" cy="98" r="6.5" fill="#3e2723"/>
+            <circle cx="76" cy="96" r="2.5" fill="#ffffff"/> <circle cx="122" cy="98" r="6.5" fill="#3e2723"/>
+            <circle cx="120" cy="96" r="2.5" fill="#ffffff"/> <path d="M 94,112 Q 100,120 106,112" fill="none" stroke="#d81b60" stroke-width="2.5" stroke-linecap="round"/>
             
-            <circle cx="75" cy="112" r="7" fill="url(#blush)"/>
-            <circle cx="125" cy="112" r="7" fill="url(#blush)"/>
+            <path d="M 55,95 C 55,30 145,30 145,95 C 145,65 120,45 100,45 C 80,45 55,65 55,95 Z" fill="#4e342e"/>
+            <path d="M 75,50 Q 100,75 112,50" fill="none" stroke="#4e342e" stroke-width="6" stroke-linecap="round"/>
             
-            <path d="M 96,115 Q 100,122 104,115" stroke="#d81b60" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+            <path d="M 100,45 L 85,35 L 85,55 Z" fill="#ff4081"/>
+            <path d="M 100,45 L 115,35 L 115,55 Z" fill="#ff4081"/>
+            <circle cx="100" cy="45" r="5" fill="#c2185b"/>
         </svg>
     </div>
   </div>
