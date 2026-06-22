@@ -162,6 +162,24 @@
     .ptr-spin { animation: fastSpin 0.5s linear infinite !important; }
     @keyframes fastSpin { 100% { transform: rotate(360deg); } }
 
+    /* ===== FLAWLESS SCROLLABLE SCREEN ARCHITECTURE ===== */
+    .scroll-screen {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 50;
+        display: none; 
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        overflow-y: auto;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+        padding: clamp(40px, 8vh, 100px) 15px 80px 15px; 
+        perspective: 1200px;
+    }
+
     /* ===== CINEMATIC 3D INTRO CONTAINER ===== */
     #scene-container {
       position: fixed;
@@ -284,15 +302,15 @@
         to { box-shadow: 0 10px 30px rgba(0,0,0,0.9), 0 0 25px 5px rgba(191, 149, 63, 0.4); }
     }
     
-    #letter-N:hover, #letter-N:active { 
+    #letter-N:not(.shatter):hover, #letter-N:not(.shatter):active { 
         animation: none; 
         transform: scale(1.05); 
         box-shadow: 0 20px 40px rgba(0,0,0,0.9), 0 0 30px 10px rgba(253, 245, 201, 0.3);
         background: radial-gradient(circle, rgba(191, 149, 63, 0.25) 0%, rgba(5, 5, 5, 0.9) 70%);
     }
     
-    #letter-N:hover::before, #letter-N:active::before,
-    #letter-N:hover::after, #letter-N:active::after { display: none; }
+    #letter-N:not(.shatter):hover::before, #letter-N:not(.shatter):active::before,
+    #letter-N:not(.shatter):hover::after, #letter-N:not(.shatter):active::after { display: none; }
 
     #letter-N.shatter {
         animation: epicShatter 1.2s var(--ease-in-out-circ) forwards;
@@ -332,25 +350,7 @@
     }
     @keyframes hintFade { 0% { opacity: 0.3; } 100% { opacity: 1; } }
 
-    /* ===== SCROLLABLE SCREEN ARCHITECTURE ===== */
-    .scroll-screen {
-        position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 50;
-        display: none; 
-        flex-direction: column;
-        align-items: center;
-        justify-content: flex-start;
-        overflow-y: auto;
-        overflow-x: hidden;
-        -webkit-overflow-scrolling: touch;
-        padding: clamp(40px, 8vh, 100px) 15px 80px 15px; 
-        perspective: 1200px;
-    }
-
-    /* ===== TIMER SCREEN ===== */
+    /* ===== TIMER SCREEN (SCROLLABLE PAGE 1) ===== */
     #timer-title {
       font-family: 'Cinzel', serif;
       font-size: clamp(16px, 4vw, 36px);
@@ -432,11 +432,11 @@
       font-family: 'Cinzel', serif;
     }
 
-    /* ===== TOP 3 NAMES SHOWCASE ===== */
+    /* TOP 3 NAMES SHOWCASE (ON TIMER SCREEN) */
     .fade-in-delayed {
         opacity: 0;
         transform: translate3d(0, 30px, 0);
-        transition: opacity 0.8s ease, transform 1s var(--ease-spring);
+        transition: opacity 1s ease, transform 1.2s var(--ease-spring);
     }
     .fade-in-delayed.show {
         opacity: 1;
@@ -444,11 +444,11 @@
     }
 
     #top-names-container {
-        display: none; /* Managed by JS based on 2 Days logic */
+        display: none; /* Managed by JS */
         flex-direction: column;
         align-items: center;
         width: 100%;
-        transition: opacity 0.4s ease;
+        margin-bottom: clamp(30px, 6vw, 50px);
     }
     #top-names-title {
         font-family: 'Cinzel', serif;
@@ -458,14 +458,12 @@
         text-transform: uppercase;
         text-shadow: 0 5px 15px rgba(0,0,0,0.8);
         color: var(--muted);
-        transition: opacity 0.4s ease;
     }
     .top-names-flex {
         display: flex;
         gap: clamp(10px, 3vw, 20px);
         justify-content: center;
         flex-wrap: wrap;
-        transition: opacity 0.4s ease;
     }
     .top-name-card {
         background: var(--glass);
@@ -498,7 +496,7 @@
         transform: scale(0.95) !important;
     }
 
-    .top-name-card:nth-child(2) { animation-delay: 0.5s; }
+    .top-name-card:nth-child(2) { animation-delay: 0.5s; border-color: var(--gold-1); }
     .top-name-card:nth-child(3) { animation-delay: 1s; }
     
     @keyframes floatCard {
@@ -506,13 +504,12 @@
         100% { transform: translate3d(0, -8px, 0); }
     }
 
-    /* ===== SUGGESTION BOX ===== */
+    /* SUGGESTION BOX (ON TIMER SCREEN) */
     #suggestion-container {
-        display: none; /* Toggled to flex in JS based on 2-day rule */
+        display: none; /* Managed by JS based on 2 Days logic */
         flex-direction: column;
         align-items: center;
         gap: 15px;
-        margin-top: 30px;
         margin-bottom: 20px;
     }
     .suggestion-text {
@@ -560,6 +557,10 @@
     #name-suggestion:focus {
         background: rgba(255, 255, 255, 0.05);
     }
+    #name-suggestion:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
     #name-suggestion::placeholder {
         color: rgba(255, 255, 255, 0.4);
     }
@@ -575,14 +576,22 @@
         cursor: pointer;
         transition: transform 0.2s ease, box-shadow 0.2s ease, background-position 0.4s ease;
     }
-    #submit-suggestion:hover {
+    #submit-suggestion:hover:not(:disabled) {
         background-position: right center;
         box-shadow: 0 0 15px rgba(253, 245, 201, 0.5);
         transform: scale(1.05);
     }
-    #submit-suggestion:active {
+    #submit-suggestion:active:not(:disabled) {
         transform: scale(0.95);
     }
+    #submit-suggestion:disabled {
+        background: rgba(255, 255, 255, 0.2);
+        color: rgba(255, 255, 255, 0.5);
+        cursor: not-allowed;
+        box-shadow: none;
+        transform: scale(1);
+    }
+
     #suggestion-thank-you {
         font-family: 'Cinzel', serif;
         color: var(--gold-2);
@@ -646,7 +655,24 @@
         transition: opacity 0.2s ease;
     }
 
-    /* ===== PERFECTLY POSITIONED REVEAL SCREEN ===== */
+    /* ===== REVEAL SCREEN (SCROLLABLE PAGE 2) ===== */
+    #reveal-screen { 
+      position: absolute; 
+      inset: 0;
+      z-index: 70; 
+      display: none; 
+      flex-direction: column;
+      justify-content: flex-start; 
+      padding-top: 15vh; 
+      align-items: center;
+      perspective: 1200px; 
+      width: 100%; 
+    }
+    
+    @media (min-width: 768px) {
+      #reveal-screen { justify-content: center; padding-top: 0; }
+    }
+    
     #reveal-subtitle {
       font-family: 'Cinzel', serif;
       font-weight: 400;
@@ -1306,8 +1332,15 @@
       restWrapper.appendChild(restInner);
       container.appendChild(restWrapper);
     }
+    
+    /* ===== SECURE VOTING & SUBMISSION LOGIC ===== */
+    function isVotingAllowed() {
+        if (!eventDate) return false;
+        const dist = eventDate.getTime() - Date.now();
+        const twoDaysMs = 2 * 24 * 60 * 60 * 1000;
+        return dist > twoDaysMs;
+    }
 
-    /* ===== TOP NAMES RENDERER & UNIFIED VOTING LOGIC ===== */
     function renderTopNames(isVotingEnabled) {
         if(!elements.topNamesFlex) return;
         elements.topNamesFlex.innerHTML = '';
@@ -1330,6 +1363,9 @@
 
     function submitDatabaseName(suggestionString) {
         if (!suggestionString || suggestionString.trim() === '') return;
+        
+        // Security check: Reject submission if the 2-day threshold has passed
+        if (!isVotingAllowed()) return; 
         
         // Google Apps Script Web App URL
         const scriptURL = 'https://script.google.com/macros/s/AKfycbw_7UawCbLHx9bdcPnwqMaBUFyvUxWrRgiYYJuuec7wvgMreoiOilbtVOLRRbSsEpn2/exec';
@@ -1355,7 +1391,7 @@
             });
         }
 
-        // Fade out all suggestion/voting UI
+        // Fade out all suggestion/voting UI securely
         if(elements.suggestionText) elements.suggestionText.style.opacity = '0';
         if(elements.suggestionInputWrapper) elements.suggestionInputWrapper.style.opacity = '0';
         if(elements.topNamesFlex) elements.topNamesFlex.style.opacity = '0';
@@ -1365,7 +1401,7 @@
             if(elements.suggestionContainer) elements.suggestionContainer.style.display = 'none';
             if(elements.topNamesContainer) elements.topNamesContainer.style.display = 'none';
             
-            // Show and animate thank you message
+            // Show cinematic thank you
             if(elements.suggestionThankYou) {
                 elements.timerScreen.appendChild(elements.suggestionThankYou);
                 elements.suggestionThankYou.style.display = 'block';
@@ -1378,7 +1414,6 @@
     /* ===== TIMER LOGIC ===== */
     let countdownInterval = null;
     let finalTimer = null;
-    let eventDate = null; 
 
     function safeSetText(id, text) {
       const el = document.getElementById(id);
@@ -1425,7 +1460,7 @@
             const titleEl = qs('#journey-title');
             
             if (diff < 0) {
-                diff = Math.abs(diff); // Event has passed, count UP
+                diff = Math.abs(diff); // Count UP
                 if(titleEl) titleEl.textContent = "The Journey Unfolded For";
             } else {
                 if(titleEl) titleEl.textContent = "Untold Journey Begins In";
@@ -1530,12 +1565,11 @@
                 setTimeout(() => u.classList.add('show-unit'), 100 + (i * 120));
             });
 
-            // ===== EXACT 2-DAY RULE LOGIC =====
-            const twoDaysMs = 2 * 24 * 60 * 60 * 1000;
-            const isVotingActive = dist > twoDaysMs;
+            // ===== UNIFIED 2-DAY UI DISPLAY LOGIC =====
+            const votingActive = isVotingAllowed();
             
-            // 1. Render Top Names (Always visible, but interactivity changes based on time)
-            renderTopNames(isVotingActive);
+            // 1. Render Top Names (Always visible, but interactivity is controlled securely)
+            renderTopNames(votingActive);
             if (elements.topNamesContainer) {
                 elements.topNamesContainer.style.display = 'flex';
                 setTimeout(() => {
@@ -1543,16 +1577,33 @@
                 }, 100 + (units.length * 120) + 300);
             }
             
-            // 2. Conditionally show Custom Suggestion Box (> 2 days)
-            if (isVotingActive) {
-                if (elements.suggestionContainer) {
-                    elements.suggestionContainer.style.display = 'flex';
-                    setTimeout(() => {
-                        elements.suggestionContainer.classList.add('show-suggestion');
-                    }, 100 + (units.length * 120) + 600);
+            // 2. Safely Render Suggestion Box with Disabled States
+            if (elements.suggestionContainer) {
+                elements.suggestionContainer.style.display = 'flex';
+                
+                if (!votingActive) {
+                    if (elements.suggestionText) elements.suggestionText.textContent = "Suggestions & Voting Closed";
+                    if (elements.nameSuggestion) {
+                        elements.nameSuggestion.disabled = true;
+                        elements.nameSuggestion.placeholder = "Ceremony approaching...";
+                    }
+                    if (elements.submitSuggestion) {
+                        elements.submitSuggestion.disabled = true;
+                    }
+                } else {
+                    if (elements.suggestionText) elements.suggestionText.textContent = "Or suggest a beautiful name...";
+                    if (elements.nameSuggestion) {
+                        elements.nameSuggestion.disabled = false;
+                        elements.nameSuggestion.placeholder = "Enter name suggestion...";
+                    }
+                    if (elements.submitSuggestion) {
+                        elements.submitSuggestion.disabled = false;
+                    }
                 }
-            } else {
-                if (elements.suggestionContainer) elements.suggestionContainer.style.display = 'none';
+
+                setTimeout(() => {
+                    elements.suggestionContainer.classList.add('show-suggestion');
+                }, 100 + (units.length * 120) + 600);
             }
             
             startTimer();
@@ -1705,14 +1756,12 @@
     (function init() {
       initCanvas();
       
-      // Render English Name
       renderName(CONFIG.ceremonyNameEn, elements.babyNameEn);
       
-      // Render Tamil Name
       if (elements.babyNameTa) {
           elements.babyNameTa.innerHTML = `<div class="letter" style="opacity:1; transform:scale(1); filter:blur(0); text-shadow: 0 1px 0 #b38728, 0 2px 0 #9f7622, 0 3px 0 #8c661c, 0 15px 25px rgba(0,0,0,0.8);">${CONFIG.ceremonyNameTa}</div>`;
       }
-
+      
       elements.letterN?.addEventListener('click', triggerEntrance, { passive: true });
       elements.letterN?.addEventListener('keydown', (e) => {
           if (e.key === 'Enter' || e.key === ' ') {
@@ -1721,7 +1770,6 @@
           }
       });
       
-      // ===== CUSTOM SUGGESTION SUBMIT LOGIC =====
       elements.submitSuggestion?.addEventListener('click', () => {
           if (elements.nameSuggestion && elements.nameSuggestion.value.trim() !== '') {
               submitDatabaseName(elements.nameSuggestion.value);
