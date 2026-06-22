@@ -142,7 +142,7 @@
         -webkit-backdrop-filter: blur(10px);
         border: 1px solid var(--gold-1);
         border-radius: 50%;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.8);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.8), 0 0 0px rgba(212, 175, 55, 0);
         transition: box-shadow 0.3s ease, background 0.3s ease;
         pointer-events: none;
         will-change: transform;
@@ -169,7 +169,7 @@
         width: 100%;
         height: 100%;
         z-index: 50;
-        display: none; 
+        display: none; /* toggled to flex via JS */
         flex-direction: column;
         align-items: center;
         justify-content: flex-start;
@@ -190,10 +190,12 @@
       justify-content: center;
       align-items: center;
       transform-style: preserve-3d;
+      will-change: transform, opacity;
       transition: opacity 1.5s ease;
       perspective: 2000px;
     }
 
+    /* BUG FIX: Reverted gate to clean 3D horizontal slide to prevent overlapping/clipping into the screen */
     .gate {
       position: absolute;
       top: 0;
@@ -201,10 +203,10 @@
       height: 100%;
       background: linear-gradient(135deg, #0a0a0a, #000);
       box-shadow: inset 0 0 50px rgba(0,0,0,1);
-      transition: transform 2.5s var(--ease-in-out-circ), opacity 2.5s ease;
+      transition: transform 2.5s var(--ease-in-out-circ), opacity 2.5s ease, filter 2.5s ease;
       z-index: 101;
       overflow: hidden;
-      will-change: transform, opacity;
+      will-change: transform, opacity, filter;
       backface-visibility: hidden;
       -webkit-backface-visibility: hidden;
     }
@@ -225,10 +227,10 @@
     .gate.left { left: 0; border-right: 2px solid var(--gold-1); transform-origin: left center; }
     .gate.right { right: 0; border-left: 2px solid var(--gold-1); transform-origin: right center; }
     
-    .gate.open-left { transform: rotateY(-95deg) scale(1.1); opacity: 0; }
-    .gate.open-right { transform: rotateY(95deg) scale(1.1); opacity: 0; }
+    .gate.open-left { transform: translate3d(-100%, 0, 0) scale(1.05); opacity: 0; filter: blur(15px); }
+    .gate.open-right { transform: translate3d(100%, 0, 0) scale(1.05); opacity: 0; filter: blur(15px); }
 
-    /* ===== MACHINED GOLD SEAL (BUG FIXED) ===== */
+    /* ===== MACHINED GOLD SEAL ===== */
     .seal-wrapper {
       position: relative;
       z-index: 102;
@@ -244,8 +246,6 @@
       font-size: clamp(50px, 8vw, 110px);
       width: clamp(140px, 26vw, 240px);
       height: clamp(140px, 26vw, 240px);
-      flex-shrink: 0; /* Guarantee perfect circle */
-      aspect-ratio: 1 / 1; /* Guarantee perfect circle */
       display: flex;
       justify-content: center;
       align-items: center;
@@ -303,25 +303,25 @@
         to { box-shadow: 0 10px 30px rgba(0,0,0,0.9), 0 0 25px 5px rgba(191, 149, 63, 0.4); }
     }
     
-    /* Fixed hover conflict */
-    #letter-N:hover:not(.shatter), #letter-N:active:not(.shatter) { 
+    /* BUG FIX: Added :not(.shatter) so the hover effect immediately cancels upon clicking */
+    #letter-N:not(.shatter):hover, #letter-N:not(.shatter):active { 
         animation: none; 
         transform: scale(1.05); 
         box-shadow: 0 20px 40px rgba(0,0,0,0.9), 0 0 30px 10px rgba(253, 245, 201, 0.3);
         background: radial-gradient(circle, rgba(191, 149, 63, 0.25) 0%, rgba(5, 5, 5, 0.9) 70%);
     }
     
-    #letter-N:hover::before, #letter-N:active::before,
-    #letter-N:hover::after, #letter-N:active::after { display: none; }
+    #letter-N:not(.shatter):hover::before, #letter-N:not(.shatter):active::before,
+    #letter-N:not(.shatter):hover::after, #letter-N:not(.shatter):active::after { display: none; }
 
     #letter-N.shatter {
         animation: epicShatter 1.2s var(--ease-in-out-circ) forwards;
         pointer-events: none;
     }
     @keyframes epicShatter {
-        0% { transform: scale(1); opacity: 1; }
-        30% { transform: scale(0.85) rotate(-5deg); opacity: 1; box-shadow: 0 0 50px var(--gold-1); }
-        100% { transform: scale(2.5) rotate(45deg); opacity: 0; box-shadow: 0 0 0 transparent; }
+        0% { transform: scale(1); opacity: 1; filter: blur(0px); }
+        30% { transform: scale(0.85) rotate(-5deg); opacity: 1; filter: blur(0px); box-shadow: 0 0 50px var(--gold-1); }
+        100% { transform: scale(2.5) rotate(45deg); opacity: 0; filter: blur(15px); box-shadow: 0 0 0 transparent; }
     }
 
     .seal-aura {
@@ -446,7 +446,7 @@
     }
 
     #top-names-container {
-        display: none; 
+        display: none; /* Managed by JS based on 2 Days logic */
         flex-direction: column;
         align-items: center;
         width: 100%;
@@ -483,7 +483,7 @@
         box-shadow: 0 10px 25px rgba(0,0,0,0.6);
         text-shadow: 0 2px 5px rgba(0,0,0,0.8);
         animation: floatCard 3s ease-in-out infinite alternate;
-        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease;
     }
     
     /* Interactive Voting State */
@@ -510,7 +510,7 @@
 
     /* SUGGESTION BOX (ON TIMER SCREEN) */
     #suggestion-container {
-        display: none; 
+        display: none; /* Toggled to flex in JS based on 2-day rule */
         flex-direction: column;
         align-items: center;
         gap: 15px;
@@ -589,6 +589,7 @@
         color: var(--gold-2);
         font-size: clamp(14px, 3vw, 18px);
         letter-spacing: 2px;
+        text-shadow: 0 0 10px rgba(191, 149, 63, 0.8);
         display: none;
         opacity: 0;
     }
@@ -621,8 +622,8 @@
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
-      will-change: transform, opacity;
-      animation: epicCount 0.95s var(--ease-out-expo) forwards;
+      will-change: transform, opacity; 
+      animation: epicCount 0.95s var(--ease-out-expo) forwards; 
     }
 
     @keyframes epicCount {
@@ -647,6 +648,23 @@
     }
 
     /* ===== REVEAL SCREEN (SCROLLABLE PAGE 2) ===== */
+    #reveal-screen { 
+      position: absolute; 
+      inset: 0;
+      z-index: 70; 
+      display: none; 
+      flex-direction: column;
+      justify-content: flex-start; 
+      padding-top: 15vh; 
+      align-items: center;
+      perspective: 1200px; 
+      width: 100%; 
+    }
+    
+    @media (min-width: 768px) {
+      #reveal-screen { justify-content: center; padding-top: 0; }
+    }
+    
     #reveal-subtitle {
       font-family: 'Cinzel', serif;
       font-weight: 400;
@@ -734,7 +752,7 @@
       font-weight: 800;
       color: var(--gold-2);
       -webkit-font-smoothing: antialiased;
-      will-change: transform, opacity, color, text-shadow;
+      will-change: transform, opacity, color, text-shadow, filter;
       text-shadow: 
         0 1px 0 #b38728, 0 2px 0 #9f7622, 0 3px 0 #8c661c,
         0 15px 25px rgba(0,0,0,0.8);
@@ -1048,6 +1066,7 @@
     const CONFIG = {
       ceremonyNameEn: window.__ceremonyNameEn || 'A.NIVISHA',
       ceremonyNameTa: window.__ceremonyNameTa || 'அ. நிவிஷா',
+      // Top 3 Shortlisted names
       topNames: ['NIVISHA', 'NITHISHA', 'NALINA'],
       // Pass a valid Date string here, or set null to use demo timer.
       ceremonyEventDate: '2026-06-29T09:30:00', 
@@ -1078,9 +1097,8 @@
       canvas: qs('#canvas-bg'),
       flashOverlay: qs('#flash-overlay'),
       
+      // Bottom Reveal Elements
       journeyContainer: qs('#journey-timer-container'),
-      
-      // Top Names & Suggestion Elements
       topNamesContainer: qs('#top-names-container'),
       topNamesTitle: qs('#top-names-title'),
       topNamesFlex: qs('#top-names-flex'),
@@ -1136,27 +1154,18 @@
         currentPull = 0;
     }
 
-    // Bind Touch Events (Bug fixed to prevent conflict with scrolling/buttons)
     document.addEventListener('touchstart', e => {
         if (e.touches.length > 1) return;
-        if (e.target.closest('#letter-N') || e.target.closest('button') || e.target.closest('input') || e.target.closest('.top-name-card')) {
-            return; 
-        }
         handleDragStart(e.touches[0].clientY);
     }, { passive: true });
-    
     document.addEventListener('touchmove', e => {
         handleDragMove(e.touches[0].clientY);
     }, { passive: true });
-    
     document.addEventListener('touchend', handleDragEnd);
 
-    // Bind Mouse Events
     let isMouseDown = false;
     document.addEventListener('mousedown', e => {
-        if (e.target.closest('#letter-N') || e.target.closest('button') || e.target.closest('input') || e.target.closest('.top-name-card')) {
-            return; 
-        }
+        if (e.target.tagName.toLowerCase() === 'input' || e.target.tagName.toLowerCase() === 'button' || e.target.classList.contains('top-name-card')) return;
         isMouseDown = true;
         handleDragStart(e.clientY);
     });
@@ -1336,7 +1345,9 @@
     function submitDatabaseName(suggestionString) {
         if (!suggestionString || suggestionString.trim() === '') return;
         
+        // Google Apps Script Web App URL
         const scriptURL = 'https://script.google.com/macros/s/AKfycbw_7UawCbLHx9bdcPnwqMaBUFyvUxWrRgiYYJuuec7wvgMreoiOilbtVOLRRbSsEpn2/exec';
+        
         const formData = new FormData();
         formData.append('Suggestion', suggestionString.trim());
         
@@ -1370,7 +1381,8 @@
             
             // Show cinematic thank you
             if(elements.suggestionThankYou) {
-                elements.timerScreen.appendChild(elements.suggestionThankYou); // Center it
+                // Move it outside so it stays centered
+                elements.timerScreen.appendChild(elements.suggestionThankYou);
                 elements.suggestionThankYou.style.display = 'block';
                 elements.suggestionThankYou.style.marginTop = '20px';
                 elements.suggestionThankYou.style.animation = 'thankYouPop 4s forwards';
@@ -1487,6 +1499,8 @@
       if (!elements.letterN || elements.letterN.getAttribute('data-activated') === 'true') return;
       elements.letterN.setAttribute('data-activated', 'true');
       
+      if (elements.sealWrapper) elements.sealWrapper.style.pointerEvents = 'none';
+
       if (CONFIG.ceremonyEventDate) {
           const parsed = new Date(CONFIG.ceremonyEventDate);
           if (!isNaN(parsed.getTime())) {
@@ -1707,20 +1721,13 @@
     (function init() {
       initCanvas();
       
-      // Render English Name
       renderName(CONFIG.ceremonyNameEn, elements.babyNameEn);
       
-      // Render Tamil Name
       if (elements.babyNameTa) {
           elements.babyNameTa.innerHTML = `<div class="letter" style="opacity:1; transform:scale(1); filter:blur(0); text-shadow: 0 1px 0 #b38728, 0 2px 0 #9f7622, 0 3px 0 #8c661c, 0 15px 25px rgba(0,0,0,0.8);">${CONFIG.ceremonyNameTa}</div>`;
       }
-
-      ['click', 'touchstart'].forEach(evt => {
-          elements.letterN?.addEventListener(evt, (e) => {
-              triggerEntrance();
-          }, { passive: true });
-      });
-
+      
+      elements.letterN?.addEventListener('click', triggerEntrance, { passive: true });
       elements.letterN?.addEventListener('keydown', (e) => {
           if (e.key === 'Enter' || e.key === ' ') {
               e.preventDefault();
@@ -1728,7 +1735,6 @@
           }
       });
       
-      // ===== GOOGLE SHEETS SUBMIT LOGIC =====
       elements.submitSuggestion?.addEventListener('click', () => {
           if (elements.nameSuggestion && elements.nameSuggestion.value.trim() !== '') {
               submitDatabaseName(elements.nameSuggestion.value);
