@@ -24,6 +24,11 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Naming Ceremony">
   
+  <meta name="description" content="A grand naming ceremony invitation. Join our family to celebrate this magical milestone.">
+  <meta name="keywords" content="naming ceremony, baby naming, invitation, grand reveal, celebration, family, premium event">
+  <meta name="robots" content="index, follow">
+  <meta name="format-detection" content="telephone=no, email=no">
+  
   <title>Naming Ceremony ✨</title>
   <link rel="icon" type="image/png" href="Images/ak.png">
 
@@ -45,6 +50,7 @@
       --safe-area-top: env(safe-area-inset-top);
       --safe-area-bottom: env(safe-area-inset-bottom);
       
+      /* Cinematic Easing */
       --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
       --ease-in-out-circ: cubic-bezier(0.85, 0, 0.15, 1);
       --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -136,7 +142,7 @@
         -webkit-backdrop-filter: blur(10px);
         border: 1px solid var(--gold-1);
         border-radius: 50%;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.8);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.8), 0 0 0px rgba(212, 175, 55, 0);
         transition: box-shadow 0.3s ease, background 0.3s ease;
         pointer-events: none;
         will-change: transform;
@@ -156,22 +162,22 @@
     .ptr-spin { animation: fastSpin 0.5s linear infinite !important; }
     @keyframes fastSpin { 100% { transform: rotate(360deg); } }
 
-    /* ===== SCROLLABLE SCREEN ARCHITECTURE (BUG FIX) ===== */
-    /* This prevents mobile overlapping by allowing elegant scrolling */
+    /* ===== FLAWLESS SCROLLABLE SCREEN ARCHITECTURE ===== */
     .scroll-screen {
         position: absolute;
         inset: 0;
         width: 100%;
         height: 100%;
         z-index: 50;
-        display: none; /* toggled to flex via JS */
+        display: none; /* Managed by JS */
         flex-direction: column;
         align-items: center;
         justify-content: flex-start;
         overflow-y: auto;
         overflow-x: hidden;
         -webkit-overflow-scrolling: touch;
-        padding: clamp(40px, 8vh, 100px) 15px 80px 15px; /* Breathing room */
+        /* Padding top prevents the flex-cutoff bug on smaller mobile screens */
+        padding: clamp(40px, 8vh, 100px) 15px 80px 15px; 
         perspective: 1200px;
     }
 
@@ -185,6 +191,7 @@
       justify-content: center;
       align-items: center;
       transform-style: preserve-3d;
+      will-change: transform, opacity;
       transition: opacity 1.5s ease;
       perspective: 2000px;
     }
@@ -196,7 +203,7 @@
       height: 100%;
       background: linear-gradient(135deg, #0a0a0a, #000);
       box-shadow: inset 0 0 50px rgba(0,0,0,1);
-      transition: transform 2.5s var(--ease-in-out-circ), opacity 2.5s ease;
+      transition: transform 2.5s var(--ease-in-out-circ), opacity 2.5s ease, filter 2.5s ease;
       z-index: 101;
       overflow: hidden;
       will-change: transform, opacity;
@@ -438,11 +445,10 @@
     }
 
     #top-names-container {
-        display: none; /* Managed by JS */
+        display: none; /* Managed by JS based on 2 Days logic */
         flex-direction: column;
         align-items: center;
         width: 100%;
-        margin-bottom: clamp(30px, 6vw, 50px);
     }
     #top-names-title {
         font-family: 'Cinzel', serif;
@@ -484,11 +490,10 @@
 
     /* SUGGESTION BOX (ON TIMER SCREEN) */
     #suggestion-container {
-        display: none; 
+        display: none; /* Managed by JS based on 2 Days logic */
         flex-direction: column;
         align-items: center;
         gap: 15px;
-        margin-bottom: 20px;
     }
     .suggestion-text {
         font-family: 'Cinzel', serif;
@@ -596,7 +601,7 @@
       background-clip: text;
       color: transparent;
       will-change: transform, opacity;
-      animation: epicCount 0.95s var(--ease-out-expo) forwards;
+      animation: epicCount 0.95s var(--ease-out-expo) forwards; 
     }
 
     @keyframes epicCount {
@@ -1438,22 +1443,26 @@
                 setTimeout(() => u.classList.add('show-unit'), 100 + (i * 120));
             });
             
-            // Show Top Names
-            setTimeout(() => {
-                if(elements.topNamesContainer) elements.topNamesContainer.classList.add('show');
-            }, 800);
-            
-            // Logic for Suggestion Box (>2 days check)
+            // ===== STRICT 2-DAY RULE LOGIC =====
             const twoDaysMs = 2 * 24 * 60 * 60 * 1000;
             if (dist > twoDaysMs) {
+                // > 2 Days away: Show Suggestion Box ONLY
+                if (elements.topNamesContainer) elements.topNamesContainer.style.display = 'none';
                 if (elements.suggestionContainer) {
                     elements.suggestionContainer.style.display = 'flex';
                     setTimeout(() => {
                         elements.suggestionContainer.classList.add('show-suggestion');
-                    }, 1200);
+                    }, 100 + (units.length * 120) + 300);
                 }
             } else {
+                // <= 2 Days away: Show Top 3 Names ONLY
                 if (elements.suggestionContainer) elements.suggestionContainer.style.display = 'none';
+                if (elements.topNamesContainer) {
+                    elements.topNamesContainer.style.display = 'flex';
+                    setTimeout(() => {
+                        elements.topNamesContainer.classList.add('show');
+                    }, 100 + (units.length * 120) + 300);
+                }
             }
             
             startTimer();
