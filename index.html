@@ -88,7 +88,7 @@
       user-select: none; 
     }
 
-    /* Hide Scrollbar for a native app feel on the reveal screen */
+    /* Hide Scrollbars */
     ::-webkit-scrollbar { display: none; }
 
     body::before {
@@ -342,21 +342,24 @@
     }
     @keyframes hintFade { 0% { opacity: 0.3; } 100% { opacity: 1; } }
 
-    /* ===== BULLETPROOF GRID TIMER SCREEN ===== */
+    /* ===== BULLETPROOF GRID TIMER SCREEN WITH SUGGESTIONS & TOP NAMES ===== */
     #timer-screen {
       position: absolute;
       z-index: 50;
       opacity: 0;
       display: none;
       flex-direction: column;
-      justify-content: center;
+      justify-content: flex-start;
       align-items: center;
       transition: opacity 1s ease;
       text-align: center;
       width: 100%;
-      padding: clamp(10px, 2vw, 20px);
+      height: 100%;
+      padding: clamp(30px, 10vh, 80px) 15px 40px 15px;
       box-sizing: border-box;
       perspective: 1200px;
+      overflow-y: auto;
+      overflow-x: hidden;
     }
     
     #timer-title {
@@ -378,6 +381,7 @@
       max-width: 650px;
       padding: 0 10px;
       box-sizing: border-box;
+      margin-bottom: clamp(30px, 6vw, 50px);
     }
     
     .time-unit {
@@ -413,10 +417,6 @@
         animation: glassCardShimmer 4s infinite linear;
         pointer-events: none;
     }
-    @keyframes glassCardShimmer {
-        0%, 30% { transform: rotate(45deg) translate3d(-100%, 0, 0); }
-        70%, 100% { transform: rotate(45deg) translate3d(100%, 0, 0); }
-    }
     
     .time-unit.show-unit {
         opacity: 1;
@@ -438,6 +438,153 @@
       letter-spacing: clamp(1px, 0.5vw, 3px); 
       text-transform: uppercase; 
       font-family: 'Cinzel', serif;
+    }
+
+    /* TOP 3 NAMES SHOWCASE ON TIMER SCREEN */
+    .fade-in-delayed {
+        opacity: 0;
+        transform: translate3d(0, 30px, 0);
+        transition: opacity 1s ease, transform 1.2s var(--ease-spring);
+    }
+    .fade-in-delayed.show {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+    }
+
+    #top-names-container {
+        display: none; 
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        margin-bottom: clamp(30px, 6vw, 50px);
+    }
+    #top-names-title {
+        font-family: 'Cinzel', serif;
+        font-size: clamp(14px, 3vw, 24px);
+        margin-bottom: 20px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        text-shadow: 0 5px 15px rgba(0,0,0,0.8);
+        color: var(--muted);
+    }
+    .top-names-flex {
+        display: flex;
+        gap: clamp(10px, 3vw, 20px);
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    .top-name-card {
+        background: var(--glass);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(191, 149, 63, 0.4);
+        border-radius: 20px;
+        padding: clamp(10px, 2vw, 15px) clamp(20px, 4vw, 30px);
+        font-family: 'Cinzel', serif;
+        font-weight: 800;
+        font-size: clamp(14px, 3vw, 22px);
+        color: var(--gold-2);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+        text-shadow: 0 2px 5px rgba(0,0,0,0.8);
+        animation: floatCard 3s ease-in-out infinite alternate;
+    }
+    .top-name-card:nth-child(2) { animation-delay: 0.5s; border-color: var(--gold-1); }
+    .top-name-card:nth-child(3) { animation-delay: 1s; }
+    
+    @keyframes floatCard {
+        0% { transform: translate3d(0, 0, 0); box-shadow: 0 10px 25px rgba(0,0,0,0.6); }
+        100% { transform: translate3d(0, -8px, 0); box-shadow: 0 15px 35px rgba(191, 149, 63, 0.2); }
+    }
+
+    /* SUGGESTION BOX ON TIMER SCREEN */
+    #suggestion-container {
+        display: none; 
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+    .suggestion-text {
+        font-family: 'Cinzel', serif;
+        font-size: clamp(12px, 2.5vw, 15px);
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        text-shadow: 0 2px 5px rgba(0,0,0,0.8);
+        transition: opacity 0.4s var(--ease-out-expo);
+        background: linear-gradient(90deg, var(--gold-1), var(--gold-2), var(--gold-3), var(--gold-2), var(--gold-1));
+        background-size: 200% auto;
+        color: transparent;
+        -webkit-background-clip: text;
+        background-clip: text;
+        animation: shine 4s linear infinite;
+    }
+    .suggestion-input-wrapper {
+        display: flex;
+        gap: 8px;
+        background: var(--glass);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        padding: 5px;
+        border-radius: 30px;
+        border: 1px solid rgba(191, 149, 63, 0.3);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        transition: border-color 0.3s ease, box-shadow 0.3s ease, opacity 0.4s var(--ease-out-expo);
+    }
+    .suggestion-input-wrapper:focus-within {
+        border-color: var(--gold-1);
+        box-shadow: 0 10px 30px rgba(191, 149, 63, 0.4);
+    }
+    #name-suggestion {
+        background: transparent;
+        border: none;
+        outline: none;
+        color: #fff;
+        font-family: 'Montserrat', sans-serif;
+        padding: 10px 20px;
+        font-size: 14px;
+        width: clamp(150px, 40vw, 250px);
+        transition: background 0.3s ease;
+        border-radius: 30px;
+    }
+    #name-suggestion:focus {
+        background: rgba(255, 255, 255, 0.05);
+    }
+    #name-suggestion::placeholder {
+        color: rgba(255, 255, 255, 0.4);
+    }
+    #submit-suggestion {
+        background: linear-gradient(90deg, var(--gold-1), var(--gold-2), var(--gold-1));
+        background-size: 200% auto;
+        border: none;
+        border-radius: 25px;
+        color: #050505;
+        font-family: 'Cinzel', serif;
+        font-weight: 800;
+        padding: 10px 25px;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, background-position 0.4s ease;
+    }
+    #submit-suggestion:hover {
+        background-position: right center;
+        box-shadow: 0 0 15px rgba(253, 245, 201, 0.5);
+        transform: scale(1.05);
+    }
+    #submit-suggestion:active {
+        transform: scale(0.95);
+    }
+    #suggestion-thank-you {
+        font-family: 'Cinzel', serif;
+        color: var(--gold-2);
+        font-size: clamp(14px, 3vw, 18px);
+        letter-spacing: 2px;
+        display: none;
+        opacity: 0;
+    }
+
+    @keyframes thankYouPop {
+        0% { opacity: 0; transform: scale(0.8) translateY(20px); filter: blur(5px); }
+        15% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0px); text-shadow: 0 0 20px rgba(253, 245, 201, 0.8); }
+        85% { opacity: 1; transform: scale(1); filter: blur(0px); text-shadow: 0 0 10px rgba(191, 149, 63, 0.5); }
+        100% { opacity: 0; transform: scale(1.05) translateY(-10px); filter: blur(5px); }
     }
 
     /* ===== FLAWLESS CINEMATIC COUNTDOWN SCREEN ===== */
@@ -486,19 +633,18 @@
         transition: opacity 0.2s ease;
     }
 
-    /* ===== PERFECTLY SCROLLABLE REVEAL SCREEN ===== */
+    /* ===== PERFECTLY POSITIONED REVEAL SCREEN ===== */
     #reveal-screen { 
       position: absolute; 
       inset: 0;
       z-index: 70; 
       display: none; 
       flex-direction: column;
-      justify-content: flex-start; 
-      padding: 10vh 15px 60px 15px; 
+      justify-content: center; 
+      padding-top: 0; 
       align-items: center;
+      perspective: 1200px; 
       width: 100%; 
-      overflow-y: auto;
-      overflow-x: hidden;
     }
     
     #reveal-subtitle {
@@ -507,7 +653,7 @@
       font-size: clamp(16px, 4vw, 32px);
       letter-spacing: clamp(4px, 2vw, 12px); 
       color: var(--gold-2);
-      margin-bottom: 25px;
+      margin-bottom: 40px;
       text-transform: uppercase;
       opacity: 0;
       transform: translate3d(0, -20px, 0);
@@ -686,186 +832,6 @@
         50% { opacity: 1; transform: scale(1.2) rotate(20deg); text-shadow: 0 0 15px #fdf5c9; }
     }
 
-    /* ===== POST-REVEAL JOURNEY TIMER ===== */
-    .fade-in-delayed {
-        opacity: 0;
-        transform: translate3d(0, 30px, 0);
-        transition: opacity 1s ease, transform 1.2s var(--ease-spring);
-    }
-    .fade-in-delayed.show {
-        opacity: 1;
-        transform: translate3d(0, 0, 0);
-    }
-
-    #journey-timer-container {
-        margin-top: clamp(20px, 5vw, 40px);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        width: 100%;
-    }
-    #journey-title {
-        font-family: 'Cinzel', serif;
-        font-size: clamp(14px, 3vw, 24px);
-        margin-bottom: 15px;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        text-shadow: 0 5px 15px rgba(0,0,0,0.8);
-    }
-    .compact-timer {
-        max-width: 500px;
-        gap: clamp(4px, 1.5vw, 15px);
-    }
-    .compact-timer .time-unit {
-        padding: clamp(8px, 2vw, 15px) 2px;
-        border-radius: 8px;
-        transform: none; /* Disable 3D flip for the bottom timer to keep it neat */
-        opacity: 1;
-    }
-    .compact-timer .time-unit div {
-        font-size: clamp(16px, 4vw, 45px);
-    }
-
-    /* ===== TOP 3 NAMES SHOWCASE ===== */
-    #top-names-container {
-        margin-top: clamp(30px, 6vw, 50px);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        width: 100%;
-    }
-    #top-names-title {
-        font-family: 'Cinzel', serif;
-        font-size: clamp(14px, 3vw, 24px);
-        margin-bottom: 20px;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        text-shadow: 0 5px 15px rgba(0,0,0,0.8);
-        color: var(--muted);
-    }
-    .top-names-flex {
-        display: flex;
-        gap: clamp(10px, 3vw, 20px);
-        justify-content: center;
-        flex-wrap: wrap;
-    }
-    .top-name-card {
-        background: var(--glass);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        border: 1px solid rgba(191, 149, 63, 0.4);
-        border-radius: 20px;
-        padding: clamp(10px, 2vw, 15px) clamp(20px, 4vw, 30px);
-        font-family: 'Cinzel', serif;
-        font-weight: 800;
-        font-size: clamp(14px, 3vw, 22px);
-        color: var(--gold-2);
-        box-shadow: 0 10px 25px rgba(0,0,0,0.6);
-        text-shadow: 0 2px 5px rgba(0,0,0,0.8);
-        animation: floatCard 3s ease-in-out infinite alternate;
-    }
-    /* Stagger the floating animation */
-    .top-name-card:nth-child(2) { animation-delay: 0.5s; border-color: var(--gold-1); }
-    .top-name-card:nth-child(3) { animation-delay: 1s; }
-    
-    @keyframes floatCard {
-        0% { transform: translate3d(0, 0, 0); box-shadow: 0 10px 25px rgba(0,0,0,0.6); }
-        100% { transform: translate3d(0, -8px, 0); box-shadow: 0 15px 35px rgba(191, 149, 63, 0.2); }
-    }
-
-    /* ===== SUGGESTION BOX UI (Moved to Bottom) ===== */
-    #suggestion-container {
-        margin-top: clamp(40px, 8vw, 60px);
-        display: flex; /* Display managed by >2 days logic */
-        flex-direction: column;
-        align-items: center;
-        gap: 15px;
-    }
-    .suggestion-text {
-        font-family: 'Cinzel', serif;
-        color: var(--gold-1);
-        font-size: clamp(12px, 2.5vw, 15px);
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        text-shadow: 0 2px 5px rgba(0,0,0,0.8);
-        transition: opacity 0.4s var(--ease-out-expo);
-        background: linear-gradient(90deg, var(--gold-1), var(--gold-2), var(--gold-3), var(--gold-2), var(--gold-1));
-        background-size: 200% auto;
-        color: transparent;
-        -webkit-background-clip: text;
-        background-clip: text;
-        animation: shine 4s linear infinite;
-    }
-    .suggestion-input-wrapper {
-        display: flex;
-        gap: 8px;
-        background: var(--glass);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
-        padding: 5px;
-        border-radius: 30px;
-        border: 1px solid rgba(191, 149, 63, 0.3);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-        transition: border-color 0.3s ease, box-shadow 0.3s ease, opacity 0.4s var(--ease-out-expo);
-    }
-    .suggestion-input-wrapper:focus-within {
-        border-color: var(--gold-1);
-        box-shadow: 0 10px 30px rgba(191, 149, 63, 0.4);
-    }
-    #name-suggestion {
-        background: transparent;
-        border: none;
-        outline: none;
-        color: #fff;
-        font-family: 'Montserrat', sans-serif;
-        padding: 10px 20px;
-        font-size: 14px;
-        width: clamp(150px, 40vw, 250px);
-        transition: background 0.3s ease;
-        border-radius: 30px;
-    }
-    #name-suggestion:focus {
-        background: rgba(255, 255, 255, 0.05);
-    }
-    #name-suggestion::placeholder {
-        color: rgba(255, 255, 255, 0.4);
-    }
-    #submit-suggestion {
-        background: linear-gradient(90deg, var(--gold-1), var(--gold-2), var(--gold-1));
-        background-size: 200% auto;
-        border: none;
-        border-radius: 25px;
-        color: #050505;
-        font-family: 'Cinzel', serif;
-        font-weight: 800;
-        padding: 10px 25px;
-        cursor: pointer;
-        transition: transform 0.2s ease, box-shadow 0.2s ease, background-position 0.4s ease;
-    }
-    #submit-suggestion:hover {
-        background-position: right center;
-        box-shadow: 0 0 15px rgba(253, 245, 201, 0.5);
-        transform: scale(1.05);
-    }
-    #submit-suggestion:active {
-        transform: scale(0.95);
-    }
-    #suggestion-thank-you {
-        font-family: 'Cinzel', serif;
-        color: var(--gold-2);
-        font-size: clamp(14px, 3vw, 18px);
-        letter-spacing: 2px;
-        display: none;
-        opacity: 0;
-    }
-
-    @keyframes thankYouPop {
-        0% { opacity: 0; transform: scale(0.8) translateY(20px); filter: blur(5px); }
-        15% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0px); text-shadow: 0 0 20px rgba(253, 245, 201, 0.8); }
-        85% { opacity: 1; transform: scale(1); filter: blur(0px); text-shadow: 0 0 10px rgba(191, 149, 63, 0.5); }
-        100% { opacity: 0; transform: scale(1.05) translateY(-10px); filter: blur(5px); }
-    }
-
     /* ===== HARDWARE ACCELERATED BALLOONS ===== */
     .balloon-anim {
         position: absolute;
@@ -932,6 +898,21 @@
       <div class="time-unit"><div id="hours">00</div><span id="label-hours">Hours</span></div>
       <div class="time-unit"><div id="mins">00</div><span id="label-mins">Minutes</span></div>
       <div class="time-unit"><div id="secs">00</div><span id="label-secs">Seconds</span></div>
+    </div>
+
+    <div id="top-names-container" class="fade-in-delayed">
+        <h4 id="top-names-title">Top Shortlisted Names</h4>
+        <div class="top-names-flex" id="top-names-flex">
+            </div>
+    </div>
+    
+    <div id="suggestion-container" class="fade-in-delayed">
+        <p class="suggestion-text" id="suggestion-text">Have a beautiful name in mind?</p>
+        <div class="suggestion-input-wrapper">
+            <input type="text" id="name-suggestion" placeholder="Enter name suggestion..." maxlength="25" autocomplete="off" />
+            <button id="submit-suggestion" aria-label="Submit Name">Send</button>
+        </div>
+        <div id="suggestion-thank-you">Thank you for your suggestion! ✨</div>
     </div>
   </div>
 
@@ -1010,32 +991,6 @@
             </g>
         </svg>
     </div>
-    
-    <div id="journey-timer-container" class="fade-in-delayed">
-        <h4 class="gold-shimmer" id="journey-title">Untold Journey Begins In</h4>
-        <div class="timer-box compact-timer">
-          <div class="time-unit"><div id="j-days">00</div><span>Days</span></div>
-          <div class="time-unit"><div id="j-hours">00</div><span>Hours</span></div>
-          <div class="time-unit"><div id="j-mins">00</div><span>Minutes</span></div>
-          <div class="time-unit"><div id="j-secs">00</div><span>Seconds</span></div>
-        </div>
-    </div>
-
-    <div id="top-names-container" class="fade-in-delayed">
-        <h4 id="top-names-title">Top Shortlisted Names</h4>
-        <div class="top-names-flex" id="top-names-flex">
-            </div>
-    </div>
-
-    <div id="suggestion-container" class="fade-in-delayed">
-        <p class="suggestion-text" id="suggestion-text">Have a beautiful name in mind?</p>
-        <div class="suggestion-input-wrapper">
-            <input type="text" id="name-suggestion" placeholder="Enter name suggestion..." maxlength="25" autocomplete="off" />
-            <button id="submit-suggestion" aria-label="Submit Name">Send</button>
-        </div>
-        <div id="suggestion-thank-you">Thank you for your suggestion! ✨</div>
-    </div>
-
   </div>
 
   <noscript>
@@ -1054,11 +1009,10 @@
     const CONFIG = {
       ceremonyNameEn: window.__ceremonyNameEn || 'A.NIVISHA',
       ceremonyNameTa: window.__ceremonyNameTa || 'அ. நிவிஷா',
-      // Top 3 Shortlisted names
       topNames: ['NIVISHA', 'NITHISHA', 'NALINA'],
-      // Set to null to use demo timer. To bypass timer entirely, use a past date e.g. new Date('2023-01-01')
-      ceremonyEventDate: null, 
-      timerDemoSeconds: 0
+      // Pass a valid Date string here, or set null to use demo timer.
+      ceremonyEventDate: '2026-06-29T09:30:00', 
+      timerDemoSeconds: 8
     };
 
     /* ===== ELEMENT CACHE ===== */
@@ -1085,8 +1039,6 @@
       canvas: qs('#canvas-bg'),
       flashOverlay: qs('#flash-overlay'),
       
-      // Bottom Reveal Elements
-      journeyContainer: qs('#journey-timer-container'),
       topNamesContainer: qs('#top-names-container'),
       suggestionContainer: qs('#suggestion-container'),
       suggestionText: qs('#suggestion-text'),
@@ -1165,7 +1117,6 @@
         handleDragEnd();
     });
     
-    // Interactive Magnetic Seal Hover (Desktop Only)
     elements.sealWrapper?.addEventListener('mousemove', (e) => {
         if(window.innerWidth < 768) return;
         const rect = elements.sealWrapper.getBoundingClientRect();
@@ -1275,7 +1226,7 @@
     function renderName(nameStr, container) {
       if (!container) return;
       container.innerHTML = '';
-      const final = (nameStr && nameStr.trim().length > 0) ? nameStr.trim().toUpperCase() : 'A.NURA';
+      const final = (nameStr && nameStr.trim().length > 0) ? nameStr.trim().toUpperCase() : 'A.NIVISHA';
 
       let initialEndIdx = final.indexOf('.');
       if (initialEndIdx === -1) initialEndIdx = final.indexOf(' ');
@@ -1306,7 +1257,6 @@
       container.appendChild(restWrapper);
     }
     
-    /* Top 3 Names Renderer */
     function renderTopNames() {
         const flexContainer = qs('#top-names-flex');
         if(!flexContainer) return;
@@ -1319,7 +1269,7 @@
         });
     }
 
-    /* ===== TIMER LOGIC (PRE-REVEAL) ===== */
+    /* ===== TIMER LOGIC ===== */
     let countdownInterval = null;
     let finalTimer = null;
     let eventDate = null; 
@@ -1358,36 +1308,6 @@
       }
       updateOnce();
       countdownInterval = setInterval(updateOnce, 1000);
-    }
-
-    /* ===== POST-REVEAL JOURNEY TIMER ===== */
-    let journeyInterval = null;
-    function startJourneyTimer() {
-        if (journeyInterval) clearInterval(journeyInterval);
-        function updateJourney() {
-            const now = Date.now();
-            let diff = eventDate.getTime() - now;
-            const titleEl = qs('#journey-title');
-            
-            if (diff < 0) {
-                diff = Math.abs(diff); // Event has passed, count up
-                if(titleEl) titleEl.textContent = "The Journey Unfolded For";
-            } else {
-                if(titleEl) titleEl.textContent = "Untold Journey Begins In";
-            }
-            
-            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-            
-            safeSetText('j-days', days < 10 ? '0' + days : String(days));
-            safeSetText('j-hours', hours < 10 ? '0' + hours : String(hours));
-            safeSetText('j-mins', minutes < 10 ? '0' + minutes : String(minutes));
-            safeSetText('j-secs', seconds < 10 ? '0' + seconds : String(seconds));
-        }
-        updateJourney();
-        journeyInterval = setInterval(updateJourney, 1000);
     }
 
     /* ===== BUG-FREE CINEMATIC COUNTDOWN ===== */
@@ -1464,7 +1384,6 @@
         const dist = eventDate.getTime() - now;
 
         if (dist <= 0) {
-            // Already passed, skip pre-timer
             startFinalCountdown();
         } else {
             elements.timerScreen && (elements.timerScreen.style.display = 'flex');
@@ -1475,6 +1394,24 @@
             units.forEach((u, i) => {
                 setTimeout(() => u.classList.add('show-unit'), 100 + (i * 120));
             });
+
+            // Show Top Names
+            setTimeout(() => {
+                if(elements.topNamesContainer) elements.topNamesContainer.classList.add('show');
+            }, 800);
+            
+            // Show Suggestions only if > 2 days
+            const twoDaysMs = 2 * 24 * 60 * 60 * 1000;
+            if (dist > twoDaysMs) {
+                if (elements.suggestionContainer) {
+                    elements.suggestionContainer.style.display = 'flex';
+                    setTimeout(() => {
+                        elements.suggestionContainer.classList.add('show-suggestion');
+                    }, 1000);
+                }
+            } else {
+                if (elements.suggestionContainer) elements.suggestionContainer.style.display = 'none';
+            }
             
             startTimer();
         }
@@ -1535,33 +1472,6 @@
                       const babyGirl = qs('#baby-girl-container');
                       if(babyGirl) babyGirl.classList.add('slide-in');
                   }, 500);
-                  
-                  // Show Journey Timer
-                  setTimeout(() => {
-                      if(elements.journeyContainer) elements.journeyContainer.classList.add('show');
-                      startJourneyTimer();
-                  }, 1500);
-
-                  // Show Top 3 Names
-                  setTimeout(() => {
-                      if(elements.topNamesContainer) elements.topNamesContainer.classList.add('show');
-                  }, 2000);
-
-                  // Logic for Suggestion Box (>2 days check)
-                  const now = Date.now();
-                  const dist = eventDate.getTime() - now;
-                  const twoDaysMs = 2 * 24 * 60 * 60 * 1000;
-                  
-                  if (dist > twoDaysMs) {
-                      if (elements.suggestionContainer) {
-                          elements.suggestionContainer.style.display = 'flex';
-                          setTimeout(() => {
-                              elements.suggestionContainer.classList.add('show');
-                          }, 2500);
-                      }
-                  } else {
-                      if (elements.suggestionContainer) elements.suggestionContainer.style.display = 'none';
-                  }
 
               }, totalDelay);
 
@@ -1653,7 +1563,6 @@
       renderName(CONFIG.ceremonyNameEn, elements.babyNameEn);
       
       // Render Tamil Name
-      // Note: We bypass normal rendering logic for Tamil to handle continuous strings properly without spacing issues
       if (elements.babyNameTa) {
           elements.babyNameTa.innerHTML = `<div class="letter" style="opacity:1; transform:scale(1); filter:blur(0);">${CONFIG.ceremonyNameTa}</div>`;
       }
@@ -1674,7 +1583,6 @@
           if (elements.nameSuggestion && elements.nameSuggestion.value.trim() !== '') {
               const suggestion = elements.nameSuggestion.value.trim();
               
-              // Google Apps Script Web App URL
               const scriptURL = 'https://script.google.com/macros/s/AKfycbw_7UawCbLHx9bdcPnwqMaBUFyvUxWrRgiYYJuuec7wvgMreoiOilbtVOLRRbSsEpn2/exec';
               
               const formData = new FormData();
@@ -1686,7 +1594,6 @@
                   body: formData
               }).catch(error => console.error('Error!', error.message));
 
-              // Show Confetti Burst specifically from the button
               if (typeof confetti === 'function') {
                   const rect = elements.submitSuggestion.getBoundingClientRect();
                   const x = (rect.left + rect.width / 2) / window.innerWidth;
@@ -1701,7 +1608,6 @@
                   });
               }
 
-              // Fade out text and input wrapper smoothly
               if(elements.suggestionText) elements.suggestionText.style.opacity = '0';
               if(elements.suggestionInputWrapper) elements.suggestionInputWrapper.style.opacity = '0';
               
@@ -1710,7 +1616,6 @@
                   if(elements.suggestionText) elements.suggestionText.style.display = 'none';
                   if(elements.suggestionInputWrapper) elements.suggestionInputWrapper.style.display = 'none';
                   
-                  // Show and animate thank you message
                   if(elements.suggestionThankYou) {
                       elements.suggestionThankYou.style.display = 'block';
                       elements.suggestionThankYou.style.animation = 'thankYouPop 4s forwards';
