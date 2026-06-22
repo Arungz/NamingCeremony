@@ -24,11 +24,6 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Naming Ceremony">
   
-  <meta name="description" content="A grand naming ceremony invitation. Join our family to celebrate this magical milestone.">
-  <meta name="keywords" content="naming ceremony, baby naming, invitation, grand reveal, celebration, family, premium event">
-  <meta name="robots" content="index, follow">
-  <meta name="format-detection" content="telephone=no, email=no">
-  
   <title>Naming Ceremony ✨</title>
   <link rel="icon" type="image/png" href="Images/ak.png">
 
@@ -50,7 +45,6 @@
       --safe-area-top: env(safe-area-inset-top);
       --safe-area-bottom: env(safe-area-inset-bottom);
       
-      /* Cinematic Easing */
       --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
       --ease-in-out-circ: cubic-bezier(0.85, 0, 0.15, 1);
       --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -70,27 +64,15 @@
       overflow: hidden; 
       background-color: var(--bg);
       touch-action: pan-y;
-    }
-    
-    body {
       font-family: 'Montserrat', sans-serif;
-      background: radial-gradient(circle at 50% 50%, #1a1c20 0%, #050505 100%);
       color: #fff;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
-      text-rendering: optimizeLegibility;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding-top: var(--safe-area-top);
-      padding-bottom: var(--safe-area-bottom);
-      perspective: 1500px; 
-      user-select: none; 
     }
 
-    /* Hide Scrollbars */
+    /* Native App Scrollbar Hiding */
     ::-webkit-scrollbar { display: none; }
-
+    
     body::before {
       content: "";
       position: absolute;
@@ -133,7 +115,9 @@
       color: transparent;
       -webkit-background-clip: text;
       background-clip: text;
+      animation: shine 4s linear infinite;
     }
+    @keyframes shine { to { background-position: 200% center; } }
 
     /* ===== PULL TO REFRESH UI ===== */
     #ptr-wrapper {
@@ -152,7 +136,7 @@
         -webkit-backdrop-filter: blur(10px);
         border: 1px solid var(--gold-1);
         border-radius: 50%;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.8), 0 0 0px rgba(212, 175, 55, 0);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.8);
         transition: box-shadow 0.3s ease, background 0.3s ease;
         pointer-events: none;
         will-change: transform;
@@ -172,6 +156,25 @@
     .ptr-spin { animation: fastSpin 0.5s linear infinite !important; }
     @keyframes fastSpin { 100% { transform: rotate(360deg); } }
 
+    /* ===== SCROLLABLE SCREEN ARCHITECTURE (BUG FIX) ===== */
+    /* This prevents mobile overlapping by allowing elegant scrolling */
+    .scroll-screen {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 50;
+        display: none; /* toggled to flex via JS */
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        overflow-y: auto;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+        padding: clamp(40px, 8vh, 100px) 15px 80px 15px; /* Breathing room */
+        perspective: 1200px;
+    }
+
     /* ===== CINEMATIC 3D INTRO CONTAINER ===== */
     #scene-container {
       position: fixed;
@@ -182,7 +185,6 @@
       justify-content: center;
       align-items: center;
       transform-style: preserve-3d;
-      will-change: transform, opacity;
       transition: opacity 1.5s ease;
       perspective: 2000px;
     }
@@ -194,10 +196,10 @@
       height: 100%;
       background: linear-gradient(135deg, #0a0a0a, #000);
       box-shadow: inset 0 0 50px rgba(0,0,0,1);
-      transition: transform 2.5s var(--ease-in-out-circ), opacity 2.5s ease, filter 2.5s ease;
+      transition: transform 2.5s var(--ease-in-out-circ), opacity 2.5s ease;
       z-index: 101;
       overflow: hidden;
-      will-change: transform, opacity, filter;
+      will-change: transform, opacity;
       backface-visibility: hidden;
       -webkit-backface-visibility: hidden;
     }
@@ -218,8 +220,8 @@
     .gate.left { left: 0; border-right: 2px solid var(--gold-1); transform-origin: left center; }
     .gate.right { right: 0; border-left: 2px solid var(--gold-1); transform-origin: right center; }
     
-    .gate.open-left { transform: rotateY(-95deg) scale(1.1); opacity: 0; filter: blur(15px); }
-    .gate.open-right { transform: rotateY(95deg) scale(1.1); opacity: 0; filter: blur(15px); }
+    .gate.open-left { transform: rotateY(-95deg) scale(1.1); opacity: 0; }
+    .gate.open-right { transform: rotateY(95deg) scale(1.1); opacity: 0; }
 
     /* ===== MACHINED GOLD SEAL ===== */
     .seal-wrapper {
@@ -309,9 +311,9 @@
         pointer-events: none;
     }
     @keyframes epicShatter {
-        0% { transform: scale(1); opacity: 1; filter: blur(0px); }
-        30% { transform: scale(0.85) rotate(-5deg); opacity: 1; filter: blur(0px); box-shadow: 0 0 50px var(--gold-1); }
-        100% { transform: scale(2.5) rotate(45deg); opacity: 0; filter: blur(15px); box-shadow: 0 0 0 transparent; }
+        0% { transform: scale(1); opacity: 1; }
+        30% { transform: scale(0.85) rotate(-5deg); opacity: 1; box-shadow: 0 0 50px var(--gold-1); }
+        100% { transform: scale(2.5) rotate(45deg); opacity: 0; box-shadow: 0 0 0 transparent; }
     }
 
     .seal-aura {
@@ -342,26 +344,7 @@
     }
     @keyframes hintFade { 0% { opacity: 0.3; } 100% { opacity: 1; } }
 
-    /* ===== BULLETPROOF GRID TIMER SCREEN WITH SUGGESTIONS & TOP NAMES ===== */
-    #timer-screen {
-      position: absolute;
-      z-index: 50;
-      opacity: 0;
-      display: none;
-      flex-direction: column;
-      justify-content: flex-start;
-      align-items: center;
-      transition: opacity 1s ease;
-      text-align: center;
-      width: 100%;
-      height: 100%;
-      padding: clamp(30px, 10vh, 80px) 15px 40px 15px;
-      box-sizing: border-box;
-      perspective: 1200px;
-      overflow-y: auto;
-      overflow-x: hidden;
-    }
-    
+    /* ===== TIMER SCREEN (SCROLLABLE PAGE 1) ===== */
     #timer-title {
       font-family: 'Cinzel', serif;
       font-size: clamp(16px, 4vw, 36px);
@@ -396,7 +379,6 @@
       border-radius: 12px;
       box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
       text-align: center;
-      
       opacity: 0;
       transform: translate3d(0, -30px, -50px) rotateX(45deg);
       transition: opacity 0.6s ease, transform 1s var(--ease-spring);
@@ -416,6 +398,10 @@
         transform: rotate(45deg) translate3d(-100%, 0, 0);
         animation: glassCardShimmer 4s infinite linear;
         pointer-events: none;
+    }
+    @keyframes glassCardShimmer {
+        0%, 30% { transform: rotate(45deg) translate3d(-100%, 0, 0); }
+        70%, 100% { transform: rotate(45deg) translate3d(100%, 0, 0); }
     }
     
     .time-unit.show-unit {
@@ -440,7 +426,7 @@
       font-family: 'Cinzel', serif;
     }
 
-    /* TOP 3 NAMES SHOWCASE ON TIMER SCREEN */
+    /* TOP 3 NAMES SHOWCASE (ON TIMER SCREEN) */
     .fade-in-delayed {
         opacity: 0;
         transform: translate3d(0, 30px, 0);
@@ -452,7 +438,7 @@
     }
 
     #top-names-container {
-        display: none; 
+        display: none; /* Managed by JS */
         flex-direction: column;
         align-items: center;
         width: 100%;
@@ -496,12 +482,13 @@
         100% { transform: translate3d(0, -8px, 0); box-shadow: 0 15px 35px rgba(191, 149, 63, 0.2); }
     }
 
-    /* SUGGESTION BOX ON TIMER SCREEN */
+    /* SUGGESTION BOX (ON TIMER SCREEN) */
     #suggestion-container {
         display: none; 
         flex-direction: column;
         align-items: center;
         gap: 15px;
+        margin-bottom: 20px;
     }
     .suggestion-text {
         font-family: 'Cinzel', serif;
@@ -608,14 +595,14 @@
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
-      will-change: transform, opacity, filter;
-      animation: epicCount 1s var(--ease-out-expo) forwards;
+      will-change: transform, opacity;
+      animation: epicCount 0.95s var(--ease-out-expo) forwards;
     }
 
     @keyframes epicCount {
-      0% { transform: scale(0.2) translate3d(0,0,-200px); opacity: 0; filter: blur(20px); }
-      30% { transform: scale(1) translate3d(0,0,0); opacity: 1; filter: blur(0px); text-shadow: 0 0 50px rgba(191, 149, 63, 0.7); }
-      100% { transform: scale(2.5) translate3d(0,0,200px); opacity: 0; filter: blur(30px); }
+      0% { transform: scale(0.2) translate3d(0,0,-200px); opacity: 0; }
+      30% { transform: scale(1) translate3d(0,0,0); opacity: 1; text-shadow: 0 0 50px rgba(191, 149, 63, 0.7); }
+      100% { transform: scale(2.5) translate3d(0,0,200px); opacity: 0; }
     }
 
     /* Cinematic White Flash Transition */
@@ -633,20 +620,7 @@
         transition: opacity 0.2s ease;
     }
 
-    /* ===== PERFECTLY POSITIONED REVEAL SCREEN ===== */
-    #reveal-screen { 
-      position: absolute; 
-      inset: 0;
-      z-index: 70; 
-      display: none; 
-      flex-direction: column;
-      justify-content: center; 
-      padding-top: 0; 
-      align-items: center;
-      perspective: 1200px; 
-      width: 100%; 
-    }
-    
+    /* ===== REVEAL SCREEN (SCROLLABLE PAGE 2) ===== */
     #reveal-subtitle {
       font-family: 'Cinzel', serif;
       font-weight: 400;
@@ -681,7 +655,7 @@
         to { background-position: 200% center; }
     }
 
-    /* ===== BILINGUAL NAME SWAP CONTAINER ===== */
+    /* BILINGUAL NAME SWAP CONTAINER */
     .lang-swap-container {
       position: relative;
       width: 100%;
@@ -689,7 +663,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      margin-bottom: 10px;
+      margin-bottom: 20px;
     }
 
     .name-container { 
@@ -734,7 +708,7 @@
       font-weight: 800;
       color: var(--gold-2);
       -webkit-font-smoothing: antialiased;
-      will-change: transform, opacity, color, text-shadow, filter;
+      will-change: transform, opacity, color, text-shadow;
       text-shadow: 
         0 1px 0 #b38728, 0 2px 0 #9f7622, 0 3px 0 #8c661c,
         0 15px 25px rgba(0,0,0,0.8);
@@ -743,21 +717,19 @@
     .initial-part {
       opacity: 0;
       transform: translate3d(0, 50px, -200px) rotateX(-70deg) scale(0.8);
-      transition: transform 1.2s var(--ease-spring), opacity 1s ease, filter 1s ease;
-      filter: blur(10px);
+      transition: transform 1.2s var(--ease-spring), opacity 1s ease;
     }
     .initial-part.show { 
       opacity: 1; 
       transform: translate3d(0, 0, 0) rotateX(0deg) scale(1); 
-      filter: blur(0px);
     }
 
     .is-name { opacity: 0; margin-left: clamp(2px, 1vw, 12px); }
 
     @keyframes popFlash {
-        0% { opacity: 0; transform: translate3d(0, 50px, -150px) rotateX(-70deg) scale(0.8); color: transparent; text-shadow: 0 0 40px rgba(253, 245, 201, 0); filter: blur(12px); }
-        50% { opacity: 1; transform: translate3d(0, -10px, 30px) rotateX(10deg) scale(1.1); color: #fff; text-shadow: 0 0 50px rgba(253, 245, 201, 1), 0 10px 20px rgba(0,0,0,0.8); filter: blur(0px); }
-        100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1) rotateX(0deg); color: var(--gold-2); text-shadow: 0 1px 0 #b38728, 0 2px 0 #9f7622, 0 3px 0 #8c661c, 0 15px 25px rgba(0,0,0,0.8); filter: blur(0px); }
+        0% { opacity: 0; transform: translate3d(0, 50px, -150px) rotateX(-70deg) scale(0.8); color: transparent; text-shadow: 0 0 40px rgba(253, 245, 201, 0); }
+        50% { opacity: 1; transform: translate3d(0, -10px, 30px) rotateX(10deg) scale(1.1); color: #fff; text-shadow: 0 0 50px rgba(253, 245, 201, 1), 0 10px 20px rgba(0,0,0,0.8); }
+        100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1) rotateX(0deg); color: var(--gold-2); text-shadow: 0 1px 0 #b38728, 0 2px 0 #9f7622, 0 3px 0 #8c661c, 0 15px 25px rgba(0,0,0,0.8); }
     }
 
     /* ===== ADVANCED KAWAII BABY GIRL SVG & SPARKLES ===== */
@@ -768,7 +740,7 @@
         width: 180px;
         height: 180px;
         opacity: 0;
-        filter: drop-shadow(0 20px 20px rgba(0,0,0,0.6)) blur(8px);
+        filter: drop-shadow(0 20px 20px rgba(0,0,0,0.6));
         transition: transform 1.5s var(--ease-spring), opacity 1.2s ease, filter 1.2s ease;
         display: flex;
         justify-content: center;
@@ -781,7 +753,6 @@
     #baby-girl-container.slide-in {
         transform: translate3d(0, 0, 0) rotateX(0deg) scale(1); 
         opacity: 1;
-        filter: drop-shadow(0 20px 20px rgba(0,0,0,0.6)) blur(0px);
         animation: floatBaby 4s ease-in-out infinite forwards;
         animation-delay: 1.5s;
     }
@@ -830,6 +801,37 @@
     @keyframes twinkle {
         0%, 100% { opacity: 0; transform: scale(0.5) rotate(0deg); }
         50% { opacity: 1; transform: scale(1.2) rotate(20deg); text-shadow: 0 0 15px #fdf5c9; }
+    }
+
+    /* ===== POST-REVEAL JOURNEY TIMER ===== */
+    #journey-timer-container {
+        margin-top: clamp(30px, 6vw, 50px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+    }
+    #journey-title {
+        font-family: 'Cinzel', serif;
+        font-size: clamp(14px, 3vw, 24px);
+        margin-bottom: 15px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        text-shadow: 0 5px 15px rgba(0,0,0,0.8);
+    }
+    .compact-timer {
+        max-width: 500px;
+        gap: clamp(4px, 1.5vw, 15px);
+        margin-bottom: 0;
+    }
+    .compact-timer .time-unit {
+        padding: clamp(8px, 2vw, 15px) 2px;
+        border-radius: 8px;
+        transform: none; /* Disable 3D flip for the bottom timer */
+        opacity: 1;
+    }
+    .compact-timer .time-unit div {
+        font-size: clamp(16px, 4vw, 45px);
     }
 
     /* ===== HARDWARE ACCELERATED BALLOONS ===== */
@@ -891,7 +893,7 @@
     </div>
   </div>
 
-  <div id="timer-screen" aria-live="polite" aria-atomic="true">
+  <div id="timer-screen" class="scroll-screen" aria-live="polite" aria-atomic="true">
     <h2 id="timer-title" class="gold-shimmer">The Journey Unfolds In</h2>
     <div class="timer-box" role="group">
       <div class="time-unit"><div id="days">00</div><span id="label-days">Days</span></div>
@@ -899,13 +901,13 @@
       <div class="time-unit"><div id="mins">00</div><span id="label-mins">Minutes</span></div>
       <div class="time-unit"><div id="secs">00</div><span id="label-secs">Seconds</span></div>
     </div>
-
+    
     <div id="top-names-container" class="fade-in-delayed">
         <h4 id="top-names-title">Top Shortlisted Names</h4>
         <div class="top-names-flex" id="top-names-flex">
             </div>
     </div>
-    
+
     <div id="suggestion-container" class="fade-in-delayed">
         <p class="suggestion-text" id="suggestion-text">Have a beautiful name in mind?</p>
         <div class="suggestion-input-wrapper">
@@ -918,7 +920,7 @@
 
   <div id="countdown-screen" aria-live="assertive" aria-atomic="true"></div>
 
-  <div id="reveal-screen" aria-hidden="true">
+  <div id="reveal-screen" class="scroll-screen" aria-hidden="true">
     <h3 id="reveal-subtitle">Welcome To The World</h3>
     
     <div class="lang-swap-container">
@@ -927,10 +929,10 @@
     </div>
     
     <div id="baby-girl-container">
-        <div class="sparkle" style="top: 10px; left: 10px; animation-delay: 0s;">✨</div>
-        <div class="sparkle" style="top: 40px; right: 0px; animation-delay: 0.5s;">✨</div>
-        <div class="sparkle" style="top: 110px; left: 5px; animation-delay: 1.2s;">✨</div>
-        <div class="sparkle" style="top: -5px; right: 30px; animation-delay: 0.8s;">✨</div>
+        <div class="sparkle" style="top: 15px; left: 15px; animation-delay: 0s;">✨</div>
+        <div class="sparkle" style="top: 50px; right: 5px; animation-delay: 0.5s;">✨</div>
+        <div class="sparkle" style="top: 130px; left: 10px; animation-delay: 1.2s;">✨</div>
+        <div class="sparkle" style="top: 5px; right: 35px; animation-delay: 0.8s;">✨</div>
 
         <svg width="100%" height="100%" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
             <defs>
@@ -991,6 +993,16 @@
             </g>
         </svg>
     </div>
+    
+    <div id="journey-timer-container" class="fade-in-delayed">
+        <h4 class="gold-shimmer" id="journey-title">Untold Journey Begins In</h4>
+        <div class="timer-box compact-timer">
+          <div class="time-unit"><div id="j-days">00</div><span>Days</span></div>
+          <div class="time-unit"><div id="j-hours">00</div><span>Hours</span></div>
+          <div class="time-unit"><div id="j-mins">00</div><span>Minutes</span></div>
+          <div class="time-unit"><div id="j-secs">00</div><span>Seconds</span></div>
+        </div>
+    </div>
   </div>
 
   <noscript>
@@ -1039,6 +1051,7 @@
       canvas: qs('#canvas-bg'),
       flashOverlay: qs('#flash-overlay'),
       
+      journeyContainer: qs('#journey-timer-container'),
       topNamesContainer: qs('#top-names-container'),
       suggestionContainer: qs('#suggestion-container'),
       suggestionText: qs('#suggestion-text'),
@@ -1117,6 +1130,7 @@
         handleDragEnd();
     });
     
+    // Interactive Magnetic Seal Hover (Desktop Only)
     elements.sealWrapper?.addEventListener('mousemove', (e) => {
         if(window.innerWidth < 768) return;
         const rect = elements.sealWrapper.getBoundingClientRect();
@@ -1226,7 +1240,7 @@
     function renderName(nameStr, container) {
       if (!container) return;
       container.innerHTML = '';
-      const final = (nameStr && nameStr.trim().length > 0) ? nameStr.trim().toUpperCase() : 'A.NIVISHA';
+      const final = (nameStr && nameStr.trim().length > 0) ? nameStr.trim().toUpperCase() : 'A.NURA';
 
       let initialEndIdx = final.indexOf('.');
       if (initialEndIdx === -1) initialEndIdx = final.indexOf(' ');
@@ -1308,6 +1322,35 @@
       }
       updateOnce();
       countdownInterval = setInterval(updateOnce, 1000);
+    }
+    
+    let journeyInterval = null;
+    function startJourneyTimer() {
+        if (journeyInterval) clearInterval(journeyInterval);
+        function updateJourney() {
+            const now = Date.now();
+            let diff = eventDate.getTime() - now;
+            const titleEl = qs('#journey-title');
+            
+            if (diff < 0) {
+                diff = Math.abs(diff); // Count UP
+                if(titleEl) titleEl.textContent = "The Journey Unfolded For";
+            } else {
+                if(titleEl) titleEl.textContent = "Untold Journey Begins In";
+            }
+            
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            
+            safeSetText('j-days', days < 10 ? '0' + days : String(days));
+            safeSetText('j-hours', hours < 10 ? '0' + hours : String(hours));
+            safeSetText('j-mins', minutes < 10 ? '0' + minutes : String(minutes));
+            safeSetText('j-secs', seconds < 10 ? '0' + seconds : String(seconds));
+        }
+        updateJourney();
+        journeyInterval = setInterval(updateJourney, 1000);
     }
 
     /* ===== BUG-FREE CINEMATIC COUNTDOWN ===== */
@@ -1394,20 +1437,20 @@
             units.forEach((u, i) => {
                 setTimeout(() => u.classList.add('show-unit'), 100 + (i * 120));
             });
-
+            
             // Show Top Names
             setTimeout(() => {
                 if(elements.topNamesContainer) elements.topNamesContainer.classList.add('show');
             }, 800);
             
-            // Show Suggestions only if > 2 days
+            // Logic for Suggestion Box (>2 days check)
             const twoDaysMs = 2 * 24 * 60 * 60 * 1000;
             if (dist > twoDaysMs) {
                 if (elements.suggestionContainer) {
                     elements.suggestionContainer.style.display = 'flex';
                     setTimeout(() => {
                         elements.suggestionContainer.classList.add('show-suggestion');
-                    }, 1000);
+                    }, 1200);
                 }
             } else {
                 if (elements.suggestionContainer) elements.suggestionContainer.style.display = 'none';
@@ -1467,11 +1510,15 @@
                       }
                   }, 4000);
                   
-                  // Show Baby SVG
                   setTimeout(() => {
                       const babyGirl = qs('#baby-girl-container');
                       if(babyGirl) babyGirl.classList.add('slide-in');
                   }, 500);
+                  
+                  setTimeout(() => {
+                      if(elements.journeyContainer) elements.journeyContainer.classList.add('show');
+                      startJourneyTimer();
+                  }, 1500);
 
               }, totalDelay);
 
@@ -1480,7 +1527,7 @@
       }, 1500);
     }
 
-    /* ===== OPTIMIZED CANNON BLAST (FIXED LOGIC) ===== */
+    /* ===== OPTIMIZED CANNON BLAST ===== */
     function fireFourCornerBlast() {
       if (reducedMotion || typeof confetti !== 'function') return;
       
@@ -1564,7 +1611,7 @@
       
       // Render Tamil Name
       if (elements.babyNameTa) {
-          elements.babyNameTa.innerHTML = `<div class="letter" style="opacity:1; transform:scale(1); filter:blur(0);">${CONFIG.ceremonyNameTa}</div>`;
+          elements.babyNameTa.innerHTML = `<div class="letter" style="opacity:1; transform:scale(1); filter:blur(0); text-shadow: 0 1px 0 #b38728, 0 2px 0 #9f7622, 0 3px 0 #8c661c, 0 15px 25px rgba(0,0,0,0.8);">${CONFIG.ceremonyNameTa}</div>`;
       }
       
       // Render Top Names
