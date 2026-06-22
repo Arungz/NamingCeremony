@@ -88,6 +88,9 @@
       user-select: none; 
     }
 
+    /* Hide Scrollbar for a native app feel on the reveal screen */
+    ::-webkit-scrollbar { display: none; }
+
     body::before {
       content: "";
       position: absolute;
@@ -130,9 +133,7 @@
       color: transparent;
       -webkit-background-clip: text;
       background-clip: text;
-      animation: shine 4s linear infinite;
     }
-    @keyframes shine { to { background-position: 200% center; } }
 
     /* ===== PULL TO REFRESH UI ===== */
     #ptr-wrapper {
@@ -439,29 +440,355 @@
       font-family: 'Cinzel', serif;
     }
 
-    /* ===== ADVANCED SUGGESTION BOX UI ===== */
-    #suggestion-container {
-        margin-top: clamp(25px, 5vw, 40px);
-        display: none; 
-        flex-direction: column;
-        align-items: center;
-        gap: 15px;
-        opacity: 0;
-        transform: translate3d(0, 20px, 0);
-        transition: opacity 0.8s ease, transform 1s var(--ease-spring);
+    /* ===== FLAWLESS CINEMATIC COUNTDOWN SCREEN ===== */
+    #countdown-screen {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 60;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      pointer-events: none;
+      overflow: hidden;
     }
-    #suggestion-container.show-suggestion {
+    
+    .countdown-num {
+      position: absolute;
+      font-family: 'Cinzel', serif;
+      font-size: clamp(150px, 45vw, 400px);
+      font-weight: 800;
+      background: linear-gradient(180deg, var(--gold-2) 0%, var(--gold-1) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      will-change: transform, opacity, filter;
+      animation: epicCount 1s var(--ease-out-expo) forwards;
+    }
+
+    @keyframes epicCount {
+      0% { transform: scale(0.2) translate3d(0,0,-200px); opacity: 0; filter: blur(20px); }
+      30% { transform: scale(1) translate3d(0,0,0); opacity: 1; filter: blur(0px); text-shadow: 0 0 50px rgba(191, 149, 63, 0.7); }
+      100% { transform: scale(2.5) translate3d(0,0,200px); opacity: 0; filter: blur(30px); }
+    }
+
+    /* Cinematic White Flash Transition */
+    #flash-overlay {
+        position: fixed;
+        inset: 0;
+        background: #fff;
+        z-index: 65;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 1.5s var(--ease-out-expo);
+    }
+    #flash-overlay.flash {
+        opacity: 1;
+        transition: opacity 0.2s ease;
+    }
+
+    /* ===== PERFECTLY SCROLLABLE REVEAL SCREEN ===== */
+    #reveal-screen { 
+      position: absolute; 
+      inset: 0;
+      z-index: 70; 
+      display: none; 
+      flex-direction: column;
+      justify-content: flex-start; 
+      padding: 10vh 15px 60px 15px; 
+      align-items: center;
+      width: 100%; 
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+    
+    #reveal-subtitle {
+      font-family: 'Cinzel', serif;
+      font-weight: 400;
+      font-size: clamp(16px, 4vw, 32px);
+      letter-spacing: clamp(4px, 2vw, 12px); 
+      color: var(--gold-2);
+      margin-bottom: 25px;
+      text-transform: uppercase;
+      opacity: 0;
+      transform: translate3d(0, -20px, 0);
+      text-shadow: 0 5px 20px rgba(0,0,0,0.9);
+      text-align: center;
+      will-change: transform, opacity;
+      
+      background: linear-gradient(90deg, var(--gold-3) 0%, var(--gold-2) 40%, #fff 50%, var(--gold-2) 60%, var(--gold-3) 100%);
+      background-size: 200% auto;
+      color: transparent;
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+    
+    .subtitle-show { 
+        animation: 
+            cinematicSettle 2.5s var(--ease-out-expo) forwards,
+            shimmerSweep 4s linear infinite 2.5s; 
+    }
+    @keyframes cinematicSettle {
+        0% { opacity: 0; transform: translate3d(0, -40px, 0) scale(1.1); filter: blur(8px); }
+        100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); filter: blur(0px); text-shadow: 0 5px 20px rgba(0,0,0,0.9); }
+    }
+    @keyframes shimmerSweep {
+        to { background-position: 200% center; }
+    }
+
+    /* ===== BILINGUAL NAME SWAP CONTAINER ===== */
+    .lang-swap-container {
+      position: relative;
+      width: 100%;
+      height: clamp(60px, 15vw, 160px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .name-container { 
+      position: absolute;
+      display: flex; 
+      justify-content: center; 
+      align-items: center;
+      white-space: nowrap; 
+      max-width: 95vw;
+      transition: opacity 1.5s ease, transform 1.5s var(--ease-spring);
+    }
+    
+    .name-hidden {
+        opacity: 0 !important;
+        transform: scale(0.9) rotateX(20deg) !important;
+        pointer-events: none;
+    }
+    .name-visible {
+        opacity: 1 !important;
+        transform: scale(1) rotateX(0deg) !important;
+    }
+    
+    .rest-part-wrapper {
+        display: grid;
+        grid-template-columns: 0fr; 
+        transition: grid-template-columns 1.2s var(--ease-in-out-circ);
+        will-change: grid-template-columns;
+    }
+    .rest-part-wrapper.expand { grid-template-columns: 1fr; }
+    
+    .rest-part-inner {
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        padding: 20px 0;
+        margin: -20px 0;
+    }
+
+    .letter {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(30px, 9vw, 130px); 
+      font-weight: 800;
+      color: var(--gold-2);
+      -webkit-font-smoothing: antialiased;
+      will-change: transform, opacity, color, text-shadow, filter;
+      text-shadow: 
+        0 1px 0 #b38728, 0 2px 0 #9f7622, 0 3px 0 #8c661c,
+        0 15px 25px rgba(0,0,0,0.8);
+    }
+
+    .initial-part {
+      opacity: 0;
+      transform: translate3d(0, 50px, -200px) rotateX(-70deg) scale(0.8);
+      transition: transform 1.2s var(--ease-spring), opacity 1s ease, filter 1s ease;
+      filter: blur(10px);
+    }
+    .initial-part.show { 
+      opacity: 1; 
+      transform: translate3d(0, 0, 0) rotateX(0deg) scale(1); 
+      filter: blur(0px);
+    }
+
+    .is-name { opacity: 0; margin-left: clamp(2px, 1vw, 12px); }
+
+    @keyframes popFlash {
+        0% { opacity: 0; transform: translate3d(0, 50px, -150px) rotateX(-70deg) scale(0.8); color: transparent; text-shadow: 0 0 40px rgba(253, 245, 201, 0); filter: blur(12px); }
+        50% { opacity: 1; transform: translate3d(0, -10px, 30px) rotateX(10deg) scale(1.1); color: #fff; text-shadow: 0 0 50px rgba(253, 245, 201, 1), 0 10px 20px rgba(0,0,0,0.8); filter: blur(0px); }
+        100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1) rotateX(0deg); color: var(--gold-2); text-shadow: 0 1px 0 #b38728, 0 2px 0 #9f7622, 0 3px 0 #8c661c, 0 15px 25px rgba(0,0,0,0.8); filter: blur(0px); }
+    }
+
+    /* ===== ADVANCED KAWAII BABY GIRL SVG & SPARKLES ===== */
+    #baby-girl-container {
+        position: relative;
+        margin-top: 15px;
+        transform: translate3d(0, 50px, -50px) rotateX(-90deg) scale(0.8); 
+        width: 180px;
+        height: 180px;
+        opacity: 0;
+        filter: drop-shadow(0 20px 20px rgba(0,0,0,0.6)) blur(8px);
+        transition: transform 1.5s var(--ease-spring), opacity 1.2s ease, filter 1.2s ease;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        will-change: transform, opacity, filter;
+        transform-style: preserve-3d;
+        backface-visibility: hidden;
+    }
+    
+    #baby-girl-container.slide-in {
+        transform: translate3d(0, 0, 0) rotateX(0deg) scale(1); 
+        opacity: 1;
+        filter: drop-shadow(0 20px 20px rgba(0,0,0,0.6)) blur(0px);
+        animation: floatBaby 4s ease-in-out infinite forwards;
+        animation-delay: 1.5s;
+    }
+    
+    @keyframes floatBaby {
+        0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+        50% { transform: translate3d(0, -12px, 0) scale(1.02); }
+    }
+    
+    .waving-arm {
+        transform-origin: 140px 140px; 
+        animation: wave-hand 0.8s infinite alternate ease-in-out;
+        will-change: transform;
+    }
+    @keyframes wave-hand {
+        0% { transform: rotate(-5deg); }
+        100% { transform: rotate(35deg); }
+    }
+
+    .eyes {
+        transform-origin: 100px 98px;
+        animation: blink 4s infinite;
+    }
+    @keyframes blink {
+        0%, 96%, 98%, 100% { transform: scaleY(1); }
+        97% { transform: scaleY(0.1); }
+    }
+    
+    .head-group {
+        transform-origin: 100px 140px;
+        animation: headBob 3s infinite alternate ease-in-out;
+    }
+    @keyframes headBob {
+        0% { transform: rotate(-1.5deg); }
+        100% { transform: rotate(2.5deg); }
+    }
+
+    .sparkle {
+        position: absolute;
+        font-size: clamp(14px, 3vw, 20px);
+        opacity: 0;
+        animation: twinkle 2s infinite ease-in-out;
+        pointer-events: none;
+        will-change: transform, opacity;
+    }
+    @keyframes twinkle {
+        0%, 100% { opacity: 0; transform: scale(0.5) rotate(0deg); }
+        50% { opacity: 1; transform: scale(1.2) rotate(20deg); text-shadow: 0 0 15px #fdf5c9; }
+    }
+
+    /* ===== POST-REVEAL JOURNEY TIMER ===== */
+    .fade-in-delayed {
+        opacity: 0;
+        transform: translate3d(0, 30px, 0);
+        transition: opacity 1s ease, transform 1.2s var(--ease-spring);
+    }
+    .fade-in-delayed.show {
         opacity: 1;
         transform: translate3d(0, 0, 0);
     }
-    #suggestion-text {
+
+    #journey-timer-container {
+        margin-top: clamp(20px, 5vw, 40px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+    }
+    #journey-title {
         font-family: 'Cinzel', serif;
+        font-size: clamp(14px, 3vw, 24px);
+        margin-bottom: 15px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        text-shadow: 0 5px 15px rgba(0,0,0,0.8);
+    }
+    .compact-timer {
+        max-width: 500px;
+        gap: clamp(4px, 1.5vw, 15px);
+    }
+    .compact-timer .time-unit {
+        padding: clamp(8px, 2vw, 15px) 2px;
+        border-radius: 8px;
+        transform: none; /* Disable 3D flip for the bottom timer to keep it neat */
+        opacity: 1;
+    }
+    .compact-timer .time-unit div {
+        font-size: clamp(16px, 4vw, 45px);
+    }
+
+    /* ===== TOP 3 NAMES SHOWCASE ===== */
+    #top-names-container {
+        margin-top: clamp(30px, 6vw, 50px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+    }
+    #top-names-title {
+        font-family: 'Cinzel', serif;
+        font-size: clamp(14px, 3vw, 24px);
+        margin-bottom: 20px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        text-shadow: 0 5px 15px rgba(0,0,0,0.8);
+        color: var(--muted);
+    }
+    .top-names-flex {
+        display: flex;
+        gap: clamp(10px, 3vw, 20px);
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    .top-name-card {
+        background: var(--glass);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(191, 149, 63, 0.4);
+        border-radius: 20px;
+        padding: clamp(10px, 2vw, 15px) clamp(20px, 4vw, 30px);
+        font-family: 'Cinzel', serif;
+        font-weight: 800;
+        font-size: clamp(14px, 3vw, 22px);
+        color: var(--gold-2);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+        text-shadow: 0 2px 5px rgba(0,0,0,0.8);
+        animation: floatCard 3s ease-in-out infinite alternate;
+    }
+    /* Stagger the floating animation */
+    .top-name-card:nth-child(2) { animation-delay: 0.5s; border-color: var(--gold-1); }
+    .top-name-card:nth-child(3) { animation-delay: 1s; }
+    
+    @keyframes floatCard {
+        0% { transform: translate3d(0, 0, 0); box-shadow: 0 10px 25px rgba(0,0,0,0.6); }
+        100% { transform: translate3d(0, -8px, 0); box-shadow: 0 15px 35px rgba(191, 149, 63, 0.2); }
+    }
+
+    /* ===== SUGGESTION BOX UI (Moved to Bottom) ===== */
+    #suggestion-container {
+        margin-top: clamp(40px, 8vw, 60px);
+        display: flex; /* Display managed by >2 days logic */
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+    .suggestion-text {
+        font-family: 'Cinzel', serif;
+        color: var(--gold-1);
         font-size: clamp(12px, 2.5vw, 15px);
         letter-spacing: 2px;
         text-transform: uppercase;
         text-shadow: 0 2px 5px rgba(0,0,0,0.8);
         transition: opacity 0.4s var(--ease-out-expo);
-        /* Subtle shimmer on text */
         background: linear-gradient(90deg, var(--gold-1), var(--gold-2), var(--gold-3), var(--gold-2), var(--gold-1));
         background-size: 200% auto;
         color: transparent;
@@ -532,241 +859,11 @@
         opacity: 0;
     }
 
-    /* Cinematic Pop for Thank You Text */
     @keyframes thankYouPop {
         0% { opacity: 0; transform: scale(0.8) translateY(20px); filter: blur(5px); }
         15% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0px); text-shadow: 0 0 20px rgba(253, 245, 201, 0.8); }
         85% { opacity: 1; transform: scale(1); filter: blur(0px); text-shadow: 0 0 10px rgba(191, 149, 63, 0.5); }
         100% { opacity: 0; transform: scale(1.05) translateY(-10px); filter: blur(5px); }
-    }
-
-    /* ===== FLAWLESS CINEMATIC COUNTDOWN SCREEN ===== */
-    #countdown-screen {
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      z-index: 60;
-      display: none;
-      justify-content: center;
-      align-items: center;
-      pointer-events: none;
-      overflow: hidden;
-    }
-    
-    .countdown-num {
-      position: absolute;
-      font-family: 'Cinzel', serif;
-      font-size: clamp(150px, 45vw, 400px);
-      font-weight: 800;
-      background: linear-gradient(180deg, var(--gold-2) 0%, var(--gold-1) 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      will-change: transform, opacity, filter;
-      animation: epicCount 1s var(--ease-out-expo) forwards;
-    }
-
-    @keyframes epicCount {
-      0% { transform: scale(0.2) translate3d(0,0,-200px); opacity: 0; filter: blur(20px); }
-      30% { transform: scale(1) translate3d(0,0,0); opacity: 1; filter: blur(0px); text-shadow: 0 0 50px rgba(191, 149, 63, 0.7); }
-      100% { transform: scale(2.5) translate3d(0,0,200px); opacity: 0; filter: blur(30px); }
-    }
-
-    /* Cinematic White Flash Transition */
-    #flash-overlay {
-        position: fixed;
-        inset: 0;
-        background: #fff;
-        z-index: 65;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 1.5s var(--ease-out-expo);
-    }
-    #flash-overlay.flash {
-        opacity: 1;
-        transition: opacity 0.2s ease;
-    }
-
-    /* ===== PERFECTLY POSITIONED REVEAL SCREEN ===== */
-    #reveal-screen { 
-      position: absolute; 
-      inset: 0;
-      z-index: 70; 
-      display: none; 
-      flex-direction: column;
-      justify-content: flex-start; 
-      padding-top: 15vh; 
-      align-items: center;
-      perspective: 1200px; 
-      width: 100%; 
-    }
-    
-    @media (min-width: 768px) {
-      #reveal-screen { justify-content: center; padding-top: 0; }
-    }
-    
-    #reveal-subtitle {
-      font-family: 'Cinzel', serif;
-      font-weight: 400;
-      font-size: clamp(16px, 4vw, 32px);
-      letter-spacing: clamp(4px, 2vw, 12px); 
-      color: var(--gold-2);
-      margin-bottom: 40px;
-      text-transform: uppercase;
-      opacity: 0;
-      transform: translate3d(0, -20px, 0);
-      text-shadow: 0 5px 20px rgba(0,0,0,0.9);
-      text-align: center;
-      will-change: transform, opacity;
-      
-      background: linear-gradient(90deg, var(--gold-3) 0%, var(--gold-2) 40%, #fff 50%, var(--gold-2) 60%, var(--gold-3) 100%);
-      background-size: 200% auto;
-      color: transparent;
-      -webkit-background-clip: text;
-      background-clip: text;
-    }
-    
-    .subtitle-show { 
-        animation: 
-            cinematicSettle 2.5s var(--ease-out-expo) forwards,
-            shimmerSweep 4s linear infinite 2.5s; 
-    }
-    @keyframes cinematicSettle {
-        0% { opacity: 0; transform: translate3d(0, -40px, 0) scale(1.1); filter: blur(8px); }
-        100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); filter: blur(0px); text-shadow: 0 5px 20px rgba(0,0,0,0.9); }
-    }
-    @keyframes shimmerSweep {
-        to { background-position: 200% center; }
-    }
-
-    /* ===== SMART ANIMATION NAME CONTAINER ===== */
-    .name-container { 
-      display: flex; 
-      justify-content: center; 
-      align-items: center;
-      white-space: nowrap; 
-      max-width: 95vw;
-    }
-    
-    .rest-part-wrapper {
-        display: grid;
-        grid-template-columns: 0fr; 
-        transition: grid-template-columns 1.2s var(--ease-in-out-circ);
-        will-change: grid-template-columns;
-    }
-    .rest-part-wrapper.expand { grid-template-columns: 1fr; }
-    
-    .rest-part-inner {
-        overflow: hidden;
-        display: flex;
-        align-items: center;
-        padding: 20px 0;
-        margin: -20px 0;
-    }
-
-    .letter {
-      font-family: 'Cinzel', serif;
-      font-size: clamp(30px, 10vw, 140px); 
-      font-weight: 800;
-      color: var(--gold-2);
-      -webkit-font-smoothing: antialiased;
-      will-change: transform, opacity, color, text-shadow, filter;
-      text-shadow: 
-        0 1px 0 #b38728, 0 2px 0 #9f7622, 0 3px 0 #8c661c,
-        0 15px 25px rgba(0,0,0,0.8);
-      backface-visibility: hidden;
-      -webkit-backface-visibility: hidden;
-    }
-
-    .initial-part {
-      opacity: 0;
-      transform: translate3d(0, 50px, -200px) rotateX(-70deg) scale(0.8);
-      transition: transform 1.2s var(--ease-spring), opacity 1s ease, filter 1s ease;
-      filter: blur(10px);
-    }
-    .initial-part.show { 
-      opacity: 1; 
-      transform: translate3d(0, 0, 0) rotateX(0deg) scale(1); 
-      filter: blur(0px);
-    }
-
-    .is-name { opacity: 0; margin-left: clamp(2px, 1.5vw, 15px); }
-
-    @keyframes popFlash {
-        0% { opacity: 0; transform: translate3d(0, 50px, -150px) rotateX(-70deg) scale(0.8); color: transparent; text-shadow: 0 0 40px rgba(253, 245, 201, 0); filter: blur(12px); }
-        50% { opacity: 1; transform: translate3d(0, -10px, 30px) rotateX(10deg) scale(1.1); color: #fff; text-shadow: 0 0 50px rgba(253, 245, 201, 1), 0 10px 20px rgba(0,0,0,0.8); filter: blur(0px); }
-        100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1) rotateX(0deg); color: var(--gold-2); text-shadow: 0 1px 0 #b38728, 0 2px 0 #9f7622, 0 3px 0 #8c661c, 0 15px 25px rgba(0,0,0,0.8); filter: blur(0px); }
-    }
-
-    /* ===== ADVANCED KAWAII BABY GIRL SVG & SPARKLES ===== */
-    #baby-girl-container {
-        position: relative;
-        margin-top: 30px;
-        transform: translate3d(0, 50px, -50px) rotateX(-90deg) scale(0.8); 
-        width: 180px;
-        height: 180px;
-        opacity: 0;
-        filter: drop-shadow(0 20px 20px rgba(0,0,0,0.6)) blur(8px);
-        transition: transform 1.5s var(--ease-spring), opacity 1.2s ease, filter 1.2s ease;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        will-change: transform, opacity, filter;
-        transform-style: preserve-3d;
-        backface-visibility: hidden;
-    }
-    
-    #baby-girl-container.slide-in {
-        transform: translate3d(0, 0, 0) rotateX(0deg) scale(1); 
-        opacity: 1;
-        filter: drop-shadow(0 20px 20px rgba(0,0,0,0.6)) blur(0px);
-        animation: floatBaby 4s ease-in-out infinite forwards;
-        animation-delay: 1.5s;
-    }
-    
-    @keyframes floatBaby {
-        0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
-        50% { transform: translate3d(0, -12px, 0) scale(1.02); }
-    }
-    
-    .waving-arm {
-        transform-origin: 135px 125px; 
-        animation: wave-hand 0.8s infinite alternate ease-in-out;
-        will-change: transform;
-    }
-    @keyframes wave-hand {
-        0% { transform: rotate(-5deg); }
-        100% { transform: rotate(35deg); }
-    }
-
-    .eyes {
-        transform-origin: 100px 98px;
-        animation: blink 4s infinite;
-    }
-    @keyframes blink {
-        0%, 96%, 98%, 100% { transform: scaleY(1); }
-        97% { transform: scaleY(0.1); }
-    }
-    
-    .head-group {
-        transform-origin: 100px 140px;
-        animation: headBob 3s infinite alternate ease-in-out;
-    }
-    @keyframes headBob {
-        0% { transform: rotate(-1.5deg); }
-        100% { transform: rotate(2.5deg); }
-    }
-
-    .sparkle {
-        position: absolute;
-        font-size: clamp(14px, 3vw, 20px);
-        opacity: 0;
-        animation: twinkle 2s infinite ease-in-out;
-        pointer-events: none;
-        will-change: transform, opacity;
-    }
-    @keyframes twinkle {
-        0%, 100% { opacity: 0; transform: scale(0.5) rotate(0deg); }
-        50% { opacity: 1; transform: scale(1.2) rotate(20deg); text-shadow: 0 0 15px #fdf5c9; }
     }
 
     /* ===== HARDWARE ACCELERATED BALLOONS ===== */
@@ -836,22 +933,17 @@
       <div class="time-unit"><div id="mins">00</div><span id="label-mins">Minutes</span></div>
       <div class="time-unit"><div id="secs">00</div><span id="label-secs">Seconds</span></div>
     </div>
-    
-    <div id="suggestion-container">
-        <p class="suggestion-text" id="suggestion-text">Have a beautiful name in mind?</p>
-        <div class="suggestion-input-wrapper">
-            <input type="text" id="name-suggestion" placeholder="Enter name suggestion..." maxlength="25" autocomplete="off" />
-            <button id="submit-suggestion" aria-label="Submit Name">Send</button>
-        </div>
-        <div id="suggestion-thank-you">Thank you for your suggestion! ✨</div>
-    </div>
   </div>
 
   <div id="countdown-screen" aria-live="assertive" aria-atomic="true"></div>
 
   <div id="reveal-screen" aria-hidden="true">
     <h3 id="reveal-subtitle">Welcome To The World</h3>
-    <div class="name-container" id="baby-name" aria-hidden="true"></div>
+    
+    <div class="lang-swap-container">
+        <div class="name-container name-visible" id="baby-name-en" aria-hidden="false"></div>
+        <div class="name-container name-hidden" id="baby-name-ta" aria-hidden="true"></div>
+    </div>
     
     <div id="baby-girl-container">
         <div class="sparkle" style="top: 10px; left: 10px; animation-delay: 0s;">✨</div>
@@ -918,6 +1010,32 @@
             </g>
         </svg>
     </div>
+    
+    <div id="journey-timer-container" class="fade-in-delayed">
+        <h4 class="gold-shimmer" id="journey-title">Untold Journey Begins In</h4>
+        <div class="timer-box compact-timer">
+          <div class="time-unit"><div id="j-days">00</div><span>Days</span></div>
+          <div class="time-unit"><div id="j-hours">00</div><span>Hours</span></div>
+          <div class="time-unit"><div id="j-mins">00</div><span>Minutes</span></div>
+          <div class="time-unit"><div id="j-secs">00</div><span>Seconds</span></div>
+        </div>
+    </div>
+
+    <div id="top-names-container" class="fade-in-delayed">
+        <h4 id="top-names-title">Top Shortlisted Names</h4>
+        <div class="top-names-flex" id="top-names-flex">
+            </div>
+    </div>
+
+    <div id="suggestion-container" class="fade-in-delayed">
+        <p class="suggestion-text" id="suggestion-text">Have a beautiful name in mind?</p>
+        <div class="suggestion-input-wrapper">
+            <input type="text" id="name-suggestion" placeholder="Enter name suggestion..." maxlength="25" autocomplete="off" />
+            <button id="submit-suggestion" aria-label="Submit Name">Send</button>
+        </div>
+        <div id="suggestion-thank-you">Thank you for your suggestion! ✨</div>
+    </div>
+
   </div>
 
   <noscript>
@@ -934,9 +1052,12 @@
 
     /* ===== CONFIGURATION ===== */
     const CONFIG = {
-      ceremonyName: window.__ceremonyName || 'A.NIVISHA',
-      // Pass a valid Date string here, or set null to use demo timer.
-      ceremonyEventDate: null, 
+      ceremonyNameEn: window.__ceremonyNameEn || 'A.NIVISHA',
+      ceremonyNameTa: window.__ceremonyNameTa || 'அ. நிவிஷா',
+      // Top 3 Shortlisted names
+      topNames: ['A. NIYARA', 'A. NITHILA', 'A. NIVITHA'],
+      // Set to null to use demo timer. To bypass timer entirely, use a past date e.g. new Date('2023-01-01')
+      ceremonyEventDate: '2026-06-29T09:30:00', 
       timerDemoSeconds: 8
     };
 
@@ -957,11 +1078,16 @@
       countdownScreen: qs('#countdown-screen'),
       revealScreen: qs('#reveal-screen'),
       revealSubtitle: qs('#reveal-subtitle'),
-      babyNameContainer: qs('#baby-name'),
+      
+      babyNameEn: qs('#baby-name-en'),
+      babyNameTa: qs('#baby-name-ta'),
+      
       canvas: qs('#canvas-bg'),
       flashOverlay: qs('#flash-overlay'),
       
-      // Suggestion Elements
+      // Bottom Reveal Elements
+      journeyContainer: qs('#journey-timer-container'),
+      topNamesContainer: qs('#top-names-container'),
       suggestionContainer: qs('#suggestion-container'),
       suggestionText: qs('#suggestion-text'),
       suggestionInputWrapper: qs('.suggestion-input-wrapper'),
@@ -1039,7 +1165,7 @@
         handleDragEnd();
     });
     
-    // ADVANCED: Interactive Magnetic Seal Hover (Desktop Only)
+    // Interactive Magnetic Seal Hover (Desktop Only)
     elements.sealWrapper?.addEventListener('mousemove', (e) => {
         if(window.innerWidth < 768) return;
         const rect = elements.sealWrapper.getBoundingClientRect();
@@ -1146,8 +1272,7 @@
     }
 
     /* ===== SMART NAME RENDERER ===== */
-    function renderName(nameStr) {
-      const container = elements.babyNameContainer;
+    function renderName(nameStr, container) {
       if (!container) return;
       container.innerHTML = '';
       const final = (nameStr && nameStr.trim().length > 0) ? nameStr.trim().toUpperCase() : 'A.NURA';
@@ -1180,8 +1305,21 @@
       restWrapper.appendChild(restInner);
       container.appendChild(restWrapper);
     }
+    
+    /* Top 3 Names Renderer */
+    function renderTopNames() {
+        const flexContainer = qs('#top-names-flex');
+        if(!flexContainer) return;
+        flexContainer.innerHTML = '';
+        CONFIG.topNames.forEach(name => {
+            const el = document.createElement('div');
+            el.className = 'top-name-card';
+            el.textContent = name;
+            flexContainer.appendChild(el);
+        });
+    }
 
-    /* ===== TIMER LOGIC ===== */
+    /* ===== TIMER LOGIC (PRE-REVEAL) ===== */
     let countdownInterval = null;
     let finalTimer = null;
     let eventDate = null; 
@@ -1220,6 +1358,36 @@
       }
       updateOnce();
       countdownInterval = setInterval(updateOnce, 1000);
+    }
+
+    /* ===== POST-REVEAL JOURNEY TIMER ===== */
+    let journeyInterval = null;
+    function startJourneyTimer() {
+        if (journeyInterval) clearInterval(journeyInterval);
+        function updateJourney() {
+            const now = Date.now();
+            let diff = eventDate.getTime() - now;
+            const titleEl = qs('#journey-title');
+            
+            if (diff < 0) {
+                diff = Math.abs(diff); // Event has passed, count up
+                if(titleEl) titleEl.textContent = "The Journey Unfolded For";
+            } else {
+                if(titleEl) titleEl.textContent = "Untold Journey Begins In";
+            }
+            
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            
+            safeSetText('j-days', days < 10 ? '0' + days : String(days));
+            safeSetText('j-hours', hours < 10 ? '0' + hours : String(hours));
+            safeSetText('j-mins', minutes < 10 ? '0' + minutes : String(minutes));
+            safeSetText('j-secs', seconds < 10 ? '0' + seconds : String(seconds));
+        }
+        updateJourney();
+        journeyInterval = setInterval(updateJourney, 1000);
     }
 
     /* ===== BUG-FREE CINEMATIC COUNTDOWN ===== */
@@ -1296,28 +1464,17 @@
         const dist = eventDate.getTime() - now;
 
         if (dist <= 0) {
+            // Already passed, skip pre-timer
             startFinalCountdown();
         } else {
             elements.timerScreen && (elements.timerScreen.style.display = 'flex');
             void elements.timerScreen.offsetWidth; 
             elements.timerScreen && (elements.timerScreen.style.opacity = '1');
             
-            const units = qsa('.time-unit');
+            const units = qsa('.time-unit', elements.timerScreen);
             units.forEach((u, i) => {
                 setTimeout(() => u.classList.add('show-unit'), 100 + (i * 120));
             });
-            
-            const twoDaysMs = 2 * 24 * 60 * 60 * 1000;
-            if (dist > twoDaysMs) {
-                if (elements.suggestionContainer) {
-                    elements.suggestionContainer.style.display = 'flex';
-                    setTimeout(() => {
-                        elements.suggestionContainer.classList.add('show-suggestion');
-                    }, 100 + (units.length * 120) + 300);
-                }
-            } else {
-                if (elements.suggestionContainer) elements.suggestionContainer.style.display = 'none';
-            }
             
             startTimer();
         }
@@ -1331,15 +1488,16 @@
           elements.revealSubtitle.classList.add('subtitle-show');
       }
 
+      // Start revealing the English Name
       setTimeout(() => {
-          const initialPart = qs('.initial-part');
+          const initialPart = qs('.initial-part', elements.babyNameEn);
           if (initialPart) initialPart.classList.add('show');
 
           setTimeout(() => {
-              const wrapper = qs('.rest-part-wrapper');
+              const wrapper = qs('.rest-part-wrapper', elements.babyNameEn);
               if(wrapper) wrapper.classList.add('expand');
 
-              const restLetters = qsa('.is-name', elements.babyNameContainer);
+              const restLetters = qsa('.is-name', elements.babyNameEn);
               restLetters.forEach((letter, idx) => {
                   setTimeout(() => {
                       letter.classList.add('show');
@@ -1355,10 +1513,55 @@
                   fireFourCornerBlast();
                   fireHeartBalloons();
                   
+                  // Setup Bilingual Swap Loop
+                  setInterval(() => {
+                      const en = elements.babyNameEn;
+                      const ta = elements.babyNameTa;
+                      if(en.classList.contains('name-visible')){
+                          en.classList.remove('name-visible');
+                          en.classList.add('name-hidden');
+                          ta.classList.remove('name-hidden');
+                          ta.classList.add('name-visible');
+                      } else {
+                          ta.classList.remove('name-visible');
+                          ta.classList.add('name-hidden');
+                          en.classList.remove('name-hidden');
+                          en.classList.add('name-visible');
+                      }
+                  }, 4000);
+                  
+                  // Show Baby SVG
                   setTimeout(() => {
                       const babyGirl = qs('#baby-girl-container');
                       if(babyGirl) babyGirl.classList.add('slide-in');
-                  }, 6500);
+                  }, 500);
+                  
+                  // Show Journey Timer
+                  setTimeout(() => {
+                      if(elements.journeyContainer) elements.journeyContainer.classList.add('show');
+                      startJourneyTimer();
+                  }, 1500);
+
+                  // Show Top 3 Names
+                  setTimeout(() => {
+                      if(elements.topNamesContainer) elements.topNamesContainer.classList.add('show');
+                  }, 2000);
+
+                  // Logic for Suggestion Box (>2 days check)
+                  const now = Date.now();
+                  const dist = eventDate.getTime() - now;
+                  const twoDaysMs = 2 * 24 * 60 * 60 * 1000;
+                  
+                  if (dist > twoDaysMs) {
+                      if (elements.suggestionContainer) {
+                          elements.suggestionContainer.style.display = 'flex';
+                          setTimeout(() => {
+                              elements.suggestionContainer.classList.add('show');
+                          }, 2500);
+                      }
+                  } else {
+                      if (elements.suggestionContainer) elements.suggestionContainer.style.display = 'none';
+                  }
 
               }, totalDelay);
 
@@ -1445,7 +1648,18 @@
     /* ===== INITIALIZATION ===== */
     (function init() {
       initCanvas();
-      renderName(CONFIG.ceremonyName);
+      
+      // Render English Name
+      renderName(CONFIG.ceremonyNameEn, elements.babyNameEn);
+      
+      // Render Tamil Name
+      // Note: We bypass normal rendering logic for Tamil to handle continuous strings properly without spacing issues
+      if (elements.babyNameTa) {
+          elements.babyNameTa.innerHTML = `<div class="letter" style="opacity:1; transform:scale(1); filter:blur(0);">${CONFIG.ceremonyNameTa}</div>`;
+      }
+      
+      // Render Top Names
+      renderTopNames();
 
       elements.letterN?.addEventListener('click', triggerEntrance, { passive: true });
       elements.letterN?.addEventListener('keydown', (e) => {
