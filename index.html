@@ -142,7 +142,7 @@
         -webkit-backdrop-filter: blur(10px);
         border: 1px solid var(--gold-1);
         border-radius: 50%;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.8);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.8), 0 0 0px rgba(212, 175, 55, 0);
         transition: box-shadow 0.3s ease, background 0.3s ease;
         pointer-events: none;
         will-change: transform;
@@ -195,7 +195,6 @@
       perspective: 2000px;
     }
 
-    /* PERFECTED SAFE GATE ANIMATION */
     .gate {
       position: absolute;
       top: 0;
@@ -206,7 +205,7 @@
       transition: transform 2.5s var(--ease-in-out-circ), opacity 2.5s ease, filter 2.5s ease;
       z-index: 101;
       overflow: hidden;
-      will-change: transform, opacity, filter;
+      will-change: transform, opacity;
       backface-visibility: hidden;
       -webkit-backface-visibility: hidden;
     }
@@ -227,8 +226,8 @@
     .gate.left { left: 0; border-right: 2px solid var(--gold-1); transform-origin: left center; }
     .gate.right { right: 0; border-left: 2px solid var(--gold-1); transform-origin: right center; }
     
-    .gate.open-left { transform: translate3d(-100%, 0, 0) scale(1.05); opacity: 0; filter: blur(15px); }
-    .gate.open-right { transform: translate3d(100%, 0, 0) scale(1.05); opacity: 0; filter: blur(15px); }
+    .gate.open-left { transform: rotateY(-95deg) scale(1.1); opacity: 0; }
+    .gate.open-right { transform: rotateY(95deg) scale(1.1); opacity: 0; }
 
     /* ===== MACHINED GOLD SEAL ===== */
     .seal-wrapper {
@@ -303,7 +302,6 @@
         to { box-shadow: 0 10px 30px rgba(0,0,0,0.9), 0 0 25px 5px rgba(191, 149, 63, 0.4); }
     }
     
-    /* SAFE HOVER LOGIC TO FIX ANIMATION CANCELLATION */
     #letter-N:not(.shatter):hover, #letter-N:not(.shatter):active { 
         animation: none; 
         transform: scale(1.05); 
@@ -319,9 +317,9 @@
         pointer-events: none;
     }
     @keyframes epicShatter {
-        0% { transform: scale(1); opacity: 1; filter: blur(0px); }
-        30% { transform: scale(0.85) rotate(-5deg); opacity: 1; filter: blur(0px); box-shadow: 0 0 50px var(--gold-1); }
-        100% { transform: scale(2.5) rotate(45deg); opacity: 0; filter: blur(15px); box-shadow: 0 0 0 transparent; }
+        0% { transform: scale(1); opacity: 1; }
+        30% { transform: scale(0.85) rotate(-5deg); opacity: 1; box-shadow: 0 0 50px var(--gold-1); }
+        100% { transform: scale(2.5) rotate(45deg); opacity: 0; box-shadow: 0 0 0 transparent; }
     }
 
     .seal-aura {
@@ -554,7 +552,8 @@
         color: #fff;
         font-family: 'Montserrat', sans-serif;
         padding: 10px 20px;
-        font-size: 14px;
+        /* Increased to 16px to prevent iOS Safari auto-zoom bug */
+        font-size: 16px; 
         width: clamp(150px, 40vw, 250px);
         transition: background 0.3s ease;
         border-radius: 30px;
@@ -592,6 +591,7 @@
         letter-spacing: 2px;
         display: none;
         opacity: 0;
+        text-align: center;
     }
 
     @keyframes thankYouPop {
@@ -622,14 +622,14 @@
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
-      will-change: transform, opacity, filter;
-      animation: epicCount 1s var(--ease-out-expo) forwards;
+      will-change: transform, opacity;
+      animation: epicCount 0.95s var(--ease-out-expo) forwards; 
     }
 
     @keyframes epicCount {
-      0% { transform: scale(0.2) translate3d(0,0,-200px); opacity: 0; filter: blur(20px); }
-      30% { transform: scale(1) translate3d(0,0,0); opacity: 1; filter: blur(0px); text-shadow: 0 0 50px rgba(191, 149, 63, 0.7); }
-      100% { transform: scale(2.5) translate3d(0,0,200px); opacity: 0; filter: blur(30px); }
+      0% { transform: scale(0.2) translate3d(0,0,-200px); opacity: 0; }
+      30% { transform: scale(1) translate3d(0,0,0); opacity: 1; text-shadow: 0 0 50px rgba(191, 149, 63, 0.7); }
+      100% { transform: scale(2.5) translate3d(0,0,200px); opacity: 0; }
     }
 
     /* Cinematic White Flash Transition */
@@ -648,6 +648,23 @@
     }
 
     /* ===== REVEAL SCREEN (SCROLLABLE PAGE 2) ===== */
+    #reveal-screen { 
+      position: absolute; 
+      inset: 0;
+      z-index: 70; 
+      display: none; 
+      flex-direction: column;
+      justify-content: flex-start; 
+      padding-top: 15vh; 
+      align-items: center;
+      perspective: 1200px; 
+      width: 100%; 
+    }
+    
+    @media (min-width: 768px) {
+      #reveal-screen { justify-content: center; padding-top: 0; }
+    }
+    
     #reveal-subtitle {
       font-family: 'Cinzel', serif;
       font-weight: 400;
@@ -735,32 +752,28 @@
       font-weight: 800;
       color: var(--gold-2);
       -webkit-font-smoothing: antialiased;
-      will-change: transform, opacity, color, text-shadow, filter;
+      will-change: transform, opacity, color, text-shadow;
       text-shadow: 
         0 1px 0 #b38728, 0 2px 0 #9f7622, 0 3px 0 #8c661c,
         0 15px 25px rgba(0,0,0,0.8);
-      backface-visibility: hidden;
-      -webkit-backface-visibility: hidden;
     }
 
     .initial-part {
       opacity: 0;
       transform: translate3d(0, 50px, -200px) rotateX(-70deg) scale(0.8);
-      transition: transform 1.2s var(--ease-spring), opacity 1s ease, filter 1s ease;
-      filter: blur(10px);
+      transition: transform 1.2s var(--ease-spring), opacity 1s ease;
     }
     .initial-part.show { 
       opacity: 1; 
       transform: translate3d(0, 0, 0) rotateX(0deg) scale(1); 
-      filter: blur(0px);
     }
 
     .is-name { opacity: 0; margin-left: clamp(2px, 1vw, 12px); }
 
     @keyframes popFlash {
-        0% { opacity: 0; transform: translate3d(0, 50px, -150px) rotateX(-70deg) scale(0.8); color: transparent; text-shadow: 0 0 40px rgba(253, 245, 201, 0); filter: blur(12px); }
-        50% { opacity: 1; transform: translate3d(0, -10px, 30px) rotateX(10deg) scale(1.1); color: #fff; text-shadow: 0 0 50px rgba(253, 245, 201, 1), 0 10px 20px rgba(0,0,0,0.8); filter: blur(0px); }
-        100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1) rotateX(0deg); color: var(--gold-2); text-shadow: 0 1px 0 #b38728, 0 2px 0 #9f7622, 0 3px 0 #8c661c, 0 15px 25px rgba(0,0,0,0.8); filter: blur(0px); }
+        0% { opacity: 0; transform: translate3d(0, 50px, -150px) rotateX(-70deg) scale(0.8); color: transparent; text-shadow: 0 0 40px rgba(253, 245, 201, 0); }
+        50% { opacity: 1; transform: translate3d(0, -10px, 30px) rotateX(10deg) scale(1.1); color: #fff; text-shadow: 0 0 50px rgba(253, 245, 201, 1), 0 10px 20px rgba(0,0,0,0.8); }
+        100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1) rotateX(0deg); color: var(--gold-2); text-shadow: 0 1px 0 #b38728, 0 2px 0 #9f7622, 0 3px 0 #8c661c, 0 15px 25px rgba(0,0,0,0.8); }
     }
 
     /* ===== ADVANCED KAWAII BABY GIRL SVG & SPARKLES ===== */
@@ -771,7 +784,7 @@
         width: 180px;
         height: 180px;
         opacity: 0;
-        filter: drop-shadow(0 20px 20px rgba(0,0,0,0.6)) blur(8px);
+        filter: drop-shadow(0 20px 20px rgba(0,0,0,0.6));
         transition: transform 1.5s var(--ease-spring), opacity 1.2s ease, filter 1.2s ease;
         display: flex;
         justify-content: center;
@@ -784,7 +797,6 @@
     #baby-girl-container.slide-in {
         transform: translate3d(0, 0, 0) rotateX(0deg) scale(1); 
         opacity: 1;
-        filter: drop-shadow(0 20px 20px rgba(0,0,0,0.6)) blur(0px);
         animation: floatBaby 4s ease-in-out infinite forwards;
         animation-delay: 1.5s;
     }
@@ -1436,7 +1448,7 @@
             const titleEl = qs('#journey-title');
             
             if (diff < 0) {
-                diff = Math.abs(diff); // Event has passed, count UP
+                diff = Math.abs(diff); // Count UP
                 if(titleEl) titleEl.textContent = "The Journey Unfolded For";
             } else {
                 if(titleEl) titleEl.textContent = "Untold Journey Begins In";
@@ -1544,7 +1556,7 @@
             // ===== EXACT 2-DAY RULE LOGIC =====
             const votingActive = isVotingAllowed();
             
-            // 1. Render Top Names
+            // 1. Render Top Names (Always visible, but interactivity is controlled securely)
             renderTopNames(votingActive);
             if (elements.topNamesContainer) {
                 elements.topNamesContainer.style.display = 'flex';
@@ -1553,16 +1565,33 @@
                 }, 100 + (units.length * 120) + 300);
             }
             
-            // 2. Conditionally show Custom Suggestion Box (> 2 days)
-            if (votingActive) {
-                if (elements.suggestionContainer) {
-                    elements.suggestionContainer.style.display = 'flex';
-                    setTimeout(() => {
-                        elements.suggestionContainer.classList.add('show-suggestion');
-                    }, 100 + (units.length * 120) + 600);
+            // 2. Safely Render Suggestion Box with Disabled States
+            if (elements.suggestionContainer) {
+                elements.suggestionContainer.style.display = 'flex';
+                
+                if (!votingActive) {
+                    if (elements.suggestionText) elements.suggestionText.textContent = "Suggestions & Voting Closed";
+                    if (elements.nameSuggestion) {
+                        elements.nameSuggestion.disabled = true;
+                        elements.nameSuggestion.placeholder = "Ceremony approaching...";
+                    }
+                    if (elements.submitSuggestion) {
+                        elements.submitSuggestion.disabled = true;
+                    }
+                } else {
+                    if (elements.suggestionText) elements.suggestionText.textContent = "Or suggest a beautiful name...";
+                    if (elements.nameSuggestion) {
+                        elements.nameSuggestion.disabled = false;
+                        elements.nameSuggestion.placeholder = "Enter name suggestion...";
+                    }
+                    if (elements.submitSuggestion) {
+                        elements.submitSuggestion.disabled = false;
+                    }
                 }
-            } else {
-                if (elements.suggestionContainer) elements.suggestionContainer.style.display = 'none';
+
+                setTimeout(() => {
+                    elements.suggestionContainer.classList.add('show');
+                }, 100 + (units.length * 120) + 600);
             }
             
             startTimer();
@@ -1722,7 +1751,7 @@
       if (elements.babyNameTa) {
           elements.babyNameTa.innerHTML = `<div class="letter" style="opacity:1; transform:scale(1); filter:blur(0); text-shadow: 0 1px 0 #b38728, 0 2px 0 #9f7622, 0 3px 0 #8c661c, 0 15px 25px rgba(0,0,0,0.8);">${CONFIG.ceremonyNameTa}</div>`;
       }
-      
+
       elements.letterN?.addEventListener('click', triggerEntrance, { passive: true });
       elements.letterN?.addEventListener('keydown', (e) => {
           if (e.key === 'Enter' || e.key === ' ') {
@@ -1731,6 +1760,7 @@
           }
       });
       
+      // ===== CUSTOM SUGGESTION SUBMIT LOGIC =====
       elements.submitSuggestion?.addEventListener('click', () => {
           if (elements.nameSuggestion && elements.nameSuggestion.value.trim() !== '') {
               submitDatabaseName(elements.nameSuggestion.value);
