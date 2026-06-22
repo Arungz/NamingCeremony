@@ -142,7 +142,7 @@
         -webkit-backdrop-filter: blur(10px);
         border: 1px solid var(--gold-1);
         border-radius: 50%;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.8), 0 0 0px rgba(212, 175, 55, 0);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.8);
         transition: box-shadow 0.3s ease, background 0.3s ease;
         pointer-events: none;
         will-change: transform;
@@ -195,6 +195,7 @@
       perspective: 2000px;
     }
 
+    /* PERFECTED SAFE GATE ANIMATION */
     .gate {
       position: absolute;
       top: 0;
@@ -226,8 +227,8 @@
     .gate.left { left: 0; border-right: 2px solid var(--gold-1); transform-origin: left center; }
     .gate.right { right: 0; border-left: 2px solid var(--gold-1); transform-origin: right center; }
     
-    .gate.open-left { transform: rotateY(-95deg) scale(1.1); opacity: 0; filter: blur(15px); }
-    .gate.open-right { transform: rotateY(95deg) scale(1.1); opacity: 0; filter: blur(15px); }
+    .gate.open-left { transform: translate3d(-100%, 0, 0) scale(1.05); opacity: 0; filter: blur(15px); }
+    .gate.open-right { transform: translate3d(100%, 0, 0) scale(1.05); opacity: 0; filter: blur(15px); }
 
     /* ===== MACHINED GOLD SEAL ===== */
     .seal-wrapper {
@@ -302,6 +303,7 @@
         to { box-shadow: 0 10px 30px rgba(0,0,0,0.9), 0 0 25px 5px rgba(191, 149, 63, 0.4); }
     }
     
+    /* SAFE HOVER LOGIC TO FIX ANIMATION CANCELLATION */
     #letter-N:not(.shatter):hover, #letter-N:not(.shatter):active { 
         animation: none; 
         transform: scale(1.05); 
@@ -436,7 +438,7 @@
     .fade-in-delayed {
         opacity: 0;
         transform: translate3d(0, 30px, 0);
-        transition: opacity 1s ease, transform 1.2s var(--ease-spring);
+        transition: opacity 0.8s ease, transform 1s var(--ease-spring);
     }
     .fade-in-delayed.show {
         opacity: 1;
@@ -444,11 +446,12 @@
     }
 
     #top-names-container {
-        display: none; /* Managed by JS */
+        display: none; /* Managed by JS based on rule */
         flex-direction: column;
         align-items: center;
         width: 100%;
         margin-bottom: clamp(30px, 6vw, 50px);
+        transition: opacity 0.4s ease;
     }
     #top-names-title {
         font-family: 'Cinzel', serif;
@@ -458,12 +461,14 @@
         text-transform: uppercase;
         text-shadow: 0 5px 15px rgba(0,0,0,0.8);
         color: var(--muted);
+        transition: opacity 0.4s ease;
     }
     .top-names-flex {
         display: flex;
         gap: clamp(10px, 3vw, 20px);
         justify-content: center;
         flex-wrap: wrap;
+        transition: opacity 0.4s ease;
     }
     .top-name-card {
         background: var(--glass);
@@ -506,7 +511,7 @@
 
     /* SUGGESTION BOX (ON TIMER SCREEN) */
     #suggestion-container {
-        display: none; /* Managed by JS based on 2 Days logic */
+        display: none; /* Toggled to flex in JS based on 2-day rule */
         flex-direction: column;
         align-items: center;
         gap: 15px;
@@ -557,10 +562,6 @@
     #name-suggestion:focus {
         background: rgba(255, 255, 255, 0.05);
     }
-    #name-suggestion:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-    }
     #name-suggestion::placeholder {
         color: rgba(255, 255, 255, 0.4);
     }
@@ -576,22 +577,14 @@
         cursor: pointer;
         transition: transform 0.2s ease, box-shadow 0.2s ease, background-position 0.4s ease;
     }
-    #submit-suggestion:hover:not(:disabled) {
+    #submit-suggestion:hover {
         background-position: right center;
         box-shadow: 0 0 15px rgba(253, 245, 201, 0.5);
         transform: scale(1.05);
     }
-    #submit-suggestion:active:not(:disabled) {
+    #submit-suggestion:active {
         transform: scale(0.95);
     }
-    #submit-suggestion:disabled {
-        background: rgba(255, 255, 255, 0.2);
-        color: rgba(255, 255, 255, 0.5);
-        cursor: not-allowed;
-        box-shadow: none;
-        transform: scale(1);
-    }
-
     #suggestion-thank-you {
         font-family: 'Cinzel', serif;
         color: var(--gold-2);
@@ -599,7 +592,6 @@
         letter-spacing: 2px;
         display: none;
         opacity: 0;
-        text-align: center;
     }
 
     @keyframes thankYouPop {
@@ -656,23 +648,6 @@
     }
 
     /* ===== REVEAL SCREEN (SCROLLABLE PAGE 2) ===== */
-    #reveal-screen { 
-      position: absolute; 
-      inset: 0;
-      z-index: 70; 
-      display: none; 
-      flex-direction: column;
-      justify-content: flex-start; 
-      padding-top: 15vh; 
-      align-items: center;
-      perspective: 1200px; 
-      width: 100%; 
-    }
-    
-    @media (min-width: 768px) {
-      #reveal-screen { justify-content: center; padding-top: 0; }
-    }
-    
     #reveal-subtitle {
       font-family: 'Cinzel', serif;
       font-weight: 400;
@@ -1332,7 +1307,7 @@
       restWrapper.appendChild(restInner);
       container.appendChild(restWrapper);
     }
-    
+
     /* ===== SECURE VOTING & SUBMISSION LOGIC ===== */
     function isVotingAllowed() {
         if (!eventDate) return false;
@@ -1414,6 +1389,7 @@
     /* ===== TIMER LOGIC ===== */
     let countdownInterval = null;
     let finalTimer = null;
+    let eventDate = null; 
 
     function safeSetText(id, text) {
       const el = document.getElementById(id);
@@ -1460,7 +1436,7 @@
             const titleEl = qs('#journey-title');
             
             if (diff < 0) {
-                diff = Math.abs(diff); // Count UP
+                diff = Math.abs(diff); // Event has passed, count UP
                 if(titleEl) titleEl.textContent = "The Journey Unfolded For";
             } else {
                 if(titleEl) titleEl.textContent = "Untold Journey Begins In";
@@ -1565,10 +1541,10 @@
                 setTimeout(() => u.classList.add('show-unit'), 100 + (i * 120));
             });
 
-            // ===== UNIFIED 2-DAY UI DISPLAY LOGIC =====
+            // ===== EXACT 2-DAY RULE LOGIC =====
             const votingActive = isVotingAllowed();
             
-            // 1. Render Top Names (Always visible, but interactivity is controlled securely)
+            // 1. Render Top Names
             renderTopNames(votingActive);
             if (elements.topNamesContainer) {
                 elements.topNamesContainer.style.display = 'flex';
@@ -1577,33 +1553,16 @@
                 }, 100 + (units.length * 120) + 300);
             }
             
-            // 2. Safely Render Suggestion Box with Disabled States
-            if (elements.suggestionContainer) {
-                elements.suggestionContainer.style.display = 'flex';
-                
-                if (!votingActive) {
-                    if (elements.suggestionText) elements.suggestionText.textContent = "Suggestions & Voting Closed";
-                    if (elements.nameSuggestion) {
-                        elements.nameSuggestion.disabled = true;
-                        elements.nameSuggestion.placeholder = "Ceremony approaching...";
-                    }
-                    if (elements.submitSuggestion) {
-                        elements.submitSuggestion.disabled = true;
-                    }
-                } else {
-                    if (elements.suggestionText) elements.suggestionText.textContent = "Or suggest a beautiful name...";
-                    if (elements.nameSuggestion) {
-                        elements.nameSuggestion.disabled = false;
-                        elements.nameSuggestion.placeholder = "Enter name suggestion...";
-                    }
-                    if (elements.submitSuggestion) {
-                        elements.submitSuggestion.disabled = false;
-                    }
+            // 2. Conditionally show Custom Suggestion Box (> 2 days)
+            if (votingActive) {
+                if (elements.suggestionContainer) {
+                    elements.suggestionContainer.style.display = 'flex';
+                    setTimeout(() => {
+                        elements.suggestionContainer.classList.add('show-suggestion');
+                    }, 100 + (units.length * 120) + 600);
                 }
-
-                setTimeout(() => {
-                    elements.suggestionContainer.classList.add('show-suggestion');
-                }, 100 + (units.length * 120) + 600);
+            } else {
+                if (elements.suggestionContainer) elements.suggestionContainer.style.display = 'none';
             }
             
             startTimer();
@@ -1756,8 +1715,10 @@
     (function init() {
       initCanvas();
       
+      // Render English Name
       renderName(CONFIG.ceremonyNameEn, elements.babyNameEn);
       
+      // Render Tamil Name
       if (elements.babyNameTa) {
           elements.babyNameTa.innerHTML = `<div class="letter" style="opacity:1; transform:scale(1); filter:blur(0); text-shadow: 0 1px 0 #b38728, 0 2px 0 #9f7622, 0 3px 0 #8c661c, 0 15px 25px rgba(0,0,0,0.8);">${CONFIG.ceremonyNameTa}</div>`;
       }
