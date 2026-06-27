@@ -482,7 +482,7 @@
         box-shadow: 0 10px 25px rgba(0,0,0,0.6);
         text-shadow: 0 2px 5px rgba(0,0,0,0.8);
         animation: floatCard 3s ease-in-out infinite alternate;
-        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease, opacity 0.3s ease;
     }
     
     /* Interactive Voting State */
@@ -497,6 +497,14 @@
     }
     .top-name-card.voting-enabled:active {
         transform: scale(0.95) !important;
+    }
+
+    /* Disabled Voting State */
+    .top-name-card.voting-disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+        animation: none; /* Stops the floating animation when disabled */
+        border-color: rgba(191, 149, 63, 0.2);
     }
 
     .top-name-card:nth-child(2) { animation-delay: 0.5s; border-color: var(--gold-1); }
@@ -529,6 +537,14 @@
         background-clip: text;
         animation: shine 4s linear infinite;
     }
+    
+    /* Disabled text state */
+    .suggestion-text.disabled-text {
+        background: none;
+        color: var(--muted);
+        animation: none;
+    }
+
     .suggestion-input-wrapper {
         display: flex;
         gap: 8px;
@@ -541,6 +557,13 @@
         box-shadow: 0 10px 20px rgba(0,0,0,0.5);
         transition: border-color 0.3s ease, box-shadow 0.3s ease, opacity 0.4s var(--ease-out-expo);
     }
+    
+    /* Disabled Wrapper State */
+    .suggestion-input-wrapper.disabled-wrapper {
+        opacity: 0.5;
+        pointer-events: none;
+    }
+
     .suggestion-input-wrapper:focus-within {
         border-color: var(--gold-1);
         box-shadow: 0 10px 30px rgba(191, 149, 63, 0.4);
@@ -923,7 +946,7 @@
 
     <div id="suggestion-container" class="fade-in-delayed">
         <p class="suggestion-text" id="suggestion-text">Or suggest a beautiful name...</p>
-        <div class="suggestion-input-wrapper">
+        <div class="suggestion-input-wrapper" id="suggestion-input-wrapper">
             <input type="text" id="name-suggestion" placeholder="Enter name suggestion..." maxlength="25" autocomplete="off" />
             <button id="submit-suggestion" aria-label="Submit Name">Send</button>
         </div>
@@ -1026,7 +1049,7 @@
       ceremonyNameEn: window.__ceremonyNameEn || 'A.NIVISHA',
       ceremonyNameTa: window.__ceremonyNameTa || 'அ. நிவிஷா',
       topNames: ['NIVISHA-நிவிஷா', 'NITHISHA-நித்திஷா', 'NALINA-நளினா'],
-      // Pass a valid Date string here, or set null to use demo timer.
+      // Pass a valid Date string here, or set null to use demo timer. 
       ceremonyEventDate: null,
       timerDemoSeconds: 8
     };
@@ -1061,7 +1084,7 @@
       topNamesFlex: qs('#top-names-flex'),
       suggestionContainer: qs('#suggestion-container'),
       suggestionText: qs('#suggestion-text'),
-      suggestionInputWrapper: qs('.suggestion-input-wrapper'),
+      suggestionInputWrapper: qs('#suggestion-input-wrapper'),
       nameSuggestion: qs('#name-suggestion'),
       submitSuggestion: qs('#submit-suggestion'),
       suggestionThankYou: qs('#suggestion-thank-you')
@@ -1290,16 +1313,24 @@
         elements.topNamesFlex.innerHTML = '';
         
         if (elements.topNamesTitle) {
-            elements.topNamesTitle.textContent = isVotingEnabled ? "Vote for your favorite name" : "Top Shortlisted Names";
+            elements.topNamesTitle.textContent = isVotingEnabled 
+                ? "Vote for your favorite name" 
+                : "Top Shortlisted Names (Voting Closed)";
         }
 
         CONFIG.topNames.forEach(name => {
             const el = document.createElement('div');
             el.className = 'top-name-card';
+            
             if (isVotingEnabled) {
                 el.classList.add('voting-enabled');
+                el.title = "Click to vote!";
                 el.addEventListener('click', () => submitDatabaseName(name));
+            } else {
+                el.classList.add('voting-disabled');
+                el.title = "Voting is closed within 48 hours of the event.";
             }
+            
             el.textContent = name;
             elements.topNamesFlex.appendChild(el);
         });
@@ -1309,7 +1340,10 @@
         if (!suggestionString || suggestionString.trim() === '') return;
         
         // Security check: Reject submission if the 2-day threshold has passed
-        if (!isVotingAllowed()) return; 
+        if (!isVotingAllowed()) {
+            console.warn("Voting and submissions are closed.");
+            return; 
+        }
         
         // Google Apps Script Web App URL
         const scriptURL = 'https://script.google.com/macros/s/AKfycbw_7UawCbLHx9bdcPnwqMaBUFyvUxWrRgiYYJuuec7wvgMreoiOilbtVOLRRbSsEpn2/exec';
@@ -1481,10 +1515,10 @@
                 setTimeout(() => u.classList.add('show-unit'), 100 + (i * 120));
             });
 
-            // ===== EXACT 2-DAY RULE LOGIC =====
+            // ===== EXACT 2-DAY RULE LOGIC ENFORCEMENT =====
             const votingActive = isVotingAllowed();
             
-            // 1. Render Top Names (Always visible, but interactivity is controlled securely)
+            // 1. Render Top Names (Interactivity explicitly bound by rule)
             renderTopNames(votingActive);
             if (elements.topNamesContainer) {
                 elements.topNamesContainer.style.display = 'flex';
@@ -1493,12 +1527,18 @@
                 }, 100 + (units.length * 120) + 300);
             }
             
-            // 2. Safely Render Suggestion Box with Disabled States
+            // 2. Visually Disable Suggestion Box
             if (elements.suggestionContainer) {
                 elements.suggestionContainer.style.display = 'flex';
                 
                 if (!votingActive) {
-                    if (elements.suggestionText) elements.suggestionText.textContent = "Suggestions & Voting Closed";
+                    if (elements.suggestionText) {
+                        elements.suggestionText.textContent = "Suggestions Closed";
+                        elements.suggestionText.classList.add('disabled-text');
+                    }
+                    if (elements.suggestionInputWrapper) {
+                        elements.suggestionInputWrapper.classList.add('disabled-wrapper');
+                    }
                     if (elements.nameSuggestion) {
                         elements.nameSuggestion.disabled = true;
                         elements.nameSuggestion.placeholder = "Ceremony approaching...";
@@ -1507,7 +1547,13 @@
                         elements.submitSuggestion.disabled = true;
                     }
                 } else {
-                    if (elements.suggestionText) elements.suggestionText.textContent = "Or suggest a beautiful name...";
+                    if (elements.suggestionText) {
+                        elements.suggestionText.textContent = "Or suggest a beautiful name...";
+                        elements.suggestionText.classList.remove('disabled-text');
+                    }
+                    if (elements.suggestionInputWrapper) {
+                        elements.suggestionInputWrapper.classList.remove('disabled-wrapper');
+                    }
                     if (elements.nameSuggestion) {
                         elements.nameSuggestion.disabled = false;
                         elements.nameSuggestion.placeholder = "Enter name suggestion...";
