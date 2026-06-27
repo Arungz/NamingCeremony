@@ -847,37 +847,6 @@
         50% { opacity: 1; transform: scale(1.2) rotate(20deg); text-shadow: 0 0 15px #fdf5c9; }
     }
 
-    /* ===== POST-REVEAL JOURNEY TIMER ===== */
-    #journey-timer-container {
-        margin-top: clamp(30px, 6vw, 50px);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        width: 100%;
-    }
-    #journey-title {
-        font-family: 'Cinzel', serif;
-        font-size: clamp(14px, 3vw, 24px);
-        margin-bottom: 15px;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        text-shadow: 0 5px 15px rgba(0,0,0,0.8);
-    }
-    .compact-timer {
-        max-width: 500px;
-        gap: clamp(4px, 1.5vw, 15px);
-        margin-bottom: 0;
-    }
-    .compact-timer .time-unit {
-        padding: clamp(8px, 2vw, 15px) 2px;
-        border-radius: 8px;
-        transform: none; /* Disable 3D flip for the bottom timer */
-        opacity: 1;
-    }
-    .compact-timer .time-unit div {
-        font-size: clamp(16px, 4vw, 45px);
-    }
-
     /* ===== HARDWARE ACCELERATED BALLOONS ===== */
     .balloon-anim {
         position: absolute;
@@ -1038,16 +1007,6 @@
             </g>
         </svg>
     </div>
-    
-    <div id="journey-timer-container" class="fade-in-delayed">
-        <h4 class="gold-shimmer" id="journey-title">Untold Journey Begins In</h4>
-        <div class="timer-box compact-timer">
-          <div class="time-unit"><div id="j-days">00</div><span>Days</span></div>
-          <div class="time-unit"><div id="j-hours">00</div><span>Hours</span></div>
-          <div class="time-unit"><div id="j-mins">00</div><span>Minutes</span></div>
-          <div class="time-unit"><div id="j-secs">00</div><span>Seconds</span></div>
-        </div>
-    </div>
   </div>
 
   <noscript>
@@ -1095,8 +1054,6 @@
       
       canvas: qs('#canvas-bg'),
       flashOverlay: qs('#flash-overlay'),
-      
-      journeyContainer: qs('#journey-timer-container'),
       
       // Top Names & Suggestion Elements
       topNamesContainer: qs('#top-names-container'),
@@ -1439,35 +1396,6 @@
       countdownInterval = setInterval(updateOnce, 1000);
     }
     
-    let journeyInterval = null;
-    function startJourneyTimer() {
-        if (journeyInterval) clearInterval(journeyInterval);
-        function updateJourney() {
-            const now = Date.now();
-            let diff = eventDate.getTime() - now;
-            const titleEl = qs('#journey-title');
-            
-            if (diff < 0) {
-                diff = Math.abs(diff); // Count UP
-                if(titleEl) titleEl.textContent = "The Journey Unfolded For";
-            } else {
-                if(titleEl) titleEl.textContent = "Untold Journey Begins In";
-            }
-            
-            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-            
-            safeSetText('j-days', days < 10 ? '0' + days : String(days));
-            safeSetText('j-hours', hours < 10 ? '0' + hours : String(hours));
-            safeSetText('j-mins', minutes < 10 ? '0' + minutes : String(minutes));
-            safeSetText('j-secs', seconds < 10 ? '0' + seconds : String(seconds));
-        }
-        updateJourney();
-        journeyInterval = setInterval(updateJourney, 1000);
-    }
-
     /* ===== BUG-FREE CINEMATIC COUNTDOWN ===== */
     function startFinalCountdown() {
       if (elements.countdownScreen) elements.countdownScreen.style.display = 'flex';
@@ -1652,11 +1580,6 @@
                       const babyGirl = qs('#baby-girl-container');
                       if(babyGirl) babyGirl.classList.add('slide-in');
                   }, 500);
-                  
-                  setTimeout(() => {
-                      if(elements.journeyContainer) elements.journeyContainer.classList.add('show');
-                      startJourneyTimer();
-                  }, 1500);
 
               }, totalDelay);
 
