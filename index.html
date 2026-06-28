@@ -624,37 +624,6 @@
         100% { opacity: 0; transform: scale(1.05) translateY(-10px); filter: blur(5px); }
     }
 
-    /* ===== FLAWLESS CINEMATIC COUNTDOWN SCREEN ===== */
-    #countdown-screen {
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      z-index: 60;
-      display: none;
-      justify-content: center;
-      align-items: center;
-      pointer-events: none;
-      overflow: hidden;
-    }
-    
-    .countdown-num {
-      position: absolute;
-      font-family: 'Cinzel', serif;
-      font-size: clamp(150px, 45vw, 400px);
-      font-weight: 800;
-      background: linear-gradient(180deg, var(--gold-2) 0%, var(--gold-1) 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      will-change: transform, opacity;
-      animation: epicCount 0.95s var(--ease-out-expo) forwards; 
-    }
-
-    @keyframes epicCount {
-      0% { transform: scale(0.2) translate3d(0,0,-200px); opacity: 0; }
-      30% { transform: scale(1) translate3d(0,0,0); opacity: 1; text-shadow: 0 0 50px rgba(191, 149, 63, 0.7); }
-      100% { transform: scale(2.5) translate3d(0,0,200px); opacity: 0; }
-    }
-
     /* Cinematic White Flash Transition */
     #flash-overlay {
         position: fixed;
@@ -720,6 +689,14 @@
     }
     @keyframes shimmerSweep {
         to { background-position: 200% center; }
+    }
+
+    .fade-text-out {
+        animation: textFadeOut 1s var(--ease-in-out-circ) forwards !important;
+    }
+    @keyframes textFadeOut {
+        0% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); filter: blur(0px); }
+        100% { opacity: 0; transform: translate3d(0, -20px, 0) scale(1.05); filter: blur(10px); }
     }
 
     /* BILINGUAL NAME SWAP CONTAINER */
@@ -955,8 +932,6 @@
     <div id="suggestion-thank-you">Thank you! Your suggestion has been received ✨</div>
   </div>
 
-  <div id="countdown-screen" aria-live="assertive" aria-atomic="true"></div>
-
   <div id="reveal-screen" class="scroll-screen" aria-hidden="true">
     <h3 id="reveal-subtitle">Welcome To The World</h3>
     
@@ -1068,7 +1043,6 @@
       gateRight: qs('#gate-right'),
       sceneContainer: qs('#scene-container'),
       timerScreen: qs('#timer-screen'),
-      countdownScreen: qs('#countdown-screen'),
       revealScreen: qs('#reveal-screen'),
       revealSubtitle: qs('#reveal-subtitle'),
       
@@ -1391,7 +1365,6 @@
 
     /* ===== TIMER LOGIC ===== */
     let countdownInterval = null;
-    let finalTimer = null;
     let eventDate = null; 
 
     function safeSetText(id, text) {
@@ -1412,7 +1385,13 @@
           }
           setTimeout(() => {
               if (elements.timerScreen) elements.timerScreen.style.display = 'none';
-              startFinalCountdown();
+              
+              if (elements.flashOverlay) {
+                  elements.flashOverlay.classList.add('flash');
+                  setTimeout(() => elements.flashOverlay.classList.remove('flash'), 100);
+              }
+              
+              triggerGrandReveal();
           }, 1000); 
           return;
         }
@@ -1428,40 +1407,6 @@
       }
       updateOnce();
       countdownInterval = setInterval(updateOnce, 1000);
-    }
-    
-    /* ===== BUG-FREE CINEMATIC COUNTDOWN ===== */
-    function startFinalCountdown() {
-      if (elements.countdownScreen) elements.countdownScreen.style.display = 'flex';
-      let count = 5;
-      
-      function popNumber(num) {
-          if (!elements.countdownScreen) return;
-          elements.countdownScreen.innerHTML = '';
-          const span = document.createElement('span');
-          span.className = 'countdown-num';
-          span.textContent = String(num);
-          elements.countdownScreen.appendChild(span);
-      }
-
-      popNumber(count);
-
-      finalTimer = setInterval(() => {
-        count--;
-        if (count > 0) {
-            popNumber(count);
-        } else {
-            clearInterval(finalTimer);
-            if (elements.countdownScreen) elements.countdownScreen.style.display = 'none';
-            
-            if (elements.flashOverlay) {
-                elements.flashOverlay.classList.add('flash');
-                setTimeout(() => elements.flashOverlay.classList.remove('flash'), 100);
-            }
-            
-            triggerGrandReveal();
-        }
-      }, 1000);
     }
 
     /* ===== ENTRANCE & REVEAL LOGIC ===== */
@@ -1504,7 +1449,11 @@
         const dist = eventDate.getTime() - now;
 
         if (dist <= 0) {
-            startFinalCountdown();
+            if (elements.flashOverlay) {
+                elements.flashOverlay.classList.add('flash');
+                setTimeout(() => elements.flashOverlay.classList.remove('flash'), 100);
+            }
+            triggerGrandReveal();
         } else {
             elements.timerScreen && (elements.timerScreen.style.display = 'flex');
             void elements.timerScreen.offsetWidth; 
@@ -1576,10 +1525,55 @@
     function triggerGrandReveal() {
       elements.revealScreen && (elements.revealScreen.style.display = 'flex');
       
-      if (elements.revealSubtitle) {
-          elements.revealSubtitle.classList.add('subtitle-show');
+      const subtitle = elements.revealSubtitle;
+      
+      // The sequence of messages to display
+      const blessings = [
+          "Blessings from the Gods ✨",
+          "Blessings from the Grandparents 🕊️",
+          "Blessings from the Parents 💖",
+          "Welcome To The World"
+      ];
+      
+      let currentStep = 0;
+
+      function playNextBlessing() {
+          if (!subtitle) return;
+          
+          // Update the text for the current step
+          subtitle.textContent = blessings[currentStep];
+          
+          // Reset animations by triggering a reflow
+          subtitle.classList.remove('subtitle-show', 'fade-text-out');
+          void subtitle.offsetWidth; 
+          
+          // Fade the text in
+          subtitle.classList.add('subtitle-show');
+
+          // If this is the last message ("Welcome To The World"), trigger the name reveal
+          if (currentStep === blessings.length - 1) {
+              setTimeout(revealNameSequence, 1500);
+          } else {
+              // Wait 2.5 seconds to read, then trigger the fade out
+              setTimeout(() => {
+                  subtitle.classList.remove('subtitle-show');
+                  subtitle.classList.add('fade-text-out');
+                  
+                  // Wait 1 second for the fade out to finish, then go to the next step
+                  setTimeout(() => {
+                      currentStep++;
+                      playNextBlessing();
+                  }, 1000);
+                  
+              }, 2500); 
+          }
       }
 
+      // Start the loop
+      playNextBlessing();
+    }
+
+    function revealNameSequence() {
       // Start revealing the English Name
       setTimeout(() => {
           const initialPart = qs('.initial-part', elements.babyNameEn);
@@ -1631,7 +1625,7 @@
 
           }, 1200); 
           
-      }, 1500);
+      }, 500); // Slight delay after "Welcome to the world" before the name pops up
     }
 
     /* ===== OPTIMIZED CANNON BLAST ===== */
